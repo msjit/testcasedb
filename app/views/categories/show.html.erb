@@ -1,0 +1,16 @@
+<p>
+  <b>Name:</b>
+  <%= @category.name %>
+</p>
+
+<p>
+  <b>Product:</b>
+  <%= @category.product.name if @category.product_id %>
+</p>
+
+<p>
+  <b>Category:</b>
+  <%= @category.category.name if @category.category_id %>
+</p>
+<%= link_to "Edit", edit_category_path(@category)  %>
+<a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>

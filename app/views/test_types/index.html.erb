@@ -1,0 +1,27 @@
+<h1>Test Types</h1>
+
+<div class="row-fluid">
+  <div class="span12">
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th>Name</th>
+        <th>Description</th>
+        <th></th>
+        <th></th>
+      </tr>
+
+    <% @test_types.each do |test_type| %>
+      <tr class="<%= cycle('odd', 'even') %>">
+        <td><%= link_to test_type.name, test_type %></td>
+        <td><%= test_type.description %></td>
+        <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_test_type_path(test_type) %></td>
+        <td><%= link_to '<i class="icon-remove"></i> Delete'.html_safe, test_type, :confirm => 'Are you sure?', :method => :delete %></td>
+      </tr>
+    <% end %>
+    </table>
+  </div>
+</div>
+
+<% if can? :create, @test_type %>
+  <div class="addLink"><%= link_to "New Test Type", new_test_type_path, :class => "btn btn-primary" %></div>
+<% end %>

@@ -1,0 +1,23 @@
+<div id="chart1" style="width: 100%; height: 600px;"></div>
+
+<script type="text/javascript" charset="utf-8">
+var data = [
+    { label: "Passed",  data: <%= release_progress_daily_series(@report.product_id, @report.version_id, "Passed", @report.start_date, @report.end_date) %>, color: "#21b82e"},
+    { label: "Failed",  data: <%= release_progress_daily_series(@report.product_id, @report.version_id, "Failed", @report.start_date, @report.end_date) %>, color: "#dc2d27"},
+    { label: "Blocked",  data: <%= release_progress_daily_series(@report.product_id, @report.version_id, "Blocked", @report.start_date, @report.end_date) %>, color: "#d8db27"},
+    { label: "Total",  data: <%= escape_javascript(release_progress_daily_total_cases_series(@report.product_id, @report.version_id, @report.start_date, @report.end_date)) %>, color: "#2159b8"}
+];
+  var options = {
+    xaxis: { mode: "time",minTickSize: [1, "day"],
+                    min: <%= @report.start_date.to_time.to_i * 1000 %>,
+                    max: <%= @report.end_date.to_time.to_i * 1000 %>
+    }
+  };
+  
+  // Add the Flot version string to the footer
+  $(function() {
+    $.plot("#chart1", data, options);
+  });
+
+
+</script>

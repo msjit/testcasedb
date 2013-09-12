@@ -1,0 +1,27 @@
+<div class='moduleHeader'>Steps</div>
+<div class='module'>
+  <div id="stepHeader">
+	  <div class='stepHandle'></div> 
+	  <div class="stepAction">Action</div>
+	  <div class="stepResult">Result</div>
+	</div>
+  <div id="steps">
+	  <% if @test_case.steps.count == 0 %>
+		  <div id="no_steps">Test case does not contain steps</div>
+		<% else %>
+  		<% @test_case.steps.order("step_number").each do |step| %>
+	  	  <div class='step' id='step_<%= step.id %>'>
+		  	  <div class='stepHandle'><span class="ui-icon ui-icon-arrowthick-2-n-s"></span></div> 
+          <div class='stepAction'><%= step.action %></div>
+           <div class='stepResult'><%= step.result %></div>
+           <div class='stepEdit'><%= link_to 'Edit', edit_test_case_step_path(@test_case, step), :remote => true %></div>
+  		    <div class='stepDelete'><%= link_to 'Delete', test_case_step_url(@test_case, step), :confirm => 'Are you sure?', :method => :delete, :remote => true %></div>
+	  	  </div>
+		<% end %>
+	<% end %>
+  </div>
+	<br/ >
+	<div id="addStep">
+	  <%= link_to 'Add Step', new_test_case_step_path(@test_case), :remote => true, :id => "add_step_link", :class => "btn" %>
+	</div>
+</div>

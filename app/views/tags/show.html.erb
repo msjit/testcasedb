@@ -1,0 +1,21 @@
+<h1>Tag: <%= @tag.name %></h1>
+
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Tag Overview</legend>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td class="title">Name</td>
+          <td><%= @tag.name %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="addLink">
+  <%= link_to "Edit", edit_tag_path(@tag), :class => "btn btn-primary"  %>
+  <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+</div>
+

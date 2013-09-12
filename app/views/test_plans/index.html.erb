@@ -1,0 +1,26 @@
+<h1>Test Plans</h1>
+
+<%= form_tag test_plan_search_path, :method => 'get', :class => "form-search" do %>
+  <%= text_field_tag :search, params[:search], :placeholder => "Search", :class=>"search_text" %>
+  <button type="submit" class="btn btn-primary">
+    <i class="icon-search icon-white"></i> Search
+  </button>
+<% end %>
+
+
+<legend>Tree View</legend>
+<div id="treeView">
+ <% @products.each do |product| %>
+   <div class="treeParent" id='treeParent<%= product.id %>'>
+   
+	   <ul>
+	     <li><i class="icon-chevron-right"></i> <%= link_to product.name, list_test_plans_path(product.id), :remote => true, :class => 'treeLink' %>
+		 </ul>
+	 </div>
+ <% end %>
+
+</div> <!-- end treeView -->
+
+<% if can? :create, @test_plan %>
+  <div class="addLink"><%= link_to "New Test Plan", new_test_plan_path, :class => "btn btn-primary" %></div>
+<% end %>

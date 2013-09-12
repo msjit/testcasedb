@@ -1,0 +1,55 @@
+<h2>Task: <%= @task.name %></h2>
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Task Overview</legend>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td class="title">User</td>
+          <td><%= @task.user.first_name %> <%= @task.user.last_name %></td>
+        </tr>
+
+        <tr>
+          <td class="title">Task</td>
+          <td><%= (t :task_types)[@task.task] %></td>
+        </tr>
+
+        <tr>
+          <td class="title">Status</td>
+          <td><%= (t :task_status)[@task.status] %></td>
+        </tr>
+
+        <tr>
+          <td class="title">Description</td>
+          <td><%= @task.description %></td>
+        </tr>
+
+        <tr>
+          <td class="title">Due date</td>
+          <td><%= @task.due_date %></td>
+        </tr>
+
+        <tr>
+          <td class="title">Completion date</td>
+          <td><%= @task.completion_date %></td>
+        </tr>
+
+        <% if @task.assignment_id %>
+          <tr>
+            <td class="title">Test Execution Assignment</td>
+            <td><%= link_to "Assignment", @task.assignment %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="addLink">
+  <% if can? :update, Task %>
+    <%= link_to "Edit", edit_task_path(@task), :class => "btn btn-primary"  %>
+  <% end %>
+  <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+</div>
+
+<%= render 'comments' %>

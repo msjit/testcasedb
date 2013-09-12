@@ -1,0 +1,9 @@
+<% # Remove the new category form %>
+$('#edit_category_<%= @category.id %>').slideUp(300).queue(function() {
+  $(this).remove(); 
+});
+
+<% # We make the change to treeLink and expanded treeLink as either could occur %>
+$('#treeChild<%= @category.id %>').children(".treeLink").text('<%= escape_javascript(@category.name) %>');
+$('#treeChild<%= @category.id %>').children(".expandedTreeLink").text('<%= escape_javascript(@category.name) %>');
+$('#treeChild<%= @category.id %>').toggle();

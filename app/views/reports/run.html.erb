@@ -1,0 +1,25 @@
+<h1>Report: <%= @report.report_type %></h1>
+<% case %>
+<% when @report.report_type == "System Status" %>
+  <%= render 'system_status' %>
+<% when @report.report_type == "Release Current State" %>
+  <%= render 'release_current_state' %>
+  <% when @report.report_type == "Release Current State - By User" %>
+    <%= render 'release_current_state_by_user' %>
+<% when @report.report_type == "Release Progress - Daily" %>
+  <%= render 'release_progress_daily' %>
+<% when @report.report_type == "Compare Release Results" %>
+  <%= render 'compare_release_results' %>
+<% when @report.report_type == "Compare Release Results - Detailed" %>
+  <%= render 'compare_release_results_detailed' %>
+<% when @report.report_type == "Test Cases without Steps" %>
+  <%= render 'test_cases_without_steps' %>
+<% when @report.report_type == "Open Tasks" %>
+  <%= render 'open_tasks' %>
+<% when @report.report_type == "Release Bug Report" %>
+  <%= render 'release_bug_report' %>
+<% end %>
+
+<br/>
+<a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+<br/><br/>

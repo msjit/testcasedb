@@ -1,0 +1,250 @@
+$body-background: #e5e5e5;
+$header-background: #1f3452;
+$header-highlight: #2d4c77;
+$footer-background: #1f3452;
+$header-color: #fff;
+$footer-color: #fff;
+$header-hover: #bdcbdf;
+$legend-color: #1f3452;
+$tr-even: #fff;
+$tr-odd: #d7e0ed;
+
+div#container {
+  min-height: 100%;
+  position:relative;
+}
+
+
+html[xmlns] #nav {display: block;}
+* html #nav {height: 1%;}
+
+.clear {height: 34px; }
+
+/* Main content styles */
+div#content{ background: #ffffff; padding: 15px; margin: 15px; border: 1px solid #aaaaaa; -moz-border-radius: 10px; border-radius: 10px; height:100%}
+div#content h1 { font-size: 1.3em; border-bottom: 1px solid black; padding-bottom: 0px; margin-bottom: 5px;}
+/*div#content a:hover{ color: #000000;}*/
+div#content td{ padding-right: 15px;}
+div#content th{ padding-right: 10px; text-align: left;}
+
+/* Styling for home page */
+.leftColumn { float:left; width: 60%;}
+.rightColumn { float:right; vertical-align:top; width: 40%;}
+.clearfix {clear:both;}
+
+/* Styling for ajax alert */
+div#ajaxAlert{ display:none; background-color: #ffffaa; position: fixed; top: 0px; left: 50%; width:150px; margin: 0 0 0 -75px; padding: 2px 0 3px 0; z-index:1000; text-align: center; border: 2px solid #ffdd00;}
+
+/* General item styling */
+.addLink{margin:15px 0;}
+label {font-weight:bold;}
+.inactiveTextField{background-color: #eeeeee; color: #555555;}
+.hiddenActions{visibility:hidden}
+/* General module syling */
+.adminModule {width: 500px;margin-left: auto; margin-right: auto; background-color: #eeeeee; padding: 7px; margin: 5px 5px 20px 5px; border: solid #999999; -webkit-border-radius: 7px; -moz-border-radius: 7px; border-radius: 7px;}
+.adminModuleNode {width: 400px;margin-left: auto; margin-right: auto; padding: 7px; margin: 5px;}
+.moduleHeader{ padding-left: 15px; font-weight: bold;}
+textarea { white-space:pre-wrap;}
+.description { white-space:pre-wrap; padding-left: 10px;}
+
+/* Comment module */
+.commentModule {margin-left: auto; margin-right: auto; padding: 7px; margin: 5px 5px 20px 5px; border-top: solid #999999; border-bottom: solid #999999; }
+.commentTitle{ border-bottom: solid #1E90ff; padding-left:5px;}
+.commentTime { width: 200px; float:right; display:inline; font-size: 0.8em;}
+.comment{ padding: 5px 2px 20px 5px; white-space:pre-wrap;}
+
+/* Styling for sortable steps */
+#stepHeader { font-weight: bold; border-bottom: solid 2px #999999;}
+.step{ border-bottom: solid 1px #999999;}
+.step :hover{}
+.stepHandle { width: 15px; display: inline-block; cursor: move; vertical-align:top;}
+.stepNumber { width: 25px; display: inline-block; vertical-align:top;}
+.stepAction { width: 40%; display: inline-block; white-space:pre-wrap; vertical-align:top;}
+.stepResult { width: 40%; display: inline-block; white-space:pre-wrap; vertical-align:top;}
+.stepEdit { width: 6%; display: inline-block; vertical-align:top;}
+.stepDelete { width: 6%; display: inline-block; vertical-align:top;}
+.stepBlank { width: 15px; display: inline-block;}
+
+/* Styling for selected test cases */
+#caseHeader { font-weight: bold; border-bottom: solid 2px #999999;}
+.selectedCase{ border-bottom: solid 1px #999999;}
+.step {padding-top:7px;}
+.caseHandle { width: 15px; display: inline-block; cursor: move;}
+.caseProduct { width: 13%; display: inline-block; }
+.caseCategory { width: 15%; display: inline-block;}
+.caseName { width: 15%; display: inline-block;}
+.caseVersion { width: 7%; display: inline-block;}
+.caseDescription { width: 30%; display: inline-block;}
+.caseTags { width: 10%; display: inline-block;}
+.caseRemove { width: 5%; display: inline-block;}
+
+#addUpload{ background: #f0f0f0; padding: 20px 0 1px 10px;}
+
+/* Custom field styling */
+div.custom_field {padding: 5px 0;}
+
+table.front-page {
+  width: 100%;
+}
+
+/* Styling for the tree view */
+div#treeView { width: 97%; padding: 5px 5px 0px 5px;}
+div#treeView a{color: #2467c9;}
+div#treeView a:link{color: #2467c9;}
+div#treeView a:visited{ color: #2467c9;}
+div#treeView a:hover {color: #1E90ff; background-color: none; text-decoration:underline;}
+div#treeView a:active {color: #ff0000; background-color: none; }
+div#treeView img{vertical-align: top; width: 20px; height: 20px;}
+.treeHeader { background-color: #00aa00; width: 100%;}
+.treeHeader ul{  background-color: #00aaaa; list-style-type: none; }
+.treeHeader ul li{ display: inline; margin-left: 1px; padding-right: 50px; background-color: #ffffff}
+.treeParent { padding: 7px; margin: 5px; }
+.treeParent a{font-size: 1.3em; }
+.treeParent ul{  list-style-type: none; }
+.treeParent ul li{ display: inline; margin-left: 1px; padding-right: 5px; }
+.treeChild {padding: 7px 0px 7px 7px; margin: 5px 0px 5px 50px; border: none; }
+.treeNode { margin: 5px 0px 0px 0px}
+.treeNode a{font-size: 1em; }
+.treeForm { margin: 7px 0px 7px 20px;}
+.treeNoData { border: none; }
+.treeTable {width: 100%;}
+.treeTable a{font-size: 1em;}
+.treeTable td{ padding-right: 15px; }
+.treeTable td th{padding-left: 5px;}
+.treeTable tr{ border-bottom: 1px solid #000000;}
+td.treeTableCheck {width:8px;}
+tr.rowLink:hover{background: #FBE2AC; cursor: pointer;}
+.rectangle { width: 100%; margin-top: 3px; height: 2px; background: #cccccc; }
+
+/* Sortable tables*/
+.sortableHeader {background-color: #303030; color: #ffffff; border-bottom: solid 1px; border-top: solid 1px; padding: 0 2px 0 2px;}
+.sortableHeader a:link{color: #ffffff;}
+.sortableHeader a:visited{ color: #ffffff;}
+.sortableHeader a:hover{color: #d0d0d0;}
+.sortableHeader a:active {color: #ff0000; }
+.even {background-color: #eff8da;}
+.overdue {background-color: #FBBBAC;}
+.sortable_table {width: 100%; margin-bottom: 20px;}
+.sortable_table th {padding: 2px 0 2px 5px; text-align: left;}
+.sortable_table th .current {padding-right: 21px; background-repeat: no-repeat; background-position: right center;}
+.sortable_table th .asc {background-image: url('up.png'); }
+.sortable_table th .desc { background-image: url('down.png'); }
+.sortable_table td{padding-left: 5px;}
+.sortable_table img{padding: 3px 3px 0 3px;}
+.setting_name {width: 30%;}
+.setting_value {width: 30%;}
+.setting_edit {width: 30%;}
+/* pagination */
+.pagination {text-align: center;}
+
+td, th {padding: 4px;}
+/* Simple Sortabl tables JS sorts */
+th.type-int:hover{cursor: pointer;}
+th.type-string:hover{cursor: pointer;}
+th.type-float:hover{cursor: pointer;}
+th.type-int{text-decoration:underline}
+th.type-string{text-decoration:underline}
+th.type-float{text-decoration:underline}
+
+th.left {text-align: left;}
+/* Chosen items */
+#test_case_tag_ids { width: 450px;}
+#product_user_ids { width: 450px;}
+#user_product_ids { width: 450px;}
+
+.buffer {height:20px;}
+/* Scheduler calendar on devices */
+#calendarHolder {height: 450px; width:908px; margin:0; padding:0;}
+#calendarHeader {height: 20px; text-align:center; }
+#timeGrid {height:430px; overflow-x:scroll; }
+.calendarTitle {background: #555555; float: left; width: 119px; border-right: solid 1px #aaaaaa; color:#ffffff;}
+.calendarTimeTitle {background: #555555; float: left; width: 50px; border-right: solid 1px #aaaaaa;}
+.labelColumn {float: left; width: 50px;border-right: solid 1px #aaaaaa; background: #555555; color:#ffffff;}
+.calendarTimeLabel{width:50px; height:60px; border-bottom: solid 1px #dddddd;}
+.dayColumn {float: left; width: 119px;border-right: solid 1px #aaaaaa;}
+.calendarTimeSegment{height:60px; border-bottom: solid 1px #dddddd; position:relative; background: #ffffff;}
+.scheduledItem{width:117px; border: solid 1px #0000ff; color:#ff0000; background-color:#B2D1FF; font-size:0.8em;}
+
+/* Search text */
+.search_text {
+  border-spacing: 0px;
+  margin: 0px;
+  padding: 0px;
+  space: 0px;
+  vertical-align: middle;
+  font-size: 1.1em;
+}
+
+/* Firefox button height fix */
+.btn { line-height:normal!important; }
+
+td.title {
+  background: #eeeeee;
+  font-weight: bold;
+  width: 200px;
+  color: #333;
+}
+legend.show {
+  margin-bottom: 0;
+}
+
+legend {
+  color: #96c924;
+  font-weight: bold;
+  
+  /* IE10 Consumer Preview */ 
+  background-image: -ms-linear-gradient(top, #FFFFFF 0%, #EEEEEE 100%);
+
+  /* Mozilla Firefox */ 
+  background-image: -moz-linear-gradient(top, #FFFFFF 0%, #EEEEEE 100%);
+
+  /* Opera */ 
+  background-image: -o-linear-gradient(top, #FFFFFF 0%, #EEEEEE 100%);
+
+  /* Webkit (Safari/Chrome 10) */ 
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FFFFFF), color-stop(1, #EEEEEE));
+
+  /* Webkit (Chrome 11+) */ 
+  background-image: -webkit-linear-gradient(top, #FFFFFF 0%, #EEEEEE 100%);
+
+  /* W3C Markup, IE10 Release Preview */ 
+  background-image: linear-gradient(to bottom, #FFFFFF 0%, #EEEEEE 100%);
+}
+
+table.front-page {
+  border-bottom: 1px solid #EFF8DA;
+}
+
+#wrap {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  /* Negative indent footer by it's height */
+  margin: 0 auto -60px;
+}
+
+/* Set the fixed height of the footer here */
+#push,
+#footer {
+  height: 60px;
+}
+#footer {
+  background-color: #f5f5f5;
+}
+
+/* Lastly, apply responsive CSS fixes as necessary */
+@media (max-width: 767px) {
+  #footer {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+#footer {padding: 10px;}
+
+p.credit {
+  text-align: center;
+  padding-top: 5px;
+}

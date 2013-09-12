@@ -1,0 +1,188 @@
+<h2>Test Case: <%= @test_case.name %></h2>
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Test Case Overview</legend>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td class="title">Product</td>
+          <td><%= @test_case.product.name %></td>
+        </tr>
+        <tr>
+          <td class="title">Category</td>
+          <td><%= @test_case.category.name %></td>
+        </tr>
+        <tr>
+          <td class="title">Test Type</td>
+          <td>
+            <% if @test_case.test_type %>
+              <%= @test_case.test_type.name%>
+            <% end %>
+          </td>
+        </tr>
+        <tr>
+          <td class="title">Version</td>
+          <td><%= @test_case.version %></td>
+        </tr>
+        <tr>
+          <td class="title">Deprecated</td>
+          <td><%= @test_case.deprecated ? "Yes" : "No" %></td>
+        </tr>
+        <tr>
+          <td class="title">Created</td>
+          <td><%= @test_case.created_at.strftime("%H:%M on %B %d, %Y ") %></td>
+        </tr>
+        <tr>
+          <td class="title">Created By</td>
+          <td>
+            <% unless @test_case.created_by.nil? %>
+              <%= @test_case.created_by.first_name + " " +  @test_case.created_by.last_name %>
+            <% end %>
+          </td>
+        </tr>
+        <tr>
+          <td class="title">Last Modified</td>
+          <td><%= @test_case.updated_at.strftime("%H:%M on %B %d, %Y ") %></td>
+        </tr>
+        <tr>
+          <td class="title">Last Modified By</td>
+          <td>
+            <% unless @test_case.modified_by.nil? %>
+              <%= @test_case.modified_by.first_name + " " +  @test_case.modified_by.last_name %>
+            <% end %>
+          </td>
+        </tr>
+        <tr>
+          <td class="title">Status</td>
+          <td><%= (t :item_status)[@test_case.status] %></td>
+        </tr>
+        <tr>
+          <td class="title">Description</td>
+          <td><%= @test_case.description %></td>
+        </tr>
+        <tr>
+          <td class="title">Tags</td>
+          <td><%=list_of_test_case_tags(@test_case.tags) %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if @test_case.custom_items.count > 0 %>
+  <div class="row-fluid">
+    <div class="span12">
+      <legend class="show">Custom Fields</legend>
+      <table class="table">
+        <tbody>
+          <% @test_case.custom_items.each do |custom_item|%>
+            <tr>
+              <td class="title"><%= custom_item.custom_field.field_name %></td>
+              <td>
+                <% if custom_item.custom_field.field_type == 'check_box' %>  
+                  <% if custom_item.value == '1' %>
+                    True
+                  <% else %>
+                    False
+                  <% end %>
+                <% else %>
+                  <%= custom_item.value %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div> <!-- end module div -->
+<% end %>
+
+<% if @test_case.test_type %>
+  <% if @test_case.test_type.name == 'jMeter'%>
+    <div class="row-fluid">
+      <div class="span12">
+        <legend>Target Files</legend>
+        <table>
+          <tr><th>File Name</th><th>Content Type</th></tr>
+          <% @test_case.test_case_targets.each do |target| %>
+            <tr><td><%= target.filename %></td><td><%= (t :content_types)[target.content] %></td></tr>
+          <% end %>
+       </table>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<div class="row-fluid">
+  <div class="span12">
+    <legend>Steps</legend>
+
+    <% if @test_case.steps.count == 0 %>
+      No steps
+    <% else %>
+    <div id="stepHeader">
+      <div class="stepNumber"></div>
+      <div class="stepAction">Action</div>
+      <div class="stepResult">Result</div>
+    </div>
+    <div id="steps">
+    	<% @test_case.steps.each do |step| %>
+    	  <div class='step' id='step_<%= step.id %>'>
+    		  <div class="stepNumber"><%= step.step_number %>.</div>
+          <div class='stepAction'><%= step.action %></div>
+          <div class='stepResult'><%= step.result %></div>
+    	  </div>
+    	<% end %>
+    </div>
+    <% end %>
+  </div>
+</div>
+<br/><br/>
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Other Versions of this Test Case</legend>
+    <% if @test_cases.count == 0 %>
+      There are no other versions of this test case
+    <% else %>
+    	<table class="table">
+    	  <thead>
+      	  <tr>
+      	    <th>Name</th>
+      	    <th>Description</th>
+      	    <th>Version</th>
+      	  </tr>
+      	</thead>
+      	<tbody>
+    	    <% @test_cases.each do |test_case| %>
+      	    <tr>
+      	      <td><%= link_to test_case.name, test_case %></td>
+      	      <td><%= test_case.description %></td>
+      	      <td><%= test_case.version %></td>
+      	    </tr>
+      	  <% end %>
+      	</tbody>
+    	</table>
+    <% end %>
+  </div>
+</div>
+
+<div class="addLink">
+  <% if can? :update, @test_case %>
+  <%= link_to "Edit", edit_test_case_path(@test_case), :class => "btn btn-primary"  %>
+  <% end %>
+  <% if can? :destroy, @test_case %>
+  <%= link_to "Delete", @test_case, :confirm => 'Are you sure? All related information will be deleted. This will impact existing results related to this test case.', :class => "btn btn-danger", :method => :delete  %>
+  <% end %>
+  <% if can? :create, @test_case %>
+  <%= link_to "New Version", create_new_test_case_version_path(@test_case), :class => "btn btn-success"  %>
+  <% end %>
+  <% if can? :create, @test_case %>
+  <%= link_to "Copy", copy_test_case_path(@test_case), :class => "btn btn-success"  %>
+  <% end %>
+
+  <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+</div>
+
+<%= render 'uploads' %>
+
+<%= render 'comments' %>

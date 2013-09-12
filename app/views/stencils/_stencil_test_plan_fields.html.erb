@@ -1,0 +1,34 @@
+<tr class="selectedPlan">    
+  <td class="planHandle"><i class="icon-resize-vertical"></i></td>
+  <% unless f.object.test_plan == nil %>
+    <td>
+      <div class="control-group">
+        <label class="control-label custom-width">Product</label>
+        <div class="controls custom-margin">
+          <%= select "product", "id_" + f.object.id.to_s, product_list, { :include_blank => 'Select a product', :selected => f.object.test_plan.product.id }, { :class => 'product_select' } %>
+        </div>
+      </div>
+    </td>
+    <td><%= f.input :test_plan_id, as: :select, collection: test_plan_list(f.object.test_plan.product.id) %></td>
+    <td><%= f.input :device_id, as: :select, collection: device_list %></td>
+    <td>
+      <%= f.input :plan_order, as: :hidden, input_html: { class: "plan_number"} %>
+      <%= link_to_remove_test_plans "Delete", f %>
+    </td>
+  <% else %>
+    <td>
+      <div class="control-group">
+        <label class="control-label custom-width">Product</label>
+        <div class="controls custom-margin">
+          <%= select "product", "new_id" + f.object.id.to_s, product_list, { :include_blank => 'Select a product' }, { :class => 'product_select' } %>
+        </div>
+      </div>
+    </td>
+    <td><%= f.input :test_plan_id, as: :select %></td>
+    <td><%= f.input :device_id,  as: :select, collection: device_list %></td>
+    <td>
+      <%= f.input :plan_order, as: :hidden, input_html: { class: "plan_number"} %>
+      <%= link_to_remove_test_plans "Delete", f %>
+    </td>
+  <% end %>
+</tr>

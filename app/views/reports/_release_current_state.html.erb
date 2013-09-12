@@ -1,0 +1,24 @@
+<div id="chart1" style="width: 100%; height: 400px;"></div>
+
+<script type="text/javascript" charset="utf-8">
+
+var data = [
+    { label: "Passed",  data: <%=  @tests_passed %>, color: "#21b82e"},
+    { label: "Failed",  data: <%=  @tests_failed %>, color: "#dc2d27"},
+    { label: "Blocked",  data: <%= @tests_blocked %>, color: "#d8db27"},
+    { label: "Not Run",  data: <%= @not_run %>, color: "#2159b8"}
+];
+
+$.plot($("#chart1"), data, 
+{
+        series: {
+            pie: { 
+                show: true
+            }
+        },
+        legend: {
+            show: false
+        }
+});
+
+</script>

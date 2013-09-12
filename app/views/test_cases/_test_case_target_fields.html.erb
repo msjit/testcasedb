@@ -1,0 +1,6 @@
+<tr>
+<td><div class="field"><%= f.text_field :filename %></div></td>
+<td><div class="field"><%= f.select :content, content_types_list %></div></td>
+
+<td><%= link_to_remove_test_case_targets "Delete", f %></td>
+</tr>

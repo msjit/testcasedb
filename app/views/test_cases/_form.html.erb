@@ -1,0 +1,138 @@
+<%= simple_form_for @test_case, :html => { :class => 'form-horizontal' } do |f| %>
+  <fieldset>
+    <legend>Test Case Overview</legend>
+    <%= f.input :name %>
+
+    <% if @test_case.category_id %>
+      <%= f.association :product, as: :select, collection: product_list %>
+    <% else %>
+      <%= f.association :product, as: :select, collection: product_list, include_blank: 'Select a product' %>
+    <% end %>
+
+     <div id="productCategories" class="field">
+        <%= render :partial => 'categories' %>
+     </div>
+
+	  <%= f.association :test_type, collection: test_type_list %>
+
+    <div class="control-group optional">
+      <label class="select optional control-label" for="test_case_version_id">Version</label>
+      <div class="controls">
+        <input type="text" value="<%= @test_case.version ? @test_case.version : "1"	 %>" size="50" name="test_case[version]" id="test_case_version" class="string required" disabled>
+      </div>
+    </div>
+
+    <div class="control-group optional">
+      <label class="select optional control-label" for="test_case_deprecated">Deprecated</label>
+      <div class="controls">
+        <input type="text" value="<%= @test_case.deprecated ? "Yes" : "No" %>" size="50" name="test_case[deprecated]" id="test_case_deprecated" class="string required" disabled>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="created_by">Created By</label>
+      <div class="controls">
+        <input type="text" id="created_by" value="<%= @test_case.created_by.nil? ? '' : @test_case.created_by.first_name + " " +  @test_case.created_by.last_name %>" disabled>
+      </div>
+    </div>
+      
+    <div class="control-group">
+      <label class="control-label" for="modified_by">Last Modified By</label>
+      <div class="controls">
+        <input type="text" id="modified_b" value="<% @test_case.modified_by.nil? ? '' : @test_case.modified_by.first_name + " " +  @test_case.modified_by.last_name %>" disabled>
+      </div>
+    </div>
+  
+    <%= f.input :status, as: :select, collection: item_statuses %>
+    <%= f.input :description, :input_html => { :rows => 5, :class => "input-xxlarge"} %>
+
+    <div class="control-group">
+      <label class="control-label" for="modified_by">Tags</label>
+      <div class="controls">
+        <%= f.collection_select :tag_ids, Tag.order(:name), :id, :name, {}, {:multiple => true} %>
+      </div>
+    </div>
+
+  
+  <% if CustomField.where(:item_type => 'test_case', :active => true).count > 0 %>
+    <legend>Custom Fields</legend>
+    <%= f.fields_for :custom_items do |custom_item|%>
+      <div class="control-group">
+        <%= custom_item.hidden_field :custom_field_id %>
+        <label class="control-label" for="modified_by"><%= CustomField.where(:id => custom_item.object.custom_field_id).first.field_name %></label>
+        <div class="controls">
+          <% field_type = CustomField.where(:id => custom_item.object.custom_field_id).first.field_type %>
+          <% if field_type == 'string' %>
+            <%= custom_item.text_field :value %>
+          <% elsif field_type == 'drop_down' %>
+            <%= custom_item.select :value, CustomField.where(:id => custom_item.object.custom_field_id).first.accepted_values.split(','), :include_blank => true %>
+          <% elsif field_type == 'check_box' %>
+            <%= custom_item.check_box :value %>
+          <% elsif field_type == 'number' %>
+            <%= custom_item.number_field :value, :step => 0.000001 %>
+          <% elsif field_type == 'radio_button' %>
+            <% CustomField.where(:id => custom_item.object.custom_field_id).first.accepted_values.split(',').each do |radio_value| %>
+              <label class="radio">
+                <%= custom_item.radio_button :value, radio_value %>
+                <%= custom_item.label :value, radio_value %>
+              </label>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+
+  <div class='moduleHeader' id="targetHeader" style="display: none">
+    <legend>Target Files</legend>
+    <div class='module' id="targetModule" style="display: none">
+      <table>
+  	    <tr><th class="left">File Name</th><th class="left">Content Type</th><th></th></tr>
+        <%= f.fields_for :test_case_targets do |builder| %>
+          <%= render "test_case_target_fields", :f => builder %>
+        <% end %>
+      </table>
+      <%= link_to_add_steps "Add Target File", f, :test_case_targets %>
+    </div>
+  </div>
+
+  <br/>
+  <legend>Steps</legend>
+  <div id="stepHeader">
+	  <div class='stepHandle'></div> 
+	  <div class="stepAction">Action</div>
+	  <div class="stepResult">Result</div>
+	</div>
+	<div id="steps" class="ui-sortable">
+  <%= f.fields_for :steps do |builder| %>
+    <%= render "step_fields", :f => builder %>
+  <% end %>  
+  
+  <%= link_to_add_steps "Add Step", f, :steps %>
+  </div>
+
+  <br/>
+  <div class="actions">  
+    <%= f.submit nil, :class => "btn btn-success"%>
+    <% unless @test_case.id %>
+      <%= f.submit "Save and Create Additional", :class => "btn btn-success" %>
+	  <% end %>
+	  <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+  </div>
+
+<% end %>
+
+<script>
+// when the #test case product field changes
+$("#test_case_product_id").change(function() {
+  // make a POST call and replace the content
+  var product = $('select#test_case_product_id :selected').val();
+  if(product == "") product="0";
+  jQuery.get('<%= jquery_test_case_category_update_url %>/' + product, function(data) { 
+    $("#productCategories").html(data);
+  })
+  return false;
+});
+
+</script>

@@ -1,0 +1,119 @@
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Assignment Overview</legend>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td class="title">Product</td>
+          <td><%= @assignment.product.name %></td>
+        </tr>
+        <tr>
+          <td class="title">Version</td>
+          <td><%= @assignment.version.version %></td>
+        </tr>
+
+        <tr>
+          <td class="title">Test plan</td>
+          <td>
+            <% if @assignment.test_plan %>
+              <%= link_to @assignment.test_plan.name + ' - Version ' + @assignment.test_plan.version.to_s, @assignment.test_plan %>
+            <% else %>
+              None
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="title">Stencil</td>
+          <td>
+            <% if @assignment.stencil %>
+              <%= link_to @assignment.stencil.name + ' - Version ' + @assignment.stencil.version.to_s, @assignment.stencil %>
+            <% else %>
+              None
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="title">Notes</td>
+          <td><%= @assignment.notes %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if @assignment.task != nil%>
+  <div class="row-fluid">
+    <div class="span12">
+      <legend class="show">Task Details</legend>
+      <table class="table">
+        <tbody>
+          <tr>
+            <td class="title">Name</td>
+            <td><%= link_to @assignment.task.name, task_path(@assignment.task)%></td>
+          </tr>
+          <tr>
+            <td class="title">Assigned User</td>
+            <td><%= @assignment.task.user.first_name %> <%= @assignment.task.user.last_name %></td>
+          </tr>
+          <tr>
+            <td class="title">Due Date</td>
+            <td><%= @assignment.task.due_date%></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>
+
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Test Cases</legend>
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th>Test Case</th>
+        <th>Description</th>
+        <th>Product</th>
+        <th>Category</th>
+        <th>Device</th>
+        <th>Result</th>
+        <th>Bugs</th>
+        <th></th>
+        <th></th>
+      </tr>
+
+      <% @results.each do |result| %>
+        <tr class="<%= cycle('odd', 'even') %>">
+      	  <td><%= result.test_case.name %></td>
+      	  <td><%= truncate(result.test_case.description, :length => 70) %></td>
+        	<td><%= result.test_case.product.name %></td>
+          <td><%= result.test_case.category.name %></td>
+          <td>
+          <% if result.device_id %>
+            <%= result.device.name %> 
+          <% end %>
+          </td>
+      	  <td><%= result.result %></td>
+      	  <td><%= result.bugs %></td>
+      	  <td><%= result.uploads.count > 0 ? image_tag("attach.png", :alt => "Attach") : ""%>
+    
+      	  <% if result.result %>
+      	    <td><%= link_to '<i class="icon-th"></i> View Result'.html_safe, result %></td>  
+      	  <% else %>
+      	    <% if can? :execute, Assignment %>
+              <td><%= link_to '<i class="icon-play"></i> Execute'.html_safe, edit_result_path(result) %></td>
+            <% end %>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+    
+</div>
+
+<div class="addLink">
+<% if can? :update, Assignment %>
+<%= link_to "Edit", edit_assignment_path(@assignment), :class => "btn btn-primary"  %>
+<% end %>
+<a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+</div>

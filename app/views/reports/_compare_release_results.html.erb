@@ -1,0 +1,93 @@
+<div id="chart1" style="width: 100%; height: 600px;"></div>
+
+<script type="text/javascript" charset="utf-8">
+var totalData = [
+  <% i = 0.8 %>
+  <% Version.where(:product_id => @report.product_id).each do |version| %>
+    <%= i == 0.8 ? '' : ','%> [<%= release_case_count(@report.product_id, version.id) %>, <%= i%>]
+    <% i = i + 1 %>
+  <% end %>
+];
+var passedData = [
+  <% i = 0.6 %>
+  <% Version.where(:product_id => @report.product_id).each do |version| %>
+    <%= i == 0.6 ? '' : ','%> [<%= release_result(@report.product_id, version.id, 'Passed') %>, <%= i%>]
+    <% i = i + 1 %>
+  <% end %>
+];
+var failedData = [
+  <% i = 0.4 %>
+  <% Version.where(:product_id => @report.product_id).each do |version| %>
+    <%= i == 0.4 ? '' : ','%> [<%= release_result(@report.product_id, version.id, 'Failed') %>, <%= i%>]
+    <% i = i + 1 %>
+  <% end %>
+];
+var blockedData =[
+  <% i = 0.2 %>
+  <% Version.where(:product_id => @report.product_id).each do |version| %>
+    <%= i == 0.2 ? '' : ','%> [<%= release_result(@report.product_id, version.id, 'Blocked') %>, <%= i%>]
+    <% i = i + 1 %>
+  <% end %>
+];
+        var dataSet = [{ label: "Total", data: totalData, color: "#2159b8" },
+                      { label: "Passed", data: passedData, color: "#21b82e" },
+                      { label: "Failed", data: failedData, color: "#dc2d27" },
+                      { label: "Blocked", data: blockedData, color: "#d8db27" }];
+        
+        var ticks = [
+          <% i = 0.5 %>
+          <% Version.where(:product_id => @report.product_id).collect(&:version).each do |v| %>
+            <%= i == 0.5 ? '' : ','%> [<%= i%>, "<%= v %>"]
+            <% i = i + 1 %>
+          <% end %>
+        ];
+ 
+        var options = {
+            series: {
+                bars: {
+                    show: true
+                }
+            },
+            bars: {
+                align: "center",
+                barWidth: 0.1,
+                horizontal: true,
+                fillColor: { colors: [{ opacity: 0.5 }, { opacity: 1}] },
+                lineWidth: 1
+            },
+            xaxis: {
+                axisLabel: "Number of Test Cases",
+                axisLabelUseCanvas: true,
+                axisLabelFontSizePixels: 12,
+                axisLabelFontFamily: 'Verdana, Arial',
+                axisLabelPadding: 10,
+                tickColor: "#5E5E5E",
+                color: "black"
+            },
+            yaxis: {
+                axisLabel: "Version",
+                axisLabelUseCanvas: true,
+                axisLabelFontSizePixels: 12,
+                axisLabelFontFamily: 'Verdana, Arial',
+                axisLabelPadding: 3,
+                tickColor: "#5E5E5E",
+                ticks: ticks,
+                color: "black"
+            },
+            legend: {
+                noColumns: 0,
+                labelBoxBorderColor: "#858585",
+                position: "ne"
+            },
+            grid: {
+                hoverable: true,
+                borderWidth: 2,
+                backgroundColor: { colors: ["#171717", "#4F4F4F"] }
+            }
+        };
+ 
+        $(document).ready(function () {
+            $.plot($("#chart1"), dataSet, options);
+        });
+</script>
+

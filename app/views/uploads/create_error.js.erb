@@ -1,0 +1,11 @@
+<%= remotipart_response do %>
+  $('#ajaxAlert').hide();
+  
+  var errorMessage = 'Unable to save attachment.\n\nError: ';
+  <% if @upload.errors.any? %>
+    <% @upload.errors.full_messages.each do |msg| %>
+      errorMessage += '<%= escape_javascript(msg) %>';
+    <% end %>
+  <% end %>
+  alert(errorMessage);
+<% end %>

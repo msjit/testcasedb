@@ -1,0 +1,23 @@
+<table class="sortable_table">
+  <tr class="sortableHeader">
+    <th>Test Plan</th>
+    <th>Test Case</th>
+    <th><%= @report.version.version %> Result</th>
+    <th><%= @report.version.version %> Comment</th>
+    <th><%= @report.second_version.version %> Result</th>
+    <th><%= @report.second_version.version %> Comment</th>
+
+  </tr>
+  <% test_cases_in_versions(@report.version, @report.second_version).each do |result|%>
+
+    <tr class="<%= cycle('odd', 'even') %>">
+      <td><%= result[:tp_name] %> - Version <%= result[:tp_version] %></td>
+      <td><%= link_to result[:name], result %> - Version <%= result[:tc_version] %></td>
+      <td><%= result[:v1_result] %></td>
+      <td><%= result[:v1_comment] %></td>
+      <td><%= result[:v2_result] %></td>
+      <td><%= result[:v2_comment] %></td>
+    </tr>
+  <% end %>
+</table>
+<br/>

@@ -1,0 +1,32 @@
+<h2>Edit Setting - <%= @setting.name %></h2>
+
+<div class="row-fluid">
+  <div class="span12">
+    <%= simple_form_for @setting, :html => { :class => 'form-horizontal' } do |f| %>
+
+      <div class="control-group">
+        <label class="control-label" for="inputPassword">Description</label>
+        <div class="controls">
+          <%= @setting.description %>  
+        </div>
+      </div>
+
+      <% if (@setting.value == 'Enabled') || (@setting.value == 'Disabled') %>
+        <%=  f.input :value, as: :boolean do %>
+          <%= f.check_box :value, {}, "Enabled", "Disabled" %>
+        <% end %>
+      <% elsif (@setting.name == 'Ticket System')%>
+        <%= f.input :value, as: :select, collection: ticket_systems_list %>
+      <% elsif (@setting.name == 'Ticket System Password') %>
+        <%= f.input :value, as: :password %>  
+      <% else %>
+        <%= f.input :value %>  
+      <% end %>
+ 
+      <div class="actions">
+        <%= f.submit nil, :class => "btn btn-success" %>
+        <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+      </div>
+    <% end %>
+  </div>
+</div>

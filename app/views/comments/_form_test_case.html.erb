@@ -1,0 +1,21 @@
+<%= form_for [@test_case, @new_comment], :remote => true do |f| %>
+  <% if @new_comment.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@new_comment.errors.count, "error") %> prohibited this step from being saved:</h2>
+
+      <ul>
+      <% @new_comment.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.text_area :comment, :rows => 1, :class => 'inactiveTextField  input-xxlarge', :title => "Add a comment." %>
+  </div>
+
+  <div class="hiddenActions">
+    <%= f.submit nil, :class => "btn btn-success"%>
+  </div>
+<% end %>

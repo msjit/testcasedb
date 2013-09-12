@@ -1,0 +1,39 @@
+<h1>Schedules</h1>
+
+<div class='module'>
+<table class="sortable_table">
+  <tr class="sortableHeader">
+    <th><%= sortable "devices.name", "Device" %></th>
+    <th><%= sortable "products.name", "Product" %></th>
+    <th><%= sortable "test_plans.name", "Test plan" %></th>
+    <th><%= sortable "start_time", "Start time" %></th>
+    <th></th>
+    <% if can? :update, Schedule %>
+      <th></th>
+    <% end %>
+    <% if can? :destroy, Schedule %>
+      <th></th>
+    <% end %>
+  </tr>
+
+<% @schedules.each do |schedule| %>
+  <tr class="<%= cycle('odd', 'even') %>">
+    <td><%= link_to schedule.device.name, schedule.device %></td>
+    <td><%= schedule.product.name %></td>
+    <td><%= link_to schedule.test_plan.name, schedule.test_plan %></td>
+    <td><%= schedule.start_time.hour %>:<%= schedule.start_time.min.to_s.rjust(2, '0') %></td>
+    <td><%= link_to '<i class="icon-th-list"></i> Show'.html_safe, schedule %></td>
+    <% if can? :update, Schedule %>
+      <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_schedule_path(schedule) %></td>
+    <% end %>
+    <% if can? :destroy, Schedule %>
+      <td><%= link_to '<i class="icon-remove"></i> Delete'.html_safe, schedule, :confirm => 'Are you sure? All related schedules will be deleted.', :method => :delete %></td>
+    <% end %>
+  </tr>
+<% end %>
+</table>
+</div>
+
+<% if can? :create, Schedule %>
+  <div class="addLink"><%= link_to "New Schedule", new_schedule_path, :class => "btn btn-primary" %></div>
+<% end %>

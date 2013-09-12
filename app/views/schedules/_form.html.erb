@@ -1,0 +1,52 @@
+<%= simple_form_for @schedule, :html => { :class => 'form-horizontal' } do |f| %>
+
+  <fieldset>
+    <legend>Schedule Overview</legend>
+    <%= f.association :device, as: :select, collection: devices_list, prompt: "Select a device" %>
+    <%= f.association :product, as: :select, collection: product_list, prompt: "Select a product" %>
+
+    <% # We render the test plan select here so we can select pre-selected values %>
+    <% # Test Plan field updates use the partial %>
+  	<% if !@schedule.product_id.blank? %>
+      <%= f.association :test_plan, collection: TestPlan.where(:product_id => @schedule.product_id).order(:name).collect {|p| [ p.name + " | Version " + p.version.to_s, p.id ]} %>
+    <% else %>
+      <%= f.association :test_plan, collection: [] %>
+  	<% end %>
+  
+    <legend>Schedule Start Time</legend>
+  	<p>Select which days this test plan should be executed and select the start time. Remember that the test plan will be delayed if there are test plans in progress on the device queue at the start time.</p>
+      <%= f.input :monday %>
+      <%= f.input :tuesday %>
+      <%= f.input :wednesday %>
+      <%= f.input :thursday %>
+      <%= f.input :friday %>
+      <%= f.input :saturday %>
+      <%= f.input :sunday %>
+      <%= f.input :start_time, :minute_step => 5 %>
+  
+      <legend>Email Recipients</legend>
+      <p>Select the users that will receive results for each run via e-mail</p>
+      <%= f.association :users, as: :select, collection: user_email_list %>
+
+  
+    <div class="actions">
+      <%= f.submit nil, :class => "btn btn-success"%>
+      <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+    
+    </div>
+  </fieldset>
+<% end %>
+
+
+<script>
+// when the #test result product field changes get a list of versions
+$("#schedule_product_id").change(function() {
+  // make a POST call and replace the content
+  var product = $('select#schedule_product_id :selected').val();
+  if(product == "") product="0";
+  jQuery.get('<%= jquery_schedule_test_plan_update_url %>/' + product, function(data) { 
+    $("#schedule_test_plan_id").empty().append(data);
+  })
+  return false;
+});
+</script>

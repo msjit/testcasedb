@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Case DB</title>
+  <%= stylesheet_link_tag    "application", :media => "all" %>
+  <%= javascript_include_tag "application" %>
+  <%= csrf_meta_tags %>
+</head>
+
+<body class="login">
+  <div class="container">
+    <% flash.each do |name, msg| %>
+      <% if msg.is_a?(String) %>
+        <div class="alert alert-<%= name == :notice ? "success" : "error" %>">
+          <a class="close" data-dismiss="alert">&#215;</a>
+          <%= content_tag :div, msg, :id => "flash_#{name}" %>
+        </div>
+      <% end %>
+    <% end %>
+    <!--[if lt IE 8]>
+		  <center><p>Your browser is not supported. Please use IE 8 and up or Firefox 3.6 and up.</p></center>
+		<![endif]-->
+		<div id="nojs">Please enable JavaScript before logging in to this application.</div>
+		
+    <%= simple_form_for @user_session, :html => { :class => 'form-signin' } do |f| %>
+      <h2 class="form-signin-heading"><%= image_tag "logo.png", :size => "214x35" %></h2>
+
+      <% if @user_session.errors.any? %>
+        <% @user_session.errors.full_messages.each do |msg| %>
+          <div class="alert alert-error %>">
+            <a class="close" data-dismiss="alert">&#215;</a>
+            <%= content_tag :div, msg, :id => "flash_error" %>
+          </div>
+        <% end %>
+      <% end %>
+      
+      <%= f.input :username, label: false, placeholder: "Username" %>
+      <%= f.input :password, label: false, placeholder: "Password" %>
+      <label class="checkbox">
+        <input type="checkbox" value="remember-me"> Remember me
+      </label>
+      <button class="btn btn-large btn-primary" type="submit">Sign in</button>
+    <% end %>
+
+  </div>
+
+  <div id="login-footer">Copyright &copy; 2012 - 2013 MSJ IT Services Inc. All rights reserved.</div>	
+  </div>
+  </div>
+  
+  <script>
+    $('input').placeholder();
+    $('#user_session_username').focus();
+  </script>
+  </body>
+</html>

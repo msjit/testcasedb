@@ -1,0 +1,68 @@
+<table class="front-page">
+<% if @histories.count == 0 %>
+  <tr>
+	  <td>Recent history is currently blank.</td>
+	</tr>
+<% else %>
+	<% @histories.each do |history| %>
+	  <tr class="<%= cycle("even", "odd") %>">
+		  <% begin %>
+		    <td><%= history.user.first_name %> <%= history.user.last_name %> <%= history_actions history.action %>
+	  		<% if history.test_case_id %>
+			    <% if history.action == 3 %>
+		  	    test case <%= history.test_case_id %>
+	  		  <% else %>
+			      test case <%= link_to history.test_case.name, history.test_case %>
+			    <% end %>
+		  	<% elsif history.test_plan_id %>
+	  		  <% if history.action == 3 %>
+			      test plan <%= history.test_plan_id %>
+			    <% else %>
+			      test plan <%= link_to history.test_plan.name, history.test_plan %>
+		  		<% end %>
+	      <% elsif history.result_id %>
+	        <% if history.action == 3 %>
+			      result <%= history.result_id %>
+			    <% else %>
+			      test case <%= link_to history.result.test_case.name, history.result %>
+			    <% end %>
+	      <% elsif history.assignment_id %>
+				  <% if history.action == 3 %>
+			      assignment <%= history.assignment_id %>
+			    <% else %>
+			      an assignment for <%= link_to history.assignment.test_plan.name, history.assignment %>
+			    <% end %>
+		    <% elsif history.product_id %>
+	        <% if history.action == 3 %>
+			      product <%= history.product_id %>
+			    <% else %>
+			      product <%= history.product.name %>
+			    <% end %>
+	      <% elsif history.category_id %>
+	        <% if history.action == 3 %>
+			      category <%= history.category_id %>
+			    <% else %>
+			      category <%= history.category.name %>
+			    <% end %>
+	      <% elsif history.task_id %>
+	        <% if history.action == 3 %>
+			      task <%= history.task_id %>
+			    <% else %>
+			      task <%= link_to history.task.name, history.task %>
+			    <% end %>
+  		  <% elsif history.stencil_id %>
+	        <% if history.action == 3 %>
+			      stencil <%= history.stencil_id %>
+			    <% else %>
+			      stencil <%= link_to history.stencil.name, history.stencil %>
+			    <% end %>
+	  		<% end %>
+      
+			<% rescue %>
+			  a deleted item
+			<% end %>
+			</td>
+	  </tr>
+	<% end %>
+<% end %>
+</table>

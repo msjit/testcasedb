@@ -1,0 +1,11 @@
+<% # Remove the normal view and place the form %>
+$("#treeChild<%= @category.id %>").toggle();
+$("#treeChild<%= @category.id %>").after('<%= escape_javascript(render "form") %>');
+
+<% # If cancel is clicked, remove the form and show the s tep again %>
+$("#edit_category_<%= @category.id %>").delegate('input[value ="Cancel"]', "click", function(){
+  $("#edit_category_<%= @category.id %>").remove();
+  $("#treeChild<%= @category.id %>").toggle();
+  $("#edit_category_<%= @category.id %>").undelegate('input[value ="Cancel"]', "click");
+  return false;
+});

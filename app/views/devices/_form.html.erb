@@ -1,0 +1,48 @@
+<div class="row-fluid">
+  <div class="span12">
+    <%= simple_form_for @device, :html => { :class => 'form-horizontal' } do |f| %>
+      <fieldset>
+        <legend>Device Overview</legend>
+        <%= f.input :name %>
+        <%= f.input :description, :input_html => { :rows => 5, :class => "input-xxlarge"}  %>
+        <%= f.input :active %>
+      </fieldset>
+      <% if CustomField.where(:item_type => 'device', :active => true).count > 0 %>
+        <fieldset>
+          <legend>Custom Fields</legend>
+
+          <%= f.fields_for :custom_items do |custom_item|%>
+            <div class="control-group">
+              <%= custom_item.hidden_field :custom_field_id %>
+              <label class="control-label">
+                <%= CustomField.where(:id => custom_item.object.custom_field_id).first.field_name %>
+              </label>
+              <div class="controls">
+                <% field_type = CustomField.where(:id => custom_item.object.custom_field_id).first.field_type %>
+                <% if field_type == 'string' %>
+                  <%= custom_item.text_field :value %>
+                <% elsif field_type == 'drop_down' %>
+                  <%= custom_item.select :value, CustomField.where(:id => custom_item.object.custom_field_id).
+                                  first.accepted_values.split(','), :include_blank => true %>
+                <% elsif field_type == 'check_box' %>
+                  <%= custom_item.check_box :value %>
+                <% elsif field_type == 'number' %>
+                  <%= custom_item.number_field :value, :step => 0.000001 %>
+                <% elsif field_type == 'radio_button' %>
+                  <% CustomField.where(:id => custom_item.object.custom_field_id).
+                                 first.accepted_values.split(',').each do |radio_value| %>
+                    <%= custom_item.radio_button :value, radio_value %> <%= custom_item.label :value, radio_value %>  
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </fieldset>
+      <% end %>
+  
+      <div class="actions">
+        <%= f.submit nil, :class => "btn btn-success" %>
+        <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+    <% end %>
+  </div>
+</div>

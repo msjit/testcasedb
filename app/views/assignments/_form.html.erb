@@ -1,0 +1,79 @@
+<%= simple_form_for @assignment, :html => { :class => 'form-horizontal' } do |f| %>
+  <fieldset>
+    <legend>Test Assignment Components</legend>
+    <% if !@assignment.id.blank? and !@assignment.product_id.blank? %>
+      <%= f.association :product, collection: product_list, disabled: true %>
+    <% else %>
+      <%= f.association :product, collection: product_list, prompt: 'Select a product' %>
+    <% end %>
+
+    <% # We render the version select here so we can select pre-selected values %>
+    <% # Version field updates use the partial %>
+    <div id="productVersions">
+      <% if !@assignment.id.blank? and !@assignment.product_id.blank? %>
+        <%= f.association :version, collection: version_list(@assignment.product_id), disabled: true %>
+      <% else %>
+        <%= f.association :version, collection: version_list(@assignment.product_id) %>
+      <% end %>
+  	</div>
+
+
+    <% # We render the test plan select here so we can select pre-selected values %>
+    <% # Test Plan field updates use the partial %>
+    <div id="productPlans">
+      <% if !@assignment.id.blank? and !@assignment.product_id.blank? %>
+        <%= f.association :test_plan, collection: test_plans_list(@assignment), disabled: true %>
+      <% else %>
+        <%= f.association :test_plan, collection: test_plans_list(@assignment), promt: ' ' %>
+      <% end %>
+  	</div>
+
+    <% # We render the test plan stencik select here so we can select pre-selected values %>
+    <% # Test Plan stencil field updates use the partial %>
+    <div id="productStencils">
+      <% if !@assignment.id.blank? and !@assignment.product_id.blank? %>
+  	    <%= f.association :stencil, collection: stencils_list(@assignment), disabled: true %>
+  	  <% else %>
+  	    <%= f.association :stencil, collection: stencils_list(@assignment), prompt: ' ' %>
+  	  <% end %>
+    </div>
+
+    <%= f.input :notes, :input_html => { :rows => 5, :class => "input-xxlarge"}%>    
+    <legend>Task Components</legend>
+
+    <%= f.simple_fields_for :task do |task| %>
+      <% if @assignment.task.id %>
+  	    <%= task.association :user, collection: @users_select %>
+  	  <% else %>
+  	    <%= task.association :user, collection: @users_select, prompt: 'Select a user' %>
+  	  <% end %>
+
+	    <%= task.input :due_date, as: :string %>
+	 <% end %>
+  </fieldset>
+  <div class="actions">
+    <%= f.submit nil, :class => "btn btn-success" %>
+    <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+  </div>
+  
+<% end %>
+
+<script>
+// when the #test result product field changes get a list of versions
+$("#assignment_product_id").change(function() {
+  // make a POST call and replace the content
+  var product = $('select#assignment_product_id :selected').val();
+  if(product == "") product="0";
+  jQuery.get('<%= jquery_assignment_version_update_url %>/' + product, function(data) { 
+    $("#assignment_version_id").empty().append(data);
+  })
+  jQuery.get('<%= jquery_assignment_test_plan_update_url %>/' + product, function(data) { 
+    $("#assignment_test_plan_id").empty().append(data);
+  })
+  jQuery.get('<%= jquery_assignment_stencil_update_url %>/' + product, function(data) { 
+    $("#assignment_stencil_id").empty().append(data);
+  })
+  
+  return false;
+});
+</script>

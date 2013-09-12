@@ -1,0 +1,28 @@
+<% if @tasks.count == 0%>
+  You do not have any pending tasks.
+<% else %>
+	<table class="front-page">
+	  <tr>
+		  <th class="left">Name</th>
+	    <th class="left">Task</th>
+	    <th class="left">Due date</th>
+	    <th class="left">Status</th>
+	  </tr>
+
+	<% taskDictionary = (t :task_types) %>
+	<% statusDictionary = (t :task_status) %>
+
+	<% @tasks.each do |task| %>
+	  <% if task.due_date < Date.today %>
+	    <tr class="overdue">
+	  <% else %>
+	    <tr class="<%= cycle("even", "odd") %>">
+	  <% end %>
+		  <td><%= link_to task.name, task %></td>
+	    <td><%= taskDictionary[task.task] %></td>
+	    <td><%= task.due_date %></td>
+	    <td><%= statusDictionary[task.status] %></td>
+	  </tr>
+	<% end %>
+	</table>
+<% end %>

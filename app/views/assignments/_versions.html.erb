@@ -1,0 +1,8 @@
+<% if !versions.blank? %>
+  <option value=""> </option>
+  <% versions.each do |version| %>
+    <option value="<%= version.id %>"><%= version.version %></option>
+  <% end %>
+<% else %>
+  <option value=""> </option>
+<% end %>

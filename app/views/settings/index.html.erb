@@ -1,0 +1,117 @@
+<h1>Settings</h1>
+
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">System</legend>
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th class="setting_name">Name</th>
+        <th class="setting_value">Value</th>
+        <th class="setting_edit"></th>
+      </tr>
+      <% for setting in @settings[:general] %>
+        <tr class="<%= cycle('odd', 'even') %> rowLink">
+    	    <td class="setting_name"><%= setting.name %></td>
+          <td class="setting_value"><%= setting.value %></td>
+          <td class="setting_value"><%= if setting.name != 'SystemID' then link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_setting_path(setting) end%></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Ticket System</legend>
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th class="setting_name">Name</th>
+        <th class="setting_value">Value</th>
+        <th class="setting_edit"></th>
+      </tr>
+      <% for setting in @settings[:ticket] %>
+        <tr class="<%= cycle('odd', 'even') %> rowLink">
+    	    <td class="setting_name"><%= setting.name %></td>
+    	    <% if (setting.name == 'Ticket System Password') %>
+    		    <td class="setting_value">###########</td>
+    		  <% else %>
+            <td class="setting_value"><%= setting.value %></td>
+          <% end %>
+          <td class="setting_value"><%= if setting.name != 'SystemID' then link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_setting_path(setting) end%></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Test Case Execution</legend>
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th class="setting_name">Name</th>
+        <th class="setting_value">Value</th>
+        <th class="setting_edit"></th>
+      </tr>
+      <% for setting in @settings[:results] %>
+        <tr class="<%= cycle('odd', 'even') %> rowLink">
+    	    <td class="setting_name"><%= setting.name %></td>
+          <td class="setting_value"><%= setting.value %></td>
+          <td class="setting_value"><%= if setting.name != 'SystemID' then link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_setting_path(setting) end%></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">jMeter</legend>
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th class="setting_name">Name</th>
+        <th class="setting_value">Value</th>
+        <th class="setting_edit"></th>
+      </tr>
+      <% for setting in @settings[:jmeter] %>
+        <tr class="<%= cycle('odd', 'even') %> rowLink">
+    	    <td class="setting_name"><%= setting.name %></td>
+    	    <% if (setting.name == 'jMeter Password') %>
+    		    <td class="setting_value">###########</td>
+    		  <% else %>
+            <td class="setting_value"><%= setting.value %></td>
+          <% end %>
+          <td class="setting_value"><%= if setting.name != 'SystemID' then link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_setting_path(setting) end%></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Sikuli</legend>
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th class="setting_name">Name</th>
+        <th class="setting_value">Value</th>
+        <th class="setting_edit"></th>
+      </tr>
+      <% for setting in @settings[:sikuli] %>
+        <tr class="<%= cycle('odd', 'even') %> rowLink">
+    	    <td class="setting_name"><%= setting.name %></td>
+    	    <% if (setting.name == 'Sikuli Password') %>
+    		    <td class="setting_value">###########</td>
+    		  <% else %>
+            <td class="setting_value"><%= setting.value %></td>
+          <% end %>
+          <td class="setting_value"><%= if setting.name != 'SystemID' then link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_setting_path(setting) end%></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+
+<div class="addLink">
+<a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+</div>

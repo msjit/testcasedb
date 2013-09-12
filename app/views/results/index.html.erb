@@ -1,0 +1,64 @@
+<h1>Execute Test Cases</h1>
+<form class="form-search">
+  Product: <%= select("product", "id", product_list, { :include_blank => true, :selected => @selected_product_id }) %>
+  &nbsp;&nbsp;&nbsp;
+  <div id="versionSelect" style="display: inline">Version: <%= select("version", "id", Version.where(:product_id => @selected_product_id).collect {|v| [v.version, v.id]}, { :include_blank => true, :selected => @selected_version_id }) %></div>
+  <input type="submit" value="Search" class="btn btn-primary" />
+</form>
+
+<div class="row-fluid">
+  <div class="span12">
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th><%= sortable "id", "Id" %></th>
+        <th><%= sortable "products.name", "Product" %></th>
+        <th><%= sortable "versions.version", "Version" %></th>
+        <th><%= sortable "test_plans.name", "Test Plan" %></th>
+        <th><%= sortable "stencils.name", "Stencil" %></th>
+        <th>Total Cases</th>
+        <th>Passed</th>
+        <th>Failed</th>
+        <th>Blocked</th>
+        <th></th>
+      </tr>
+
+    <% @assignments.each do |assignment| %>
+      <tr class="<%= cycle('odd', 'even') %>">
+        <td><%= assignment.id %></td>
+        <td><%= assignment.product.name %></td>
+        <td><%= assignment.version.version %></td>
+        <td>
+          <% if assignment.test_plan_id %> 
+            <%= assignment.test_plan.name %>
+          <% end %>
+        </td>
+        <td>
+          <% if assignment.stencil_id %> 
+            <%= assignment.stencil.name %>
+          <% end %>
+        </td>
+        <td><%= assignment.results.count() %></td>
+        <td><%= assignment.results.count(:conditions => "result = 'Passed'") %></td>
+        <td><%= assignment.results.count(:conditions => "result = 'Failed'") %></td>
+        <td><%= assignment.results.count(:conditions => "result = 'Blocked'") %></td>
+        <td><%= link_to '<i class="icon-play"></i> Execute'.html_safe, assignment %></td>
+      </tr>
+    <% end %>
+    </table>
+
+    <%= paginate @assignments %>
+  </div>
+</div>
+
+<script>
+// when the #test result product field changes get a list of versions
+$("#product_id").change(function() {
+  // make a POST call and replace the content
+  var product = $('select#product_id :selected').val();
+  if(product == "") product="0";
+  jQuery.get('<%= jquery_application_version_update_url %>/' + product, function(data) { 
+    $("#versionSelect").html(data);
+  })
+  return false;
+});
+</script>

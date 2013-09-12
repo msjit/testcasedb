@@ -1,0 +1,37 @@
+<h1>Listing Stencils</h1>
+
+<div class="row-fluid">
+  <div class="span12">
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th><%= sortable "id", "Id" %></th>
+        <th><%= sortable "products.name", "Product" %></th>
+        <th><%= sortable "name", "Name" %></th>
+        <th>Description</th>
+        <th><%= sortable "version", "Version" %></th>
+        <th></th>
+        <th></th>
+      </tr>
+
+    <% @stencils.each do |stencil| %>
+      <tr class="<%= cycle('odd', 'even') %> rowLink">
+        <td><%= stencil.id %></td>
+        <td><%= stencil.product.name %></td>
+        <td><%= link_to stencil.name, stencil %></td>
+        <td><%= stencil.description %></td>
+        <td><%= stencil.version %></td>
+        <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_stencil_path(stencil) %></td>
+        <td><%= link_to '<i class="icon-remove"></i> Delete'.html_safe, stencil, :confirm => 'Are you sure?', :method => :delete %></td>
+      </tr>
+    <% end %>
+    </table>
+
+    <%= paginate @stencils %>
+  </div>
+</div>
+
+<% if can? :create, Stencil %>
+  <div class="addLink"><%= link_to "New Stencil", new_stencil_path, :class => "btn btn-primary" %></div>
+<% end %>
+
+

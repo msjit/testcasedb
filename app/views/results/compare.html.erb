@@ -1,0 +1,69 @@
+<div id="chart1" style="width: 100%; height: 600px;"></div>
+<br/>
+<a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+<% categories = [] %>
+<% averages = [] %>
+<% std_devs = [] %>
+<% num_samples = [] %>
+
+  <% @result.result_statistics.each do |stat| %>
+    <% categories << stat.name %> 
+    <% averages << stat.mean %>
+    <% std_devs << stat.standard_deviation %>
+    <% num_samples << stat.n  %>
+  <% end %>
+
+<script type="text/javascript" charset="utf-8">
+  $(function () {
+    new Highcharts.Chart({
+      chart: { renderTo: 'chart1',
+        type: 'line',
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false
+		  },
+		  credits: {
+			    enabled: false
+			},
+	    title: { text: 'Comparing results' },
+			tooltip: {
+         formatter: function() {
+           return ''+  this.series.name + ': '+ this.y + ' ms';
+         }
+      },
+      xAxis: {
+      	categories: [
+      		<%= ("'" + @result_ids.join("', '") + "'").html_safe %>
+      	],
+      	title: { text: 'Result ID'}
+      },
+      yAxis: [{ // Primary yAxis
+      			title: {
+      				text: 'Response Time',
+      				style: {
+      					color: '#4572a7'
+      				}
+            },
+            min: 0
+      		}],
+			plotOptions: {
+				column: {
+        	pointPadding: 0.2,
+        	borderWidth: 0
+        }
+			},
+			series: [
+			  <% @stats.each do |key, values| %>
+			    {
+    			name: '<%= key %>',
+    			data: [
+    			<% values.each do |subkey, value| %> 
+    			  <%= value %>,
+    			<% end %>
+    			]
+    		  },
+    		<% end %>]
+    });
+  });
+</script>
+

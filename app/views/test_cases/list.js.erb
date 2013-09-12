@@ -1,0 +1,20 @@
+var newDivs = "<div class='rectangle'></div>";
+var categoryLink ="";
+
+<% if @categories.empty? %>
+  newDivs += '<div class="treeNoData">Categories have not been configured for this product</div>';
+<% else %>
+  <% @categories.each do |category| %>
+    <% # When we list categories we must generate the link to the category details %>
+    <% # To do this we need to access the name route feature. This was enabled in the categories module folder %>
+    categoryLink = '<a href="<%= list_test_case_category_children_path(category) %>" class="treeLink" data-remote="true"><%= category.name %></a>';
+    <% if can? :create, @test_case %>
+      newTestCaseLink = '<%= link_to image_tag("new_item.png", :alt => "Add Test Case", :title => "Add Test Case"), new_test_case_with_category_path(category.id) %>';
+    <% else %>
+      newTestCaseLink = '';
+    <% end %>
+    newDivs += '<div class="treeChild" id="treeChild<%= category.id.to_s %>"><i class="icon-chevron-right"></i> ' + categoryLink + ' ' + newTestCaseLink + '</div>';
+  <% end %>
+<% end %>
+
+$("#treeParent<%= @product.id %>").append(newDivs); 

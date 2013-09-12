@@ -1,0 +1,40 @@
+<div class="row-fluid">
+  <div class="span12">
+    <%= simple_form_for @user, :html => { :class => 'form-horizontal' } do |f| %>
+      <fieldset>
+        <legend>User Overview</legend>
+        <%= f.input :first_name %>
+        <%= f.input :last_name %>
+        <%= f.input :username %>
+        <%= f.input :email %>
+        <%= f.input :password %>
+        <%= f.input :password_confirmation %>
+    	  <%= f.input :time_zone, priority: /US/ %>
+    	  <%= f.input :role, as: :select, collection: user_roles.sort %>
+    	  <%= f.input :active %>
+
+      	<% # If this is a api user, show the user key %>
+      	<% if @user.role == 11%>
+      	  <p>
+      	    <label>Api Key</label>
+        	  <%= @user.single_access_token %>
+        	</p>	
+    	  <% end %>
+  
+        <legend>Authorized Products</legend>
+        <%= f.label :name, "Select products user is authorized to use" %><br/>
+        <%= f.collection_select :product_ids, list_of_products, :id, :name, {}, {:multiple => true} %>
+
+        <div class="form-actions">
+        	<% unless @user.id %>	
+            <%= f.submit "Create User", :class => "btn btn-success"%>
+        	  <%= f.submit "Save and Create Additional", :class => "btn btn-success"%>
+        	<% else %>
+        	  <%= f.submit nil, :class => "btn btn-success" %>
+          <% end %>
+          <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+        </div>
+      </fieldset>
+    <% end %>
+  </div>
+</div>

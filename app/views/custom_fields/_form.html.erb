@@ -1,0 +1,20 @@
+<div class="row-fluid">
+  <div class="span12">
+    <%= simple_form_for @custom_field, :html => { :class => 'form-horizontal' } do |f| %>
+      <fieldset>
+        <legend>Custom Field Overview</legend>
+        
+        <%= f.input :item_type, as: :select, collection: custom_field_item_types_list%>
+        <%= f.input :field_name %>
+        <%= f.input :field_type, as: :select, collection: custom_field_types_list %>
+        <%= f.input :accepted_values, :input_html => { :rows => 5, :class => "input-xxlarge"}, :hint => "For radio buttons and drop downs. Enter comma separated values. Ex. Option 1,Option 2,Option 3" %>
+
+        <%= f.input :active %>
+        <div class="actions">
+          <%= f.submit nil, :class => "btn btn-success" %>
+          <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+        </div>
+      </fieldset>
+    <% end %>
+  </div>
+</div>

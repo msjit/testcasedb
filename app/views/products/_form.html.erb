@@ -1,0 +1,26 @@
+<%= simple_form_for @product, :html => { :class => 'form-horizontal' } do |f| %>
+
+  <fieldset>
+    <legend class="">Product Overview</legend>
+  
+		<%= f.input :name %>
+		<%= f.input :description, :input_html => { :rows => 5, :class => "input-xxlarge"} %>
+
+    <div class="control-group">
+      <%= f.label :name, "Select authorized users" %>
+      <div class="controls">
+        <%= f.collection_select :user_ids, list_of_users, :id, :name_with_email, {}, {:multiple => true} %>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <% unless @product.id %>	
+        <%= f.submit nil, :class => "btn btn-success" %>
+        <%= f.submit "Save and Create Additional", :class => "btn btn-success" %>
+      <% else %>
+        <%= f.submit nil, :class => "btn btn-success"%>
+      <% end %>
+      <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+    </div>
+  </fieldset>
+<% end %>

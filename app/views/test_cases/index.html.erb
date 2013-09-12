@@ -1,0 +1,42 @@
+<h1>Test Cases</h1>
+
+<%= form_tag test_case_search_path, :method => 'get', :class => "form-search" do %>
+    <%= text_field_tag :search, params[:search], :placeholder => "Search", :class=>"search_text" %>
+    <button type="submit" class="btn btn-primary">
+      <i class="icon-search icon-white"></i> Search
+    </button>
+<% end %>
+
+
+<legend>Test Case Tree View</legend>
+<%= form_tag( {:action => "index", :format => :csv }, :method => 'GET') do %>
+  <div id="treeView">
+    <% if @products.count > 0 %>
+      <% @products.each do |product| %>
+        <div class="treeParent" id='treeParent<%= product.id %>'>
+   
+          <ul>
+      		  <li><i class="icon-chevron-right"></i> <%= link_to product.name, list_test_case_categories_path(product.id), :remote => true, :class => 'treeLink' %>
+          </ul>
+        </div>
+      <% end %>
+    <% else %>
+      <p>Please have a QA Manager or administrator create at least one product.</p>
+    <% end %>
+  </div>
+  
+  <div class="addLink">
+    <input type="submit" name="treenode_selectall" value="Select All Visible", class="btn btn-small btn-inverse" />
+    <input type="submit" name="treenode_deselectall" value="Deselect All Visible", class="btn btn-small btn-inverse" />
+  </div>
+  <div class="addLink">
+    <% if can? :create, @test_case %>
+      <%= link_to "New Test Case", new_test_case_path, :class => "btn btn-primary" %>
+      <%= link_to "Import Test Cases", import_new_test_case_path, :class => "btn btn-primary" %>
+    <% end %>
+    
+    <button type="submit" class="btn btn-primary">
+     Export Selected
+    </button>
+  </div>
+<% end %>

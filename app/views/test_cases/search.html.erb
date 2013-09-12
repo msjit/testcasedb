@@ -1,0 +1,45 @@
+<h1>Test Case Search Results</h1>
+
+<%= form_tag test_case_search_path, :method => 'get', :class => "form-search" do %>
+    <%= text_field_tag :search, params[:search], :placeholder => "Search", :class=>"search_text" %>
+    <button type="submit" class="btn btn-primary">
+      <i class="icon-search icon-white"></i> Search
+    </button>
+<% end %>
+
+<div class='module'>
+	<% unless @test_cases.empty? %>
+	  <table class="sortable_table">
+	    <thead>
+        <tr class="sortableHeader">
+          <th class="type-int">Id</th><th class="type-string">Name</th><th class="type-string">Product</th><th class="type-string">Category</th><th class="type-string">Description</th><th class="type-int">Version</th><th class="type-string">Tags</th>
+        </tr>
+      </thead>
+      <tbody>
+		  <% @test_cases.each do |testcase| %>
+		    <tr class="<%= cycle('odd', 'even') %> rowLink">
+			    <% test_case_name = testcase.deprecated ? "<del>".html_safe + testcase.name + "</del>".html_safe : testcase.name %>
+			    <td><%= testcase.id %></td>
+		      <td><%= link_to test_case_name, testcase %></td>
+		      <td><%= testcase.product.name %></td>
+		      <td><%= CategoryPathName(testcase.category_id) %></td>
+		      <td><%= testcase.description %></td>
+		      <td><%= testcase.version %></td>
+		      <td><%= list_of_test_case_tags(testcase.tags) %></td>
+		    </tr>
+		  <% end %>
+		  </tbody>
+		</table>
+  
+	<% else %>
+	  <p>No test cases matched the search. Please try again.
+	<% end %>
+</div>
+
+<div class="addLink">
+<a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+</div>
+
+<script>
+$('.sortable_table').simplesortable();
+</script>

@@ -1,0 +1,141 @@
+<h1>Stencil: <%= @stencil.name %></h1>
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Stencil Overview</legend>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td class="title">Product</td>
+          <td><%= @stencil.product.name %></td>
+        </tr>
+
+        <tr>
+          <td class="title">Version</td>
+          <td><%= @stencil.version %></td>
+        </tr>
+
+        <tr>
+          <td class="title">Deprecated</td>
+          <td><%= @stencil.deprecated ? "Yes" : "No" %></td>
+        </tr>
+
+        <tr>
+          <td class="title">Created</td>
+          <td><%= @stencil.created_at.strftime("%H:%M on %B %d, %Y ") %></td>
+        </tr>
+
+        <tr>
+          <td class="title">Created By</td>
+          <td>
+            <% unless @stencil.created_by.nil? %>
+              <%= @stencil.created_by.first_name + " " +  @stencil.created_by.last_name %>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="title">Last Modified</td>
+          <td><%= @stencil.updated_at.strftime("%H:%M on %B %d, %Y ") %></td>
+        </tr>
+
+        <tr>
+          <td class="title">Last Modified By</td>
+          <td>
+            <% unless @stencil.modified_by.nil? %>
+              <%= @stencil.modified_by.first_name + " " +  @stencil.modified_by.last_name %>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="title">Status</td>
+          <td><%= (t :item_status)[@stencil.status] %></td>
+        </tr>
+
+        <tr>
+          <td class="title">Description</td>
+          <td><%= @stencil.description %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Test Plans</legend>
+
+    <div>
+      <table class="sortable_table">
+        <tr class="sortableHeader">
+          <th>Product</th>
+          <th>Test Plan</th>
+          <th>Version</th>
+          <th>Description</th>
+          <th>Device</th>
+        </tr>
+        
+        <% @stencil.stencil_test_plans.each do |stencil_test_plan| %>
+          <tr class="<%= cycle("odd", "even") %>">
+            <td>
+              <%= stencil_test_plan.test_plan.product.name %>
+            </td>
+            <td>
+              <%= link_to stencil_test_plan.test_plan.name, stencil_test_plan.test_plan %>
+            </td>
+            <td>
+              <%= stencil_test_plan.test_plan.version %>
+            </td>
+            <td>
+              <%= stencil_test_plan.test_plan.description.truncate(50) %>
+            </td>
+            <td>
+              <%= stencil_test_plan.device.name %>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Other Versions of this Stencil</legend>
+    <% if @stencils.count == 0 %>
+      There are no other versions of this stencil
+    <% else %>
+    	<table class="treeTable">
+    	  <tr>
+    	    <th class="left">Name</th>
+    	    <th class="left">Description</th>
+    	    <th class="left">Version</th>
+    	  </tr>
+    	  <% @stencils.each do |stencil| %>
+    	    <tr>
+    	      <td><%= link_to stencil.name, stencil %></td>
+    	      <td><%= stencil.description %></td>
+    	      <td><%= stencil.version %></td>
+    	    </tr>
+    	  <% end %>
+    	</table>
+    <% end %>
+  </div>
+</div>
+
+<div class="addLink">
+  <% if can? :update, @stencil %>
+    <%= link_to "Edit", edit_stencil_path(@stencil), :class => "btn btn-primary"  %>
+  <% end %>
+  <% if can? :destroy, @stencil %>
+    <%= link_to "Delete", @stencil, :confirm => 'Are you sure? All related information will be deleted! This will impact existing results related to this test plan.', :class => "btn btn-danger", :method => :delete  %>
+  <% end %>
+  <% if can? :create, @stencil %>
+    <%= link_to "New Version", create_new_stencil_version_path(@stencil), :class => "btn btn-success"  %>
+  <% end %>
+  <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+  <% if can? :create, Assignment %>
+    <%= link_to "Assign", new_assignment_path(:stencil_id => @stencil.id), :class => "btn btn-primary" %>
+  <% end %>
+</div>

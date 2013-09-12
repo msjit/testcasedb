@@ -1,0 +1,28 @@
+<% tasks = list_open_tasks() %>
+
+<div class='module'>
+<% if tasks.count == 0 %>
+  No empty tasks found.
+<% else %>
+  <% statusDictionary = (t :task_status) %>
+	<table class="sortable_table">
+	  <tr class="sortableHeader">
+	    <th>Task Name</th>
+	    <th>Assignee</th>
+	    <th>Status</th>
+	    <th>Due Date</th>
+	    <th>Description</th>
+	  </tr>
+
+	<% tasks.each do |task| %>
+	  <tr class="<%= cycle('odd', 'even') %>">
+	    <td><%= link_to task.name, task %></td>
+	    <td><%= if task.user then task.user.first_name + " " + task.user.last_name end %></td>
+	    <td><%= statusDictionary[task.status] %></td>
+	    <td><%= task.due_date %></td>
+	    <td><%= truncate(task.description, :length => 80) %></td>
+	  </tr>
+	<% end %>
+	</table>
+<% end %>
+</div>

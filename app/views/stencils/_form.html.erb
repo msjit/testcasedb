@@ -1,0 +1,120 @@
+<div class="row-fluid">
+  <div class="span12">
+    <%= simple_form_for @stencil, :html => { :class => 'form-horizontal' } do |f| %>
+    <% if @stencil.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@stencil.errors.count, "error") %> prohibited this test_case from being saved:</h2>
+
+        <ul>
+        <% @stencil.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+      <fieldset>
+        <legend>Test Plan Stencil Overview</legend>
+        <%= f.input :name %>
+        <%= f.association :product, collection: product_list %>
+
+        <div class="control-group">
+          <label class="control-label">Version</label>
+          <div class="controls">
+            <input class="string" id="disabledInput1" type="text" placeholder="<%= @stencil.version ? @stencil.version : "1"	 %>" disabled>
+          </div>
+        </div>
+  
+        <div class="control-group">
+          <label class="control-label">Deprecated</label>
+          <div class="controls">
+            <input class="string" id="disabledInput" type="text" placeholder="<%= @stencil.deprecated ? "Yes" : "No" %>" disabled>
+          </div>
+        </div>
+
+        <%= f.input :description, :input_html => { :rows => 5, :class => "input-xxlarge"}   %>
+
+        <div class="control-group">
+          <label class="control-label">Created By</label>
+          <div class="controls">
+            <% unless @stencil.created_by.nil? %>
+              <input class="string" id="disabledInput2" type="text" placeholder="<%= @stencil.created_by.first_name + " " +  @stencil.created_by.last_name %>" disabled>
+            <% else %>
+              <input class="string" id="disabledInput2" type="text" placeholder=" " disabled>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Modified By</label>
+          <div class="controls">
+        		<% unless @stencil.modified_by.nil? %>
+              <input class="string" id="disabledInput3" type="text" placeholder="<%= @stencil.modified_by.first_name + " " +  @stencil.modified_by.last_name %>" disabled>
+            <% else %>
+              <input class="string" id="disabledInput3" type="text" placeholder=" " disabled>
+            <% end %>
+          </div>
+        </div>
+
+        <%= f.input :status, as: :select, collection: item_statuses %>
+
+      
+        <% # IF this is a new test plan matrix, allow them save or save and add cases %>
+        <% unless @stencil.id %>
+          <div class="actions">
+            <%= f.submit nil, :class => "btn btn-success" %>
+            <%= f.submit "Save and Add Test Plans", :class => "btn btn-success" %>
+          </div>
+
+        	<% # Otherwise, give full access to the form %>
+        <% else %>
+          <%= hidden_field_tag "selectedPlanOrder", "" %>
+          <legend>Selected Test Plans</legend>
+          <div id="stencil_plans" class="ui-sortable">
+            <table class="matrix">
+              <%= f.simple_fields_for :stencil_test_plans do |builder| %>
+                <%= render "stencil_test_plan_fields", :f => builder %>
+              <% end %>
+            </table>
+          </div>
+    
+          <%= link_to_add_test_plans "Add Test Plan", f, :stencil_test_plans %>
+
+          <div class="buffer">&nbsp;</div>
+          <div class="actions">
+            <%= f.submit nil, :class => "btn btn-success" %>
+            <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+          </div>
+        <% end %>
+      </fieldset>
+    <% end %>
+  </div>
+</div>
+
+<script>
+// when the #test result product field changes get a list of versions
+$(".product_select").change(function($this) {
+  // make a POST call and replace the content
+  var product = $(this).val();
+  var pContainer = this;
+  
+  if(product == "") product="0";
+  jQuery.get('<%= jquery_matrix_test_plan_update_url %>/' + product, function(data) {
+    $(pContainer).parent().parent().parent().next('td').find('select').empty().append(data);
+  })
+  return false;
+});
+
+$('[value="Add Test Plan"]').click(function() {
+  $('[name="product[new_id]"]').change(function($this) {
+    // make a POST call and replace the content
+    var product = $(this).val();
+    var pContainer = this;
+
+    if(product == "") product="0";
+    jQuery.get('<%= jquery_matrix_test_plan_update_url %>/' + product, function(data) {
+      $(pContainer).parent().parent().parent().next('td').find('select').empty().append(data);
+    })
+    return false;
+  });
+})
+</script>

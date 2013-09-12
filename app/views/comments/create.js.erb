@@ -1,0 +1,33 @@
+<% # If there were no comments, remove the no comment entry %>
+$('#no_comments').remove();
+
+<% # Remove the new comment form %>
+$('#new_comment').slideUp(300).queue(function() {
+  $(this).remove(); 
+});
+
+<% # Build the new comment %>
+comment = '<div class="commentTitle"><%= @comment.user.first_name %> <%= @comment.user.last_name %><div class="commentTime">';
+comment += '<%= @comment.created_at.strftime("%e %B %Y at %l:%M %p") %></div></div>';
+comment += '<div class="comment"><%= escape_javascript(@comment.comment) %></div>';
+
+<% # Add the new comment and highlight it %>
+$('#comments').append(comment);
+
+<% if @comment.test_case_id != nil %>
+$('#comments').append('<%= escape_javascript(render :partial => "form_test_case.html.erb") %>');
+<% elsif @comment.test_plan_id != nil %>
+$('#comments').append('<%= escape_javascript(render :partial => "form_test_plan.html.erb") %>');
+<% elsif @comment.task_id != nil %>
+$('#comments').append('<%= escape_javascript(render :partial => "form_task.html.erb") %>');
+<% end %>
+
+// Inactive field is used by comment fields that have not yes been clicked.
+$(".inactiveTextField").bind("focus", function(){ 
+  $(this).attr('rows', '4'); 
+  $(this).removeClass('inactiveTextField');
+  if ($(this).val() == 'Enter a new comment') {
+    $(this).val('');
+  }
+  $('.hiddenActions').addClass('actions').removeClass('hiddenActions');
+});

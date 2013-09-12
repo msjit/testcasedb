@@ -1,0 +1,22 @@
+<p>
+  Number of test cases that do not contain steps: 
+  <%= test_cases_without_steps_list(@report.product_id).count %>
+</p>
+<legend>List of test cases without steps</legend>
+<table class="sortable_table">
+  <tr class="sortableHeader">
+    <th>Test Case Name</th>
+    <th>Product</th>
+    <th>Category</th>
+    <th>Description</th>
+  </tr>
+<% test_cases_without_steps_list(@report.product_id).each do |test_case| %>
+  <tr class="<%= cycle('odd', 'even') %>">
+    <td><%= link_to test_case.name, test_case %></td>
+    <td><%= test_case.product.name %></td>
+    <td><%= test_case.category.name %></td>
+    <td><%= test_case.description %></td>
+  </tr>
+<% end %>
+</table>
+<br/>

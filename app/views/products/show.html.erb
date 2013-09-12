@@ -1,0 +1,38 @@
+<h1>Product: <%= @product.name %></h1>
+
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Product Overview</legend>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td class="title">Name</td>
+          <td><%= @product.name %></td>
+        </tr>
+        <tr>
+          <td class="title">Description</td>
+          <td><%= @product.description %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Authorized Users</legend>
+    <table class='sortable_table'>
+      <tr class="sortableHeader"><th>Last Name</th><th>First Name</th><th>Username</th></tr>
+      <% @product.users.order('last_name').each do |user| %>
+        <tr class="<%= cycle("even", "odd") %>">
+          <td><%= user.last_name%></td><td><%= user.first_name %></td><td><%= user.username %></td>
+        </tr>
+      <% end %>
+    </table>  
+  </div>
+</div>
+
+<div class="addLink">
+<%= link_to "Edit", edit_product_path(@product), :class => "btn btn-primary"  %>
+<a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+</div>

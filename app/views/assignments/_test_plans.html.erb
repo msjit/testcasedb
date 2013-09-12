@@ -1,0 +1,8 @@
+<% if !test_plans.blank? %>
+  <option value=""> </option>
+  <% test_plans.each do |test_plan| %>
+    <option value="<%= test_plan.id %>"><%= test_plan.name %> - Version <%= test_plan.version %></option>
+  <% end %>
+<% else %>
+  <option value=""> </option>
+<% end %>

@@ -1,0 +1,7 @@
+<div class="step">
+<div class='stepHandle'><span class="ui-icon ui-icon-arrowthick-2-n-s"></span></div>
+<div class='stepAction'><div class="field"><%= f.text_area :action, :class => "input-xlarge", :rows => 3 %></div></div>
+<div class='stepResult'><div class="field"><%= f.text_area :result, :class => "input-xlarge", :rows => 3 %></div></div>
+<%= f.hidden_field :step_number, :class =>"step_number"%>
+<%= link_to_remove_steps "Delete", f %><br />
+</div>

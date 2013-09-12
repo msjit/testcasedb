@@ -1,0 +1,8 @@
+<%= fields_for "version" do |f| %>
+    Version: 
+    <% if !versions.blank? %>
+      <%= f.select :id, options_from_collection_for_select(versions, 'id', 'version'), :include_blank => true %>
+    <% else %>
+      <%= f.select :id, [] %>
+	  <% end %>
+<% end %>

@@ -1,0 +1,42 @@
+<div class="row-fluid">
+  <div class="span12">
+    <legend>Comments</legend>
+    <div id='comments'>
+    	<% if @test_case.comments.count == 0 %>
+    	  <div id="no_comments">No comments</div>
+    	<% else %>
+
+    		<% @test_case.comments.each do |comment| %>
+    		  <div class="commentTitle">
+    		    <%= comment.user.first_name %> <%= comment.user.last_name %>
+    		    <div class="commentTime"><%= comment.created_at.strftime("%e %B %Y at %l:%M %p") %></div>
+    			</div>
+		  
+    			<div class="comment"><%= comment.comment %></div>
+    		<% end %>
+      <% end %>
+    </div><!-- end comments -->
+
+    <%= form_for([@test_case, @comment], :remote => true) do |f| %>
+      <% if @comment.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@comment.errors.count, "error") %> prohibited this step from being saved:</h2>
+
+          <ul>
+          <% @comment.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="field">
+        <%= f.text_area :comment, :cols => 80, :rows => 1, :class => 'inactiveTextField input-xxlarge', :placeholder => "Add a comment." %>
+      </div>
+
+      <div class="hiddenActions">
+        <%= f.submit nil, :class => "btn btn-success"%>
+      </div>
+    <% end %>
+  </div>
+</div><!-- end commentModule -->

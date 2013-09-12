@@ -1,0 +1,17 @@
+<% if @errors %>
+  $(".treeForm").remove();
+<% end %>
+
+$("#treeParent<%= @product.id %>").append("<div class='treeForm'><%= escape_javascript(render 'form') %></div>");
+
+$(".treeForm").delegate('input[value ="Cancel"]', "click", function(){
+  var thisID = $(this).parents().parents('div:first').slideUp().queue(function() {
+    $(this).remove(); 
+  });
+  
+  return false;
+});
+
+<% # This is frequently cached so we explicitly hide %>
+$("#ajaxAlert").hide();
+$("#treeParent<%= @product.id %>").find('#category_name').focus()

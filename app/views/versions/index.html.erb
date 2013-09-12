@@ -1,0 +1,36 @@
+<h1>Versions</h1>
+<div class="row-fluid">
+  <div class="span12">
+    <form class="form-search">
+      Product: <%= select("product", "id", product_list, { :include_blank => true, :selected => @selected_product_id }) %>
+      <button type="submit" class="btn btn-primary">
+        <i class="icon-search icon-white"></i> Search
+      </button>
+    </form>
+  
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th><%= sortable "version" %></th>
+        <th><%= sortable "description" %></th>
+        <th><%= sortable "products.name", "Product" %></th>
+        <th></th>
+        <th></th>
+      </tr>
+      <% @versions.each do |version| %>
+        <tr class="<%= cycle('odd', 'even') %>">
+          <td><%= link_to version.version, version %></td>
+          <td><%= version.description %></td>
+          <td><%= version.product.name %></td>
+          <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_version_path(version) %></td>
+          <td><%= link_to '<i class="icon-remove"></i> Delete'.html_safe, version, :confirm => 'Are you sure?', :method => :delete %></td>
+        </tr>
+      <% end %>
+    </table>
+
+    <%= paginate @versions %>
+  </div>
+</div>
+
+<% if can? :create, Version %>
+  <div class="addLink"><%= link_to "New Version", new_version_path, :class => "btn btn-primary" %></div>
+<% end %>

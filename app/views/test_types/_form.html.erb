@@ -1,0 +1,19 @@
+<div class="row-fluid">
+  <div class="span12">
+    <%= simple_form_for @test_type, :html => { :class => 'form-horizontal' } do |f| %>
+      <fieldset>
+        <legend>Test Type Overview</legend>
+      	<%= f.input :name %>
+      	<%= f.input :description, :input_html => { :rows => 5, :class => "input-xxlarge"}   %>
+
+        <div class="form-actions">
+      		<%= f.submit nil, :class => "btn btn-success" %>
+      		<% unless @test_type.id %>	
+      		  <%= f.submit "Save and Create Additional", :class => "btn btn-success" %>
+      		<% end %>
+      		<a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+        </div>
+      </fieldset>
+    <% end %>
+  </div>
+</div>

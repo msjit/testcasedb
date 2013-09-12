@@ -1,0 +1,7 @@
+if ($("#treeChild<%= @test_case.category_id %>").children(".rectangle").length > 0) {
+  
+addLink = '<%= link_to "Add Case", add_test_case_to_plan_path(@plan_id, @test_case), :class => "addCase", :remote => true %>';
+var caseName = '<%= @test_case.deprecated ? "<del>".html_safe + @test_case.name + "</del>".html_safe : @test_case.name %>';
+newDivs =  '<tr><td>' + caseName + '</td><td><%= escape_javascript(@test_case.description) %></td><td><%= @test_case.version %></td><td><%= escape_javascript(list_of_test_case_tags(@test_case.tags)) %></td><td>' + addLink + '</td></tr>';
+$("#treeChild<%= @test_case.category_id %>").children(".treeNode").children(".treeTable").children("tbody").append(newDivs);
+}

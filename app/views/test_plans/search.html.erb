@@ -1,0 +1,43 @@
+<h1>Test Plan Search Results</h1>
+
+<%= form_tag test_plan_search_path, :method => 'get', :class => "form-search" do %>
+  <%= text_field_tag :search, params[:search], :placeholder => "Search", :class=>"search_text" %>
+  <button type="submit" class="btn btn-primary">
+    <i class="icon-search icon-white"></i> Search
+  </button>
+<% end %>
+
+<div class='module'>
+	<% unless @test_plans.empty? %>
+	  <table class="sortable_table">
+	    <thead>
+        <tr class="sortableHeader">
+          <th class="type-int">Id</th><th class="type-string">Name</th><th class="type-string">Description</th><th class="type-int">Version</th>
+        </tr>
+      </thead>
+      <tbody>
+  
+		  <% @test_plans.each do |testplan| %>
+		    <tr class="<%= cycle('odd', 'even') %> rowLink">
+			    <% test_plan_name = testplan.deprecated ? "<del>".html_safe + testplan.name + "</del>".html_safe : testplan.name %>
+			    <td><%= testplan.id %></td>
+		      <td><%= link_to test_plan_name, testplan %></td>
+		      <td><%= testplan.description %></td>
+		      <td><%= testplan.version %></td>
+		    </tr>
+		  <% end %>
+		  </tbody>
+		</table>
+  
+	<% else %>
+	  <p>No test plans matched the search. Please try again.
+	<% end %>
+</div>
+
+<div class="addLink">
+<a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+</div>
+
+<script>
+$('.sortable_table').simplesortable();
+</script>

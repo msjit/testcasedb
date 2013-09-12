@@ -1,0 +1,19 @@
+<div class="row-fluid">
+  <div class="span12">
+    <%= simple_form_for @tag, :html => { :class => 'form-horizontal' } do |f| %>
+      <fieldset>
+        <legend>Tag Overview</legend>
+
+        <%= f.input :name %>
+
+    
+      <div class="actions">
+    	  <%= f.submit nil, :class => "btn btn-success"%>
+  	    <% unless @tag.id %>
+          <%= f.submit "Save and Create Additional", :class => "btn btn-success" %>
+    	  <% end %>
+    	  <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+      </div>
+    <% end %>
+  </fieldset>
+</div>

@@ -1,0 +1,70 @@
+html, body {height: 100%}
+body { background-color: #fff; color: #000; }
+
+body, p, ol, ul, td {
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size:   13px;
+  line-height: 18px;
+}
+
+pre {
+  background-color: #eee;
+  padding: 10px;
+  font-size: 11px;
+}
+
+a { color: #2467c9; }
+a:hover { color: #1E90ff; }
+
+div.field, div.actions, div#productVersions {
+  margin-bottom: 10px;
+}
+
+#notice {
+  color: green;
+  background-color: #eee;
+  border: solid green;
+  padding: 10px;
+  border-radius: 6 px;
+}
+
+.field_with_errors input{
+  border: 2px solid #c00;
+  display: inline;
+}
+
+.field_with_errors textarea{
+  border: 2px solid #c00;
+  display: inline;
+}
+
+.field_with_errors select{
+  border: 2px solid #c00;
+  display: inline;
+}
+
+#error_explanation {
+  width: 450px;
+  border: 2px solid red;
+  padding: 7px;
+  padding-bottom: 0;
+  margin-bottom: 20px;
+  background-color: #f0f0f0;
+}
+
+#error_explanation h2 {
+  text-align: left;
+  font-weight: bold;
+  padding: 5px 5px 5px 15px;
+  font-size: 12px;
+  margin: -7px;
+  margin-bottom: 0px;
+  background-color: #c00;
+  color: #fff;
+}
+
+#error_explanation ul li {
+  font-size: 12px;
+  list-style: square;
+  margin-left: 20px;
+}

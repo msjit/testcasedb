@@ -1,0 +1,69 @@
+var newDivs= '<div class="rectangle"></div>';
+var categoryLink = "";
+
+<% if @categories.empty? %>
+  <% # If there are no categories, we check if there are any test cases %>
+  <% # If there are test cases, they will be added after each of the sub-categories %>
+  <% if @testcases.empty? %>
+    newDivs += '<div class="treeNoData">Category does not contain test cases</div>';
+  <% end %>
+<% else %>
+  <% @categories.each do |category| %>
+    <% # When we list categories we must generate the link to the category details %>
+    <% # To do this we need to access the name route feature. This was enabled in the categories module folder %>
+    categoryLink = '<a href="<%= list_test_case_category_children_path(category) %>" class="treeLink" data-remote="true"><%= category.name %></a>';
+    <% if can? :create, @test_case %>
+      newTestCaseLink = '<%= link_to image_tag("new_item.png", :alt => "Add Test Case", :title => "Add Test Case"), new_test_case_with_category_path(category.id) %>';
+    <% else %>
+      newTestCaseLink = '';
+    <% end %>
+    newDivs += '<div class="treeChild" id="treeChild<%= category.id.to_s %>"><i class="icon-chevron-right"></i> ' + categoryLink + ' ' + newTestCaseLink + '</div>';
+  <% end %>
+<% end %>
+
+<% unless @testcases.empty? %>
+  var testCaseLink ="";
+  var editLink = "";
+  var caseName = "";
+  
+  newDivs += '<div class="treeNode"><table class="treeTable" id="table_<%= @category_id %>">';
+  newDivs += '<thead><tr class="sortableHeader"><th></th><th class="type-int">Id</th><th class="type-string">Name</th><th class="type-string">Description</th><th class="type-int">Version</th><th>Tags</th><th></th></tr></thead><tbody>';
+  
+  <% @testcases.each do |testcase| %>
+    caseName = '<%= testcase.deprecated ? "<del>".html_safe + testcase.name + "</del>".html_safe : testcase.name %>';
+    testCaseLink = '<a href="<%= test_case_path(testcase) %>">' + caseName + '</a>';
+    
+    <% if can? :update, testcase %>
+      editLink = '<a href="<%= edit_test_case_path(testcase) %>"><i class="icon-edit"></i> Edit</a>';
+    <% else %>
+      editLink = '';
+    <% end %>
+    
+    var tags ='<%= escape_javascript(list_of_test_case_tags(testcase.tags)) %>';
+
+    <% # .gsub below is used to strip newlines %>
+    newDivs +=  '<tr class="<%= cycle("even", "odd") %> rowLink"><td class="treeTableCheck"><%= check_box_tag testcase.id, "1", false, :class => "checkbox" %></td><td><%= testcase.id %><td>' + testCaseLink + '</td><td><%= escape_javascript(testcase.description) %></td><td><%= testcase.version %></td><td>' + tags + '</td><td>' + editLink + '</td></tr>';
+  <% end %>
+  newDivs += '</tbody></table></div>';
+<% end %>
+
+$("#treeChild<%= @category_id %>").append(newDivs);
+
+$('.rowLink').click( function(event) {
+  var $target = $(event.target);
+  if ( $target.is(".checkbox") )
+  {
+      return;
+  }
+  else if ( $target.is("a") )
+  {
+    return;
+  }
+  else
+  {
+    window.location = $(this).find('a').attr('href');
+  }
+});
+
+// Add code to sort table rows
+$('#table_<%= @category_id %>').simplesortable();

@@ -1,0 +1,19 @@
+newCase = "<div class='selectedCase' id='case_<%= @test_case.id %>'>\n";
+newCase +=  "<div class='caseHandle'><span class='ui-icon ui-icon-arrowthick-2-n-s'></span></div>\n";
+newCase +=  "<div class='caseProduct'> <%= @test_case.product.name %></div>\n";
+newCase +=  "<div class='caseCategory'><%= CategoryPathName(@test_case.category_id) %></div>\n";
+newCase +=  "<div class='caseName'><%= @test_case.deprecated ? '<del>'.html_safe + @test_case.name + '</del>'.html_safe : @test_case.name %></div>\n";
+newCase +=  "<div class='caseVersion'><%= @test_case.version %></div>\n";
+newCase +=  "<div class='caseDescription'><%= escape_javascript(@test_case.description) %></div>\n";
+newCase +=  "<div class='caseTags'><%= escape_javascript(list_of_test_case_tags(@test_case.tags)) %></div>\n";
+newCase +=  '<div class="caseRemove"><%= link_to "Remove", remove_test_case_from_plan_path(@plan_id, @test_case), :class => "removeCase", :remote => true %></div></div>';
+
+$('#selectedCases').append(newCase);
+
+$(".caseRemove").delegate("a", "click", function(){
+  $(this).parents('div.selectedCase:first').remove();
+  $('#selectedCases').trigger('sortupdate');
+});
+
+<% # We trigger the sort, otherwise we could miss location data if no sorting done %>
+$('#selectedCases').trigger('sortupdate');

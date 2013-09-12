@@ -1,0 +1,35 @@
+<% if @schedules.count === 0 %>
+  <p>There are no scheduled items for this device.</p>
+<% else %>  
+  <table class="sortable_table">
+    <tr class="sortableHeader">
+      <th>Product</th>
+      <th>Test plan</th>
+      <th>Start time</th>
+      <th>Mon</th>
+      <th>Tue</th>
+      <th>Wed</th>
+      <th>Thu</th>
+      <th>Fri</th>
+      <th>Sat</th>
+      <th>Sun</th>
+      <th></th>
+    </tr>
+  
+  <% @schedules.each do |schedule| %>
+    <tr class="<%= cycle('odd', 'even') %>">
+      <td><%= schedule.product.name %></td>
+      <td><%= link_to schedule.test_plan.name + ' - Version ' + schedule.test_plan.version.to_s, schedule.test_plan %></td>
+      <td><%= schedule.start_time.hour %>:<%= schedule.start_time.min.to_s.rjust(2, '0') %></td>
+      <td><%= schedule.monday == true ? 'Yes' : 'No' %></td>
+      <td><%= schedule.tuesday == true ? 'Yes' : 'No' %></td>
+      <td><%= schedule.wednesday == true ? 'Yes' : 'No' %></td>
+      <td><%= schedule.thursday == true ? 'Yes' : 'No' %></td>
+      <td><%= schedule.friday == true ? 'Yes' : 'No' %></td>
+      <td><%= schedule.saturday == true ? 'Yes' : 'No' %></td>
+      <td><%= schedule.sunday == true ? 'Yes' : 'No' %></td>
+      <td><%= link_to '<i class="icon-th-list"></i> Show'.html_safe, schedule %></td>
+    </tr>
+  <% end %>
+  </table>
+<% end %>

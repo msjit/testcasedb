@@ -1,0 +1,76 @@
+<h1>Assignments</h1>
+<form class="form-search">
+  Product: <%= select("product", "id", product_list, { :include_blank => true, :selected => @selected_product_id }) %>
+  &nbsp;&nbsp;&nbsp;
+  <div id="versionSelect" style="display: inline">Version: <%= select("version", "id", Version.where(:product_id => @selected_product_id).collect {|v| [v.version, v.id]}, { :include_blank => true, :selected => @selected_version_id }) %></div>
+  <button type="submit" class="btn btn-primary">
+    <i class="icon-search icon-white"></i> Search
+  </button>
+</form>
+
+<div class="row-fluid">
+  <div class="span12">
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th><%= sortable "id", "Id" %></th>
+        <th><%= sortable "products.name", "Product" %></th>
+        <th><%= sortable "versions.version", "Version" %></th>
+        <th><%= sortable "test_plans.name", "Test Plan" %></th>
+        <th><%= sortable "stencils.name", "Stencil" %></th>
+        <th><%= sortable "notes" %></th>
+        <th></th>
+        <% if can? :update, Assignment %>
+          <th></th>
+        <% end %>
+        <% if can? :destroy, Assignment %>
+          <th></th>
+        <% end %>
+      </tr>
+
+    <% @assignments.each do |assignment| %>
+    <tr class="<%= cycle('odd', 'even') %>">
+      <td><%= assignment.id %></td>
+      <td><%= assignment.product.name %></td>
+      <td><%= assignment.version.version %></td>
+      <td>
+        <% if assignment.test_plan %>
+          <%= assignment.test_plan.name %>
+        <% end %>
+      </td>
+      <td>
+        <% if assignment.stencil %>
+          <%= assignment.stencil.name %>
+        <% end %>
+      </td>
+      <td><%= assignment.notes %></td>
+      <td><%= link_to '<i class="icon-th-list"></i> Show'.html_safe, assignment %></td>
+      <% if can? :update, Assignment %>
+        <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_assignment_path(assignment) %></td>
+      <% end %>
+      <% if can? :destroy, Assignment %>
+        <td><%= link_to '<i class="icon-remove"></i> Delete'.html_safe, assignment, :confirm => 'Warning! This will delete all associated results. Are you sure you want to delete this assignment?', :method => :delete %></td>
+      <% end %>
+    </tr>
+    <% end %>
+    </table>
+
+    <%= paginate @assignments %>
+  </div>
+</div>
+
+<% if can? :create, Assignment %>
+  <div class="addLink"><%= link_to "New Assignment", new_assignment_path, :class => "btn btn-primary" %></div>
+<% end %>
+
+<script>
+// when the #test result product field changes get a list of versions
+$("#product_id").change(function() {
+  // make a POST call and replace the content
+  var product = $('select#product_id :selected').val();
+  if(product == "") product="0";
+  jQuery.get('<%= jquery_application_version_update_url %>/' + product, function(data) { 
+    $("#versionSelect").html(data);
+  })
+  return false;
+});
+</script>

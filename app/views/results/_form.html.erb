@@ -1,0 +1,94 @@
+<%= simple_form_for @result, :html => { :class => 'form-horizontal' } do |f| %>
+  <fieldset>
+    <legend class="show">Test Result Overview</legend>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td class="title">Test case</td>
+          <td><%= link_to @result.test_case.name + ' - Version ' + @result.test_case.version.to_s, @result.test_case %></td>
+        </tr>
+        <tr>
+          <td class="title">Product</td>
+          <td><%= @result.test_case.product.name %></td>
+        </tr>
+        <tr>
+          <td class="title">Category</td>
+          <td><%= @result.test_case.category.name %></td>
+        </tr>
+
+        <tr>
+          <td class="title">Assignment</td>
+          <td>
+            <% if @result.assignment.test_plan_id %>
+              <%= link_to 'Product: ' + @result.assignment.product.name + ' | Version: ' + @result.assignment.version.version + ' | Test Plan: ' + @result.assignment.test_plan.name, @result.assignment %>
+            <% else %>
+              <%= link_to 'Product: ' + @result.assignment.product.name + ' | Version: ' + @result.assignment.version.version + ' | Stencil: ' + @result.assignment.stencil.name, @result.assignment %>
+            <% end %>
+          </td>
+        </tr>
+        <tr>
+          <td class="title">Device</td>
+          <td>
+            <% if @result.device_id %>
+              <%= link_to @result.device.name, @result.device %>
+            <% else %>
+              None
+            <% end %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+	
+    <legend class="show">Test Case Steps</legend>
+
+    <% if @result.test_case.steps.empty? %>
+      <p>This test case does not contain any steps.</p>
+    <% else %> 
+    	<table class="table">
+    	  <thead>
+      	  <tr>
+      		  <th></th>
+      		  <th>Action</th>
+      		  <th>Result</th>
+      	  </tr>
+      	</thead>
+      	<tbody>
+        	<% @result.test_case.steps.order('step_number').each do |step| %>
+        	  <tr>
+        		  <td><%= step.step_number %>.</td>
+        		  <td><%= step.action %></td>
+        		  <td><%= step.result %></td>
+        	  </tr>
+        	<% end %>
+        </tbody>
+    	</table>
+    <% end %>
+
+    <legend>Result</legend>
+
+    <p>
+	    <% if @result.errors.empty? and @result.result %>
+        <%= @result.result %>
+      <% else %>
+  	    <% ["Passed", "Failed", "Blocked"].each do |resultOption|%>
+  	      <label class="checkbox inline">
+  	        <%= f.radio_button :result, resultOption %> <%= resultOption %>
+  	      </label>
+  	    <% end %>
+  	  <% end %>
+    </p>
+    <br>
+
+    <legend>Additional Information</legend>
+    <%= f.input :bugs, :hint => "(bugs should be separated by commas without spaces. ex. 123,456)" %>    
+    <%= f.input :note, :input_html => { :rows => 5, :class => "input-xxlarge"} %>
+
+  </fieldsest>
+  
+  <div class="actions">
+    <%= f.submit "Save and View", :class => "btn btn-success" %>
+    <%= f.submit "Save and Execute Next", :class => "btn btn-success" %>
+    <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+  </div>
+<% end %>
+

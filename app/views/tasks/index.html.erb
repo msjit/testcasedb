@@ -1,0 +1,57 @@
+<h1>Tasks</h1>
+
+<div class="row-fluid">
+  <div class="span12">
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+    	  <th><%= sortable "name" %></th>
+        <th><%= sortable "user_id", "User" %></th>
+        <th><%= sortable "task" %></th>
+        <th><%= sortable "description" %></th>
+        <th><%= sortable "due_date", "Due Date" %></th>
+        <th><%= sortable "completion_date", "Completed" %></th>
+        <th><%= sortable "status" %></th>
+        <% if can? :update, Task %>
+          <th></th>
+        <% end %>
+        <% if can? :destroy, Task %>
+          <th></th>
+        <% end %>
+      </tr>
+
+      <% taskDictionary = (t :task_types) %>
+      <% statusDictionary = (t :task_status) %>
+
+      <% @tasks.each do |task| %>
+        <% if task.due_date < Date.today and task.status != 127 %>
+          <tr class="overdue">
+        <% else %>
+          <tr class="<%= cycle('odd', 'even') %>">
+        <% end %>
+      	  <td><%= link_to task.name, task %></td>
+          <td><%= task.user.first_name %> <%= task.user.last_name %></td>
+          <td><%= taskDictionary[task.task] %></td>
+          <td><%= task.description %></td>
+          <td><%= task.due_date %></td>
+          <td><%= task.completion_date %></td>
+          <td><%= statusDictionary[task.status] %></td>
+          <% if can? :update, Task %>
+            <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_task_path(task) %></td>
+          <% end %>
+          <% if can? :destroy, Task %>
+            <td><%= link_to '<i class="icon-remove"></i> Delete'.html_safe, task, :confirm => 'Are you sure?', :method => :delete %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+
+  <%= paginate @tasks %>
+
+
+    <% if can? :create, Task %>
+      <div class="addLink"><%= link_to "New Task", new_task_path, :class => "btn btn-primary" %>
+    	<%= link_to "My Tasks", my_tasks_path, :class => "btn btn-primary" %> 
+    	<%= link_to "All Tasks", tasks_path, :class => "btn btn-primary" %> </div>
+    <% end %>
+  </div>
+</div>

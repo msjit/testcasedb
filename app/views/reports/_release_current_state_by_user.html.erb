@@ -1,0 +1,21 @@
+<table class="sortable_table">
+  <tr class="sortableHeader">
+    <th>User</th>
+    <th>Passed</th>
+    <th>Failed</th>
+    <th>Blocked</th>
+    <th>Not Run</th>
+  </tr>
+
+
+<% @users.each do |user| %>
+  <tr class="<%= cycle('odd', 'even') %>">
+    <% result = user_bug_count(user.id, @report.product_id, @report.version_id) %>
+    <td><%= user.first_name + ' ' + user.last_name %></td>
+    <td><%= result["passed"] %></td>
+    <td><%= result["failed"] %></td>
+    <td><%= result["blocked"] %></td>
+    <td><%= result["not_run"] %></td>
+  </tr>
+<% end %>
+</table>

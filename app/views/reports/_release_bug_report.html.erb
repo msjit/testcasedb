@@ -1,0 +1,41 @@
+<% results = release_results(@report.product_id, @report.version_id) %>
+<% bug_results = list_bug_status( results )%>
+
+<div class='module'>
+  <p><b>Product:</b> <%= @report.product.name %></p>
+  <p><b>Version:</b> <%= @report.version.version %></p>
+  <p><b>Description</b> This report shows bugs found so far and their status in the ticketing system. The bug status was not necessarily changed in this release.</p>
+</div>
+
+<div class='module'>
+<% if bug_results.empty? %>
+  No bugs found in the results for this product release
+<% elsif bug_results["error"] %>
+  <p>There was an error retrieving the bug status.</p>
+  <p>Common Causes</p>
+  * Bugs are assigned to results that have been deleted from the ticket system<br/>
+	* Ticket system permissions are not allowing the configured user to view a bug's status
+<% else %>
+	<table class="sortable_table">
+	  <tr class="sortableHeader">
+	    <th>Bug Number</th>
+	    <th>Related Results</th>
+	    <th>Bug Name</th>
+	    <th>Current Bug Status</th>
+	  </tr>
+
+		<% bug_results.sort.each do |key, value| %>
+		  <tr class="<%= cycle('odd', 'even') %> rowLink">
+		    <td><a href="<%= generate_bug_link(key) %>"><%= key %></a></td>
+		    <td>
+		    <% value[:result_ids].each do |result_id| %>
+		      <%= link_to result_id, Result.find(result_id) %>
+		    <% end %>
+		    </td>
+		    <td><%= value[:name] %></td>
+		    <td><%= value[:status] %></td>
+		  </tr>
+		<% end %>
+	</table>
+<% end %>
+</div>

@@ -1,0 +1,20 @@
+var newDivs = "<div class='rectangle' style='display: block'></div>";
+var categoryLink = "";
+var addSubCategoryLink ="";
+
+<% if @categories.empty? %>
+  <% # If there are no categories warn the user %>
+  newDivs += '<div class="treeNoData">Category does not contain sub-categories</div>';
+<% else %>
+  <% @categories.each do |category| %>
+    <% # When we list categories we must generate the link to the category details %>
+    <% # To do this we need to access the name route feature. This was enabled in the categories module folder %>
+    categoryLink = '<i class="icon-chevron-right"></i> <a href="<%= escape_javascript(list_category_children_path(category)) %>" class="treeLink" data-remote="true"><%= category.name %></a>';
+    addSubCategoryLink = '  <%= link_to image_tag("add_folder.png", :alt => "Add Category", :title => "Add Category"), new_subcategory_path(category.id), :remote => true %> ';
+    editCategoryLink = '<%= link_to image_tag("edit_folder.png", :alt => "Edit Category", :title => "Edit Category"), edit_category_path(category.id), :remote => true %> ';
+    deleteCategoryLink = '<%= link_to image_tag("remove_folder.png", :alt => "Delete Category", :title => "Delete Category"), category, :confirm => "Are you sure?", :method => :delete, :remote => true %>';
+    newDivs += '<div class="treeChild" id="treeChild<%= category.id.to_s %>"><div class="triangle-right" style="float: left"></div>' + categoryLink + addSubCategoryLink + editCategoryLink + deleteCategoryLink + '</div>';
+  <% end %>
+<% end %>
+
+$("#treeChild<%= @category_id %>").append(newDivs);

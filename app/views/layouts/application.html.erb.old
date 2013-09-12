@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Case DB</title>
+  <%= stylesheet_link_tag    "application" %>
+  <%= javascript_include_tag "application" %>
+  <%= csrf_meta_tags %>
+</head>
+
+<body>
+	<div id="ajaxAlert">Loading...</div>
+  <div id="container">
+    <div id="userbar">
+      <div id="logo">
+	  	   <%= link_to image_tag("logo_black.png", :size => "107x18"), home_path %>
+		  </div>
+	    <% if current_user %>
+        Welcome <%=current_user.first_name%> <%=current_user.last_name%> | 
+		    <%= link_to 'My Settings', my_settings_path  %> |
+		    <%= link_to "Logout", logout_path  %> |
+		    <%= link_to "Help", home_path + "quick_start_guide.pdf"  %> |
+		    <%= link_to "Admin Guide", home_path + "admin_guide.pdf" %>
+		  <% else %>
+		    <%= link_to "Login", login_path %>
+		  <% end %>
+		</div>
+  	<div id="header">
+
+      <ul id="nav">
+			  <li><%= link_to 'Tasks', tasks_path %>
+			    <ul>
+			      <li><%= link_to 'List', tasks_path %></li>
+			      <li><%= link_to 'New', new_task_path %></li>
+			      <li><%= link_to 'My Tasks', my_tasks_path %></li>
+			    </ul>
+			  </li>
+			  <li><%= link_to 'Test Cases', test_cases_path %>
+			    <ul>
+			      <li><%= link_to 'List', test_cases_path %></li>
+			      <li><%= link_to 'New', new_test_case_path %></li>
+			    </ul>
+			  </li> 
+				<li><%= link_to 'Test Plans', test_plans_path %>
+  				<ul>
+  		      <li><%= link_to 'List', test_plans_path %></li>
+  		      <li><%= link_to 'New', new_test_plan_path %></li>
+  		    </ul>
+  		  </li> 
+				<li><%= link_to 'Stencils', stencils_path %>
+				  <ul>
+			      <li><%= link_to 'List', stencils_path %></li>
+			      <li><%= link_to 'New', new_stencil_path %></li>
+			    </ul>
+			  </li> 
+				<li><%= link_to 'Test Assignments', assignments_path %>
+				  <ul>
+			      <li><%= link_to 'List', assignments_path %></li>
+			      <li><%= link_to 'New', new_assignment_path %></li>
+			    </ul>
+			  </li> 
+				<% if can? :execute, Result %>
+				  <li><%= link_to 'Execute', results_path %>
+				    <ul>
+  			      <li><%= link_to 'List', results_path %></li>
+  			      <li><%= link_to 'New', new_result_path %></li>
+  			    </ul>
+  			  </li> 
+				<% end %>
+				<% if can? :read, Report %>
+			    <li><%= link_to 'Reports', reports_path %>
+			      <ul>
+  			      <li><%= link_to 'List', reports_path %></li>
+  			      <li><%= link_to 'New', new_report_path %></li>
+  			    </ul>
+  			  </li> 
+				<% end %>
+				<% if can? :read, Schedule %>
+				  <li><%= link_to 'Scheduler', schedules_path %>
+				    <ul>
+  			      <li><%= link_to 'List', schedules_path %></li>
+  			      <li><%= link_to 'New', new_schedule_path %></li>
+  			    </ul>
+  			  </li> 
+				<% end %>
+				<% if can? :update, Admin %>
+		      <li><%= link_to 'Admin', admin_path  %>
+		        <ul>
+		          <li><%= link_to 'Products', products_path %>
+  		          <ul>
+    		          <li><%= link_to 'List', products_path %></li>
+    		          <li><%= link_to 'New', new_product_path %></li>
+    		        </ul>
+    		      </li>
+              <li><%= link_to 'Test Types', test_types_path %>
+                  <ul>
+    		          <li><%= link_to 'List', test_types_path %></li>
+    		          <li><%= link_to 'New', new_test_type_path %></li>
+    		        </ul>
+    		      </li>
+              <li><%= link_to 'Versions', versions_path %>
+                <ul>
+    		          <li><%= link_to 'List', versions_path %></li>
+    		          <li><%= link_to 'New', new_version_path %></li>
+    		        </ul>
+    		      </li>
+              <li><%= link_to 'Categories', categories_path %></li>
+              <li><%= link_to 'Custom Fields', custom_fields_path %>
+                <ul>
+    		          <li><%= link_to 'List', custom_fields_path %></li>
+    		          <li><%= link_to 'New', new_custom_field_path %></li>
+    		        </ul>
+    		      </li>
+              <li><%= link_to 'Devices', devices_path %>
+                <ul>
+    		          <li><%= link_to 'List', devices_path %></li>
+    		          <li><%= link_to 'New', new_device_path %></li>
+    		        </ul>
+    		      </li>
+              <li><%= link_to 'Tags', tags_path %><ul>
+  		          <li><%= link_to 'List', tags_path %></li>
+  		          <li><%= link_to 'New', new_tag_path %></li>
+  		        </ul>
+  		      </li>
+              <% if can? :read, User %>
+                <li><%= link_to 'Users', users_path %></li>
+                <li><%= link_to 'Settings', settings_path %></li>
+              <% end %>
+		        </ul>
+		      </li>
+		    <% end %>
+      </ul>
+
+		</div>
+  
+
+    <% flash.each do |name, msg| %>
+      <% if msg.is_a?(String) %>
+        <div class="alert alert-<%= name == :notice ? "success" : "error" %>">
+          <a class="close" data-dismiss="alert">&#215;</a>
+          <%= content_tag :div, msg, :id => "flash_#{name}" %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <div id="content">
+  
+    <%= yield %>
+
+    </div>
+  <div class="clear"></div>
+  </div><!-- end container -->
+	<div id="footer">TestCaseDB <%= t(:tcdb_version) %>. Copyright &copy; 2012 MSJ IT Services Inc. All rights reserved.</div>	
+
+  </body>
+</html>

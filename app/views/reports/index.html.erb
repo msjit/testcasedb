@@ -1,0 +1,39 @@
+<h1>Reports</h1>
+
+<div class="row-fluid">
+  <div class="span12">
+    <% if @reports.count == 0 %>
+      No reports configured.
+    <% else %>
+    	<table class="sortable_table">
+    	  <tr class="sortableHeader">
+    	    <th>Report type</th>
+    	    <th>Product</th>
+    	    <th>Version</th>
+    	    <th>Start date</th>
+    	    <th>End date</th>
+    	    <th></th>
+    	    <th></th>
+    	    <th></th>
+    	    <th></th>
+    	  </tr>
+
+    	<% @reports.each do |report| %>
+    	  <tr class="<%= cycle('odd', 'even') %>">
+    	    <td><%= report.report_type %></td>
+    	    <td><%= if report.product then report.product.name end %></td>
+    	    <td><%= if report.version then report.version.version end %></td>
+    	    <td><%= report.start_date %></td>
+    	    <td><%= report.end_date %></td>
+    	    <td><%= link_to '<i class="icon-th-list"></i> Show'.html_safe, report %></td>
+    	    <td><%= link_to '<i class="icon-play"></i> Run'.html_safe, run_report_path(report) %> </td>
+    	    <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_report_path(report) %></td>
+    	    <td><%= link_to '<i class="icon-remove"></i> Delete'.html_safe, report, :confirm => 'Are you sure?', :method => :delete %></td>
+    	  </tr>
+    	<% end %>
+    	</table>
+    <% end %>
+  </div>
+</div>
+
+<div class="addLink"><%= link_to "New Report", new_report_path, :class => "btn btn-primary" %></div>

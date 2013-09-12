@@ -1,0 +1,13 @@
+<p>The following test cases were imported.</p><br />
+
+<table class="sortable_table">
+  <tr class="sortableHeader"><th>Name</th><th>Description</th><th></th></tr>
+
+<% @test_cases.each do |test_case| %>
+	<tr class="<%= cycle('odd', 'even') %>">
+		<td><%= link_to test_case.name, test_case %></td>
+		<td><%= test_case.description %></td>
+		<td><%= link_to "Edit", edit_test_case_path(test_case) %></td>
+	</tr>
+<% end %>
+</table>

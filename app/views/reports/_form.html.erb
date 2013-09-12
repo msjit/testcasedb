@@ -1,0 +1,81 @@
+<%= form_for(@report) do |f| %>
+  <% if @report.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@report.errors.count, "error") %> prohibited this report from being saved:</h2>
+
+      <ul>
+      <% @report.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :report_type %><br />
+    <%= f.select :report_type, ReportsHelper::REPORT_TYPES, :include_blank => 'Select a report type' %>
+  </div>
+  <div class="field", id="report_product_select", style="display:none;">
+    <%= f.label :product_id %><br />
+    <%= f.select :product_id, product_list, { :include_blank => 'Select a product' } %>
+  </div>
+
+  <% # We render the version select here so we can select pre-selected values %>
+  <% # Version field updates use the partial %>
+  <div id="productVersions" >
+	<div class="field", id="report_version_select", style="display:none;">
+	
+    <%= f.label :version_id %><br />
+    <% if !@report.product_id.blank? %>
+      <%= f.select :version_id, Version.where(:product_id => @report.product_id).order("version").collect {|p| [ p.version, p.id ]} %>
+    <% else %>
+      <%= f.select :version_id, [] %>
+	  <% end %>
+	</div>
+	</div>
+
+  <div id="secondProductVersions" >
+	<div class="field", id="report_second_version_select", style="display:none;">
+	
+    <%= f.label :second_version_id %><br />
+    <% if !@report.product_id.blank? %>
+      <%= f.select :second_version_id, Version.where(:product_id => @report.product_id).order("version").collect {|p| [ p.version, p.id ]} %>
+    <% else %>
+      <%= f.select :second_version_id, [] %>
+	  <% end %>
+	</div>
+	</div>
+
+  <div class="field", id="report_start_date_select", style="display:none;">
+    <%= f.label :start_date %><br />
+    <%= f.text_field :start_date, :size => 12 %>
+  </div>
+  <div class="field",  id="report_end_date_select", style="display:none;">
+    <%= f.label :end_date %><br />
+    <%= f.text_field :end_date, :size => 12 %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit nil, :class => "btn btn-success" %>
+    <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+  </div>
+<% end %>
+
+<script>
+// when the #test result product field changes get a list of versions
+$("#report_product_id").change(function() {
+  // make a POST call and replace the content
+  // We ignore this fo Test Cases without steps
+  if ( $("#report_report_type").val() != "Test Cases without Steps" ) {
+    var product = $('select#report_product_id :selected').val();
+    if(product == "") product="0";
+    jQuery.get('<%= jquery_report_version_update_url %>/' + product, function(data) { 
+      $("#productVersions").html(data);
+    });
+    jQuery.get('<%= jquery_report_version_update_url %>/' + product, function(data) { 
+      $("#report_second_version_id").html(data.replace("report_version_id", "report_second_version_id").replace("Version</label>", "Second Version</label>"));
+    });
+  }
+  return false;
+});
+</script>

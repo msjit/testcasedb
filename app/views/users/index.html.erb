@@ -1,0 +1,38 @@
+<h1>Users</h1>
+
+<div class="row-fluid">
+  <div class="span12">
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th><%= sortable "username", "User Name" %></th>
+        <th><%= sortable "last_name", "Surname" %></th>
+        <th><%= sortable "first_name", "Given Name" %></th>
+        <th><%= sortable "role" %></th>
+        <th><%= sortable "status" %></th>
+        <th><%= sortable "email" %></th>
+        <th></th>
+        <th></th>
+      </tr>
+
+    <% userDictionary = (t :user_roles) %>
+    <% @users.each do |user| %>
+      <tr class="<%= cycle('odd', 'even') %>">
+        <td><%= user.username %></td>
+        <td><%= user.last_name %></td>
+        <td><%= user.first_name %></td>
+        <td><%= userDictionary[user.role] %></td>
+        <td><%= user.active ? "Active" : "Inactive" %></td>
+        <td><%= user.email %></td>
+        <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_user_path(user) %></td>
+        <td><%= link_to '<i class="icon-lock"></i> Unlock'.html_safe, reset_user_path(user) %></td>
+      </tr>
+    <% end %>
+    </table>
+
+    <%= paginate @users %>
+  </div>
+</div><!-- end module-->
+
+<% if can? :create, User %>
+  <div class="addLink"><%= link_to "New User", new_user_path, :class => "btn btn-primary" %></div>
+<% end %>

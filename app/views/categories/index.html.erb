@@ -1,0 +1,15 @@
+<h1>Categories</h1>
+
+<div id="treeView">
+
+ <% @products.each do |product| %>
+   <div class="treeParent" id='treeParent<%= product.id %>'>
+	   
+	   <ul>
+	     <li><i class="icon-chevron-right"></i> <%= link_to product.name, list_product_categories_path(product.id), :remote => true, :class => 'treeLink' %>
+		   <li><%= link_to image_tag("add_folder.png", :alt => "Add Category", :title => "Add Category"), new_product_category_path(product.id), :remote => true %>
+		 </ul>
+	 </div>
+ <% end %>
+
+</div> <!-- end treeView -->

@@ -1,0 +1,28 @@
+<h1>Custom Fields</h1>
+
+<div class="row-fluid">
+  <div class="span12">
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th>Field name</th>
+        <th>Item type</th>
+        <th>Field type</th>
+        <th>Accepted values</th>
+        <th>Active</th>
+        <th></th>
+      </tr>
+
+    <% @custom_fields.each do |custom_field| %>
+      <tr class="<%= cycle('odd', 'even') %>">
+        <td><%= link_to custom_field.field_name, custom_field %></td>
+        <td><%= (t :custom_field_item_types)[custom_field.item_type.to_sym] %></td>
+        <td><%= (t :custom_field_types)[custom_field.field_type.to_sym] %></td>
+        <td><%= custom_field.accepted_values %></td>
+        <td><%= custom_field.active == true ? 'Yes' : 'No' %></td>
+        <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_custom_field_path(custom_field) %></td>
+      </tr>
+    <% end %>
+    </table>
+    <div class="addLink"><%= link_to "New Custom Field", new_custom_field_path, :class => "btn btn-primary" %></div>
+  </div>
+</div>

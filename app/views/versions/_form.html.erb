@@ -1,0 +1,23 @@
+<div class="row-fluid">
+  <div class="span12">
+    <%= simple_form_for @version, :html => { :class => 'form-horizontal' } do |f| %>
+      <fieldset>
+        <legend>Version Overview</legend>
+        <%= f.association :product, collection: product_list %>
+        <%= f.input :version %>
+      	<%= f.input :description, :input_html => { :rows => 5, :class => "input-xxlarge"}   %>
+      	
+      	<div class="actions">
+          <% unless @version.id %>	
+            <%= f.submit nil, :class => "btn btn-success"%>
+            <%= f.submit "Save and Create Additional", :class => "btn btn-success" %>
+          <% else %>
+            <%= f.submit nil, :class => "btn btn-success"%>
+          <% end %>
+          <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+        </div>
+      </fieldset>
+    <% end %>
+  </div>
+</div>
+

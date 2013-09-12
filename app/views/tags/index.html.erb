@@ -1,0 +1,25 @@
+<h1>Tags</h1>
+
+<div class="row-fluid">
+  <div class="span12">
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th>Name</th>
+        <th></th>
+        <th></th>
+      </tr>
+
+    <% @tags.each do |tag| %>
+      <tr class="<%= cycle('odd', 'even') %>">
+        <td><%= link_to tag.name, tag %></td>
+        <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_tag_path(tag) %></td>
+        <td><%= link_to '<i class="icon-remove"></i> Delete'.html_safe, tag, :confirm => 'Are you sure?', :method => :delete %></td>
+      </tr>
+    <% end %>
+    </table>
+  </div>
+</div>
+
+<% if can? :create, Product %>
+  <div class="addLink"><%= link_to "New Tag", new_tag_path, :class => "btn btn-primary" %></div>
+<% end %>

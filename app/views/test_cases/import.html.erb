@@ -1,0 +1,52 @@
+<legend>Test Case Upload</legend>
+<%= form_for("test_case", :html => { :multipart => true }, :url => import_create_test_case_path, :class => "form-horizontal") do |f| %>
+
+  <% if @test_case.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@test_case.errors.count, "error") %> prohibited this test_case from being saved:</h2>
+
+      <ul>
+      <% @test_case.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="control-group">
+    <label class="control-label" for="inputProduct">Product</label>
+    <div class="controls">
+      <% if @test_case.category_id %>
+        <%= f.select :product_id, product_list,{ :selected => @test_case.product_id } %>
+      <% else %>
+        <%= f.select :product_id, product_list,{ :include_blank => 'Select a product' } %>
+      <% end %>
+    </div>
+  </div>
+
+   <div id="productCategories">
+      <%= render :partial => 'categories' %>
+   </div>
+
+   <div class="field">
+     File: <%= f.file_field :upload, :accept => 'application/vnd.ms-excel' %>
+   </div>
+
+  <%= f.submit "Import Test Cases", :class => "btn btn-success" %>
+  
+<% end %>
+
+<%= link_to "<i class='icon-download icon-white'></i> Download Sample Spreadsheet".html_safe, '/test_cases_sample.xls', :class => "btn btn-inverse" %>
+
+<script>
+// when the #test case product field changes
+$("#test_case_product_id").change(function() {
+  // make a POST call and replace the content
+  var product = $('select#test_case_product_id :selected').val();
+  if(product == "") product="0";
+  jQuery.get('<%= jquery_test_case_category_update_url %>/' + product, function(data) { 
+    $("#productCategories").html(data);
+  })
+  return false;
+});
+</script>

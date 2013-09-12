@@ -1,0 +1,150 @@
+<%= simple_form_for @test_plan, :html => { :class => 'form-horizontal' } do |f| %>
+  <fieldset>
+    <legend>Test Plan Overview</legend>
+    <%= f.input :name %>
+	  <%= f.association :product, as: :select, collection: product_list, include_blank: 'Select a product' %>
+
+    <div class="control-group optional">
+      <label class="select optional control-label" for="test_plan_version_id">Version</label>
+      <div class="controls">
+        <input type="text" value="<%= @test_plan.version ? @test_plan.version : "1"	 %>" size="50" name="tpe[version]" id="test_p_version" class="string required" disabled>
+      </div>
+    </div>
+
+    <div class="control-group optional">
+      <label class="select optional control-label" for="test_p_deprecated">Deprecated</label>
+      <div class="controls">
+        <input type="text" value="<%= @test_plan.deprecated ? "Yes" : "No" %>" size="50" name="test_p[deprecated]" id="test_p_deprecated" class="string required" disabled>
+      </div>
+    </div>
+
+  <%= f.input :description, :input_html => { :rows => 5, :class => "input-xxlarge"} %>
+
+  <div class="control-group">
+    <label class="control-label" for="created_by">Created By</label>
+    <div class="controls">
+      <input type="text" id="created_by" value="<%= @test_plan.created_by.nil? ? '' : @test_plan.created_by.first_name + " " +  @test_plan.created_by.last_name %>" disabled>
+    </div>
+  </div>
+    
+  <div class="control-group">
+    <label class="control-label" for="modified_by">Last Modified By</label>
+    <div class="controls">
+      <input type="text" id="modified_b" value="<% @test_plan.modified_by.nil? ? '' : @test_plan.modified_by.first_name + " " +  @test_plan.modified_by.last_name %>" disabled>
+    </div>
+  </div>
+
+	<%= f.input :status, as: :select, collection: item_statuses %>
+
+  <% if CustomField.where(:item_type => 'test_plan', :active => true).count > 0 %>
+    <legend>Custom Fields</legend>
+    <%= f.fields_for :custom_items do |custom_item|%>
+      <div class="control-group">
+        <%= custom_item.hidden_field :custom_field_id %>
+        <label class="control-label" for="modified_by"><%= CustomField.where(:id => custom_item.object.custom_field_id).first.field_name %></label>
+        <div class="controls">
+          <% field_type = CustomField.where(:id => custom_item.object.custom_field_id).first.field_type %>
+          <% if field_type == 'string' %>
+            <%= custom_item.text_field :value %>
+          <% elsif field_type == 'drop_down' %>
+            <%= custom_item.select :value, CustomField.where(:id => custom_item.object.custom_field_id).first.accepted_values.split(','), :include_blank => true %>
+          <% elsif field_type == 'check_box' %>
+            <%= custom_item.check_box :value %>
+          <% elsif field_type == 'number' %>
+            <%= custom_item.number_field :value, :step => 0.000001 %>
+          <% elsif field_type == 'radio_button' %>
+            <% CustomField.where(:id => custom_item.object.custom_field_id).first.accepted_values.split(',').each do |radio_value| %>
+              <label class="radio">
+                <%= custom_item.radio_button :value, radio_value %>
+                <%= custom_item.label :value, radio_value %>
+              </label>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+    	
+	<% # IF this is a new test plan, allow them save or save and add cases %>
+  <% unless @test_plan.id %>
+    <div class="actions">
+      <%= f.submit nil, :class => "btn btn-success"%>
+      <%= f.submit "Save and Add Test Cases", :class => "btn btn-success" %>
+      <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+    </div>
+
+ 	<% # Otherwise, give full access to the form %>
+  <% else %>
+
+    <%= hidden_field_tag "selectedCaseOrder", "" %>
+	  <legend>Selected test cases</legend>
+	  <div id="caseHeader">
+		  <div class='caseHandle'></div> 
+		  <div class="caseProduct">Product</div>
+		  <div class="caseCategory">Category</div>
+  		<div class="caseName">Name</div>
+    	<div class="caseVersion">Version</div>
+  		<div class="caseDescription">Description</div>
+  		<div class="caseTags">Tags</div>
+		</div>
+	  <div id="selectedCases">
+			<% @test_plan.test_cases.order("case_order").each do |test_case| %>
+			  <div class='selectedCase' id='case_<%= test_case.id %>'>
+				  <div class='caseHandle'><span class="ui-icon ui-icon-arrowthick-2-n-s"></span></div> 
+	        <div class='caseProduct'><%= test_case.product.name %></div>
+          <div class='caseCategory'><%= CategoryPathName(test_case.category_id) %></div>
+          <div class='caseName'><%= test_case.deprecated ? "<del>".html_safe + test_case.name + "</del>".html_safe : test_case.name %></div>
+          <div class='caseVersion'><%= test_case.version %></div>
+			    <div class='caseDescription'><%= test_case.description %></div>
+			    <div class='caseTags'><%= escape_javascript(list_of_test_case_tags(test_case.tags)) %></div>
+			    <div class='caseRemove'><%= link_to "Remove", remove_test_case_from_plan_path(@plan_id, test_case), :class => "removeCase", :remote => true %></div>
+			  </div>
+			<% end %>
+		</div>
+
+    <br/><br/>
+    <legend>Available test cases</legend>
+		<div id="treeView">
+		 <% @products.each do |product| %>
+		   <div class="treeParent" id='treeParent<%= product.id %>'>
+			   <ul>
+			     <li><i class="icon-chevron-right"></i>  <%= link_to product.name, list_test_plan_categories_path(@test_plan.id, product.id), :remote => true, :class => 'treeLink' %>
+				 </ul>
+			 </div>
+		 <% end %>
+
+		</div> <!-- end treeView -->  
+	  <div class="actions">
+	    <%= f.submit nil, :class => "btn btn-success" %>
+	    <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+	  </div>
+
+  <% end # test if we should show cases %> 
+
+<% end %>
+
+<script>
+	$(".caseRemove").delegate("a", "click", function(){
+	  $(this).parents('div.selectedCase:first').remove();
+	});
+	
+	$(function() {
+		$( "#selectedCases" ).sortable({
+			items: '.selectedCase',
+			handle: '.caseHandle',
+			update: function() {
+        $("#selectedCaseOrder").val( $('#selectedCases').sortable('serialize',{key:'c'}) );
+			}
+	  });
+	
+	  // We bind to event so it can be triggered by add_test_case
+	  // This is necessary as the list must be updated for each new case
+	  // We can safely ignore removes
+	  $( "#selectedCases" ).bind( "sortupdate", function(event, ui){
+		   $("#selectedCaseOrder").val( $('#selectedCases').sortable('serialize',{key:'c'}))
+		});
+		
+		$( "#selectedSteps" ).disableSelection();
+	});
+</script>

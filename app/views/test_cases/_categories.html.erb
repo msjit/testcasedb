@@ -1,0 +1,18 @@
+<div class="control-group">
+    <label class="control-label required" for="test_case_category">Category</label>
+    <div class="controls">
+      <%= fields_for "test_case" do |f| %>
+          <% if !@categories.blank? %>
+            <% # If the test case variable exists, this is initial call and there is a case%>
+            <% if @test_case %>
+              <%= f.select :category_id, @categories, {:selected => @test_case.category_id} %>
+            <% # Otherwise, just load the list with a select option %>
+            <% else %>
+              <%= f.select :category_id, @categories, {:include_blank => 'Select a category'} %>
+            <% end %>
+          <% else %>
+            <%= f.select :category_id, [], {:include_blank => 'Select a product with categories'} %>
+      	  <% end %>
+      <% end %>
+    </div>
+  </div>

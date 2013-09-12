@@ -1,0 +1,25 @@
+/* Styles specific to stencils */
+table.matrix {
+  width: 100%;
+  th {
+    text-align: left;
+  }
+  div.control-group {
+    content: none;
+  }
+  div.control-group:before {
+    content: none;
+  }
+  div.control-group:after {
+    content: none;
+  }
+  .form-horizontal {
+    content: none;
+  }
+  .custom-width {
+    width: 30px;
+  }
+  .custom-margin {
+    margin-left: 80px;
+  }
+}

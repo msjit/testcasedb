@@ -1,0 +1,41 @@
+var newDivs = '<div class="rectangle" style="display: block"></div>';
+
+<% if @test_plans.empty? %>
+  newDivs += '<div class="treeNoData">Product does not have any test plans</div>';
+<% else %>
+  newDivs += "<div class='treeNode'><table class='treeTable' id='table_<%= @product_id%>'>";
+  newDivs += "<thead><tr class='sortableHeader'><th class='type-int'>Id</th><th class='type-string'>Name</th><th class='type-string'>Description</th><th class='type-int'>Version</th><th></th></tr></thead><tbody>";
+
+  <% @test_plans.each do |testplan| %>
+    var planName = "<%= testplan.deprecated ? '<del>'.html_safe + escape_javascript(testplan.name) + '</del>'.html_safe : testplan.name %>";
+    var testPlanLink = "<a href='<%= test_plan_path(testplan) %>'>" + planName + "</a>";
+    var description = "<%= escape_javascript(testplan.description) %>";
+    var version = "<%= testplan.version %>";
+    
+    <% if can? :update, @test_plan %>
+      editLink = "<a href='<%= edit_test_plan_path(testplan) %>'><i class='icon-edit'></i>  Edit</a>";
+    <% else %>
+      editLink ="";
+    <% end %>
+    
+    newDivs +=  "<tr class='<%= cycle('even', 'odd') %> rowLink'><td><%= testplan.id %></td><td>" + testPlanLink + "</td><td>" + description + "</td><td>" + version + "</td><td>"+  editLink + "</td></tr>";
+  <% end %>
+  newDivs += '</tbody></table></div>';
+<% end %>
+
+$("#treeParent<%= @product_id %>").append(newDivs);
+
+$('.rowLink').click( function(event) {
+    var $target = $(event.target);
+    if ( $target.is("a") )
+    {
+      return;
+    }
+    else
+    {
+      window.location = $(this).find('a').attr('href');
+    }
+  });
+
+// Add code to sort table rows
+$('#table_<%= @product_id %>').simplesortable();

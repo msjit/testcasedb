@@ -1,0 +1,18 @@
+<% if params[:test_case_id] %>
+  $("#addUpload").append('<%= escape_javascript(render "form_test_case") %>');
+<% elsif params[:result_id] %>
+  $("#addUpload").append('<%= escape_javascript(render "form_result") %>');
+<% end %>
+
+<% # Disable the Add upload link %>
+$("#add_upload_link").toggle();
+
+<% # If cancel is clicked, remove the form and add the Add Upload link %>
+$("#addUpload").delegate('input[value ="Cancel"]', "click", function(){
+  $("#new_upload").slideUp(600).queue(function() {
+    $("#new_upload").remove(); 
+  });
+  $("#add_upload_link").toggle();
+  $("#addUpload").undelegate('input[value ="Cancel"]', "click");
+  return false;
+});

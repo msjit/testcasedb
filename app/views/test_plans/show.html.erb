@@ -1,0 +1,154 @@
+<h1>Test Plan: <%= @test_plan.name %></h1>
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Test Plan Overview</legend>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td class="title">Product</td>
+          <td><%= @test_plan.product.name %></td>
+        </tr>
+        <tr>
+          <td class="title">Version</td>
+          <td><%= @test_plan.version %></td>
+        </tr>
+        <tr>
+          <td class="title">Deprecated</td>
+          <td><%= @test_plan.deprecated ? "Yes" : "No" %></td>
+        </tr>
+        <tr>
+          <td class="title">Created</td>
+          <td><%= @test_plan.created_at.strftime("%H:%M on %B %d, %Y ") %></td>
+        </tr>
+        <tr>
+          <td class="title">Created By</td>
+          <td>
+            <% unless @test_plan.created_by.nil? %>
+              <%= @test_plan.created_by.first_name + " " +  @test_plan.created_by.last_name %>
+            <% end %>
+          </td>
+        </tr>
+        <tr>
+          <td class="title">Last Modified</td>
+          <td><%= @test_plan.updated_at.strftime("%H:%M on %B %d, %Y ") %></td>
+        </tr>
+        <tr>
+          <td class="title">Last Modified By</td>
+          <td>
+            <% unless @test_plan.modified_by.nil? %>
+              <%= @test_plan.modified_by.first_name + " " +  @test_plan.modified_by.last_name %>
+            <% end %>
+          </td>
+        </tr>
+        <tr>
+          <td class="title">Status</td>
+          <td><%= (t :item_status)[@test_plan.status] %></td>
+        </tr>
+        <tr>
+          <td class="title">Description</td>
+          <td><%= @test_plan.description %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if @test_plan.custom_items.count > 0 %>
+  <div class="row-fluid">
+    <div class="span12">
+      <legend class="show">Custom Fields</legend>
+      <table class="table">
+        <tbody>
+          <% @test_plan.custom_items.each do |custom_item|%>
+            <tr>
+              <td class="title"><%= custom_item.custom_field.field_name %></td>
+              <td>
+                <% if custom_item.custom_field.field_type == 'check_box' %>  
+                  <% if custom_item.value == '1' %>
+                    True
+                  <% else %>
+                    False
+                  <% end %>
+                <% else %>
+                  <%= custom_item.value %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+  </div> <!-- end module div -->
+<% end %>
+
+<br/><br/>
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Test Cases</legend>
+    <div id="caseHeader">
+  	  <div class="caseProduct">Product</div>
+  	  <div class="caseCategory">Category</div>
+  		<div class="caseName">Name</div>
+  		<div class="caseVersion">Version</div>
+  		<div class="caseDescription">Description</div>
+  		<div class="caseTags">Tags</div>
+  	</div>
+    <div id="selectedCases">
+  		<% @test_plan.test_cases.order("case_order").each do |test_case| %>
+  		  <div class='selectedCase' id='case_<%= test_case.id %>'>
+          <div class='caseProduct'><%= test_case.product.name %></div>
+          <div class='caseCategory'><%= CategoryPathName(test_case.category_id) %></div>
+          <div class='caseName'><%= link_to test_case.deprecated ? "<del>".html_safe + test_case.name + "</del>".html_safe : test_case.name, test_case %></div>
+          <div class='caseVersion'><%= test_case.version %></div>
+  		    <div class='caseDescription'><%= test_case.description %></div>
+  		    <div class='caseTags'><%= list_of_test_case_tags(test_case.tags) %></div>
+  		  </div>
+  		<% end %>
+    </div>
+  </div>
+</div>
+
+<br/><br/>
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Other Versions of this Test Plan</legend>
+	  <% if @test_plans.count == 0 %>
+  	  There are no other versions of this test plan
+  	<% else %>
+  		<table class="treeTable">
+  		  <tr>
+  		    <th class="left">Name</th>
+  		    <th class="left">Description</th>
+  		    <th class="left">Version</th>
+  		  </tr>
+  		  <% @test_plans.each do |test_plan| %>
+  		    <tr>
+  		      <td><%= link_to test_plan.name, test_plan %></td>
+  		      <td><%= test_plan.description %></td>
+  		      <td><%= test_plan.version %></td>
+  		    </tr>
+  		  <% end %>
+  		</table>
+  	<% end %>
+  </div>
+</div>
+
+<div class="addLink">
+<% if can? :update, @test_plan %>
+<%= link_to "Edit", edit_test_plan_path(@test_plan), :class => "btn btn-primary"  %>
+<% end %>
+<% if can? :destroy, @test_plan %>
+<%= link_to "Delete", @test_plan, :confirm => 'Are you sure? All related information will be deleted! This will impact existing results related to this test plan.', :class => "btn btn-danger", :method => :delete  %>
+<% end %>
+<% if can? :create, @test_plan %>
+<%= link_to "New Version", create_new_test_plan_version_path(@test_plan), :class => "btn btn-success"  %>
+<% end %>
+<a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+<%= link_to "Export PDF", test_plan_path(@test_plan, :format => "pdf"), :class => "btn btn-info"%>
+<%= link_to "Export RTF", test_plan_path(@test_plan, :format => "rtf"), :class => "btn btn-info" %>
+
+<% if can? :create, Assignment %>
+<%= link_to "Assign", new_assignment_path(:test_plan_id => @test_plan.id), :class => "btn btn-primary" %>
+<% end %>
+</div>
+
+<%= render 'comments' %>

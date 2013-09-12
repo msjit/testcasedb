@@ -1,0 +1,38 @@
+<div id="chart1" style="width: 100%; height: 400px;"></div>
+
+<h2>Summary of Data</h2>
+<ul>
+  <li>Number of products: <%= @num_products %>
+  <li>Number of test cases: <%= @num_test_cases %>
+  <li>Number of categories: <%= @num_categories %>
+  <li>Number of results: <%= @num_results %>
+</ul>
+<br>
+
+<script type="text/javascript" charset="utf-8">
+$.plot(
+   $("#chart1"),
+   [
+    {
+      label: "System Status",
+      data: [ [1, <%= @num_products.to_f %>], [2, <%= @num_categories.to_f %>], [3, <%= @num_test_cases.to_f %>], [4, <%= @num_results.to_f %>] ],
+      bars: {
+        show: true,
+        barWidth: 0.5,
+        align: "center"
+      }   
+    }
+ ],
+ {
+   xaxis: {
+     ticks: [
+       [1, "Product"],
+       [2, "Categories"],
+       [3, "Test Cases"],
+       [4, "Results"]
+     ]
+   }   
+ }
+);
+
+</script>

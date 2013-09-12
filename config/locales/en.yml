@@ -1,0 +1,92 @@
+# Sample localization file for English. Add more files in this directory for other locales.
+# See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
+en:
+  # Cusomizations for kaminari
+  views:
+    pagination:
+      first: "First"
+      previous: "Previous"
+      next: "Next"
+      last: "Last"
+      truncate: "..."
+  
+  # The different roles    
+  user_roles:
+    1: "Tester"
+    2: "Senior Tester"
+    3: "QA Manager"
+    4: "Developer"
+    10: "Admin"
+    11: "XML API User"
+    
+  # history_actions none must not be deleted
+  # Used to fill the 0 value item of the map of values
+  history_actions:
+    0: "none"
+    1: "created"
+    2: "updated"
+    3: "deleted"
+    4: "passed"
+    5: "failed"
+    6: "blocked"
+    7: "commented on"
+    
+  # List of tasks used by tasks module
+  task_types:
+    0: "Create Test Cases"
+    1: "Create Test Plan"
+    2: "Review Test Cases"
+    3: "Review Test Plan"
+    4: "Execute Test Plan"
+    
+  # task_status is again for task module
+  task_status:
+    0: "Assigned"
+    1: "In Progress"
+    2: "Awaiting Feedback"
+    127: "Complete"
+
+  # ticketing systems used in settings to set system type
+  ticketing_systems:
+    'none': "None"
+    'Bugzilla': 'Bugzilla'
+    'Jira': 'Jira'
+    'Mantis': 'Mantis Bug Tracker'
+    'Redmine': 'Redmine'
+    
+  # Item status is used for test cases (and potentially test plans
+  item_status:
+    0: "Draft"
+    1: "Pending Review"
+    2: "Reviewed"
+    3: "Changes pending"
+    4: "Complete"
+    
+  custom_field_item_types:
+    'test_case': "Test Case"
+    'test_plan': "Test Plan"
+    'device': "Device"
+
+  custom_field_types:
+    'string': "String"
+    'drop_down': "Drop Down"
+    'check_box': "Check Box"
+    'radio_button': "Radio Button"
+    'number': "Number" 
+  
+  # Content types for test case targets
+  content_types:
+    1: 'jMeter http samples'
+    2: 'jMeter jdbc samples'
+  
+  # Content type xpath sctrings
+  content_type_xpaths:
+    1: "//testResults/httpSample"
+    2: "//testResults/sample"
+    
+  # Statistic types define what sort of statistic is saved in a result_statistic
+  statistic_types:
+    1: 'Total'
+    2: 'Per Thread'
+    3: 'Per Request Type'

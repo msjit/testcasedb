@@ -1,0 +1,23 @@
+<h1>Products</h1>
+
+<table class="sortable_table">
+  <tr class="sortableHeader">
+    <th>Name</th>
+    <th>Description</th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @products.each do |product| %>
+  <tr class="<%= cycle('odd', 'even') %>">
+    <td><%= link_to product.name, product %></td>
+    <td><%= product.description %></td>
+    <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_product_path(product) %></td>
+    <td><%= link_to '<i class="icon-remove"></i> Delete'.html_safe, product, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<% if can? :create, Product %>
+  <div class="addLink"><%= link_to "New Product", new_product_path, :class => "btn btn-primary" %></div>
+<% end %>

@@ -1,0 +1,22 @@
+<div class="row-fluid">
+  <div class="span12">
+    <%= simple_form_for @task, :html => { :class => 'form-horizontal' } do |f| %>
+      <fieldset>
+        <legend>Task Overview</legend>
+        <%= f.input :name %>
+
+        <%= f.input :user_id, as: :select, collection: @users_select %>
+
+
+        <%= f.input :task, as: :select, collection: task_types %>
+        <%= f.input :status, as: :select, collection: task_status %>
+        <%= f.input :description, :rows => 5, :input_html => { :rows => 5, :class => "input-xxlarge"} %>
+        <%= f.input :due_date, as: :string, :size => 12 %>
+        <%= f.input :completion_date, as: :string, :size => 12 %>
+        <div class="actions">
+          <%= f.submit nil, :class => "btn btn-success" %>
+          <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+        </div>
+    <% end %>
+  </div>
+</div>

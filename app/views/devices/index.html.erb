@@ -1,0 +1,31 @@
+<h1>Devices</h1>
+
+<div class="row-fluid">
+  <div class="span12">
+    <table class="sortable_table">
+      <tr class="sortableHeader">
+        <th>Name</th>
+        <th>Description</th>
+        <th>Active</th>
+        <th></th>
+        <th></th>
+      </tr>
+
+      <% @devices.each do |device| %>
+        <tr class="<%= cycle('odd', 'even') %>">
+          <td><%= link_to device.name, device %></td>
+          <td><%= device.description %></td>
+          <td><%= device.active == true ? 'Yes' : 'No' %></td>
+          <% if can? :update, Device %>
+            <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_device_path(device) %></td>
+          <% end %>
+          <% if can? :destroy, Device %>
+            <td><%= link_to '<i class="icon-remove"></i> Delete'.html_safe, device, :confirm => 'All related scheduled items will be deleted. Are you sure you want to delete this device?', :method => :delete %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+
+<div class="addLink"><%= link_to "New Device", new_device_path, :class => "btn btn-primary" %></div>

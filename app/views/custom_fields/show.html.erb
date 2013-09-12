@@ -1,0 +1,32 @@
+<h1>Custom Field: <%= @custom_field.field_name %></h1>
+
+<div class="row-fluid">
+  <div class="span12">
+    <legend class="show">Custom Field Overview</legend>
+     <table class="table">
+        <tbody>
+          <tr>
+            <td class="title">Item type</td>
+            <td><%= (t :custom_field_item_types)[@custom_field.item_type.to_sym] %></td>
+          </tr>
+          <tr>
+            <td class="title">Field type</td>
+            <td><%= (t :custom_field_types)[@custom_field.field_type.to_sym] %></td>
+          </tr>
+          <tr>
+            <td class="title">Accepted values</td>
+            <td><%= @custom_field.accepted_values %></td>
+          </tr>
+          <tr>
+            <td class="title">Active</td>
+            <td><%= @custom_field.active == true ? 'Yes' : 'No' %></td>
+          </tr>
+        </tbody>
+      </table>
+
+    <div class="addLink">
+      <%= link_to  "Edit", edit_custom_field_path(@custom_field), :class => "btn btn-primary"  %>
+      <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
+    </div>
+  </div>
+</div>

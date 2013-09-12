@@ -1,0 +1,8 @@
+<% if !stencils.blank? %>
+  <option value=""> </option>
+  <% stencils.each do |stencil| %>
+    <option value="<%= stencil.id %>"><%= stencil.name %> - Version <%= stencil.version %></option>
+  <% end %>
+<% else %>
+  <option value=""> </option>
+<% end %>

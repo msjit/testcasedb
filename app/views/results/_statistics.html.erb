@@ -1,0 +1,107 @@
+<div id="chart1" style="width: 100%; height: 500px;"></div>
+<% categories = [] %>
+<% averages = [] %>
+<% std_devs = [] %>
+<% num_samples = [] %>
+
+<br/>
+<table class="sortable_table">
+  <tr class="sortableHeader"><th>Request</th><th>Average Response time (ms)</th><th>Standard Deviation</th><th>Number of samples</th></tr>
+  <% @result.result_statistics.each do |stat| %>
+    <% categories << stat.name %> 
+    <% averages << stat.mean %>
+    <% std_devs << stat.standard_deviation %>
+    <% num_samples << stat.n  %>
+    <tr class="<%= cycle('odd', 'even') %>">
+      <td><%= stat.name %></td>
+      <td><%= stat.mean %></td>
+      <td><%= stat.standard_deviation %></td>
+      <td><%= stat.n %></td>
+    </tr>
+  <% end %>
+</table><br/>
+<%= link_to "Compare Results", compare_results_path(@result), :class => "btn btn-primary" %>
+<br/><br/>
+
+<script type="text/javascript" charset="utf-8">
+  $(function () {
+    new Highcharts.Chart({
+      chart: { renderTo: 'chart1',
+        type: 'column',
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false
+		  },
+		  credits: {
+			    enabled: false
+			},
+	    title: { text: 'Result Values' },
+			tooltip: {
+         formatter: function() {
+           return ''+
+           					this.x +': '+ this.y +
+           					(this.series.name == 'Samples' ? ' samples' : ' ms');
+         }
+      },
+      xAxis: {
+      	categories: [
+      		<%= ("'" + categories.join("', '") + "'").html_safe %>
+      	]
+      },
+      yAxis: [{ // Primary yAxis
+      			labels: {
+      				formatter: function() {
+      					return this.value +' ms';
+      				},
+      				style: {
+      					color: '#4572a7'
+      				}
+      			},
+      			title: {
+      				text: 'Response Time',
+      				style: {
+      					color: '#4572a7'
+      				}
+      			}
+      		}, { // Secondary yAxis
+      			title: {
+      				text: 'Number of Samples',
+      				style: {
+      					color: '#89a54e'
+      				}
+      			},
+      			labels: {
+      				formatter: function() {
+      					return this.value +'';
+      				},
+      				style: {
+      					color: '#89a54e'
+      				}
+      			},
+      			opposite: true
+      		}],
+			plotOptions: {
+				column: {
+        	pointPadding: 0.2,
+        	borderWidth: 0
+        }
+			},
+			series: [{
+    			name: 'Average Time',
+    			data: [<%= averages.join(", ") %>]
+
+    		}, {
+    			name: 'Standard Deviation',
+    			data: [<%= std_devs.join(", ") %>]
+
+    		},   {
+      			name: 'Samples',
+      			type: 'spline',
+      			yAxis: 1,
+      			data: [<%= num_samples.join(", ") %>]
+
+      		}]
+    });
+  });
+</script>
+

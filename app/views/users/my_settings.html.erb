@@ -1,0 +1,15 @@
+<div class="row-fluid">
+  <div class="span12">
+    <%= simple_form_for @user, :url => update_my_settings_path, :html => { :class => 'form-horizontal' } do |f| %>
+    <fieldset>
+      <legend>My Settings</legend>
+
+      <%= f.input :password %>
+      <%= f.input :password_confirmation %>
+  	  <%= f.input :time_zone, priority: /US/ %>
+
+	
+      <%= f.submit nil, :class => "btn btn-success" %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+var newDivs= "<div class='rectangle'></div>";
+var categoryLink = "";
+
+<% if @categories.empty? %>
+  <% # If there are no categories, we check if there are any test cases %>
+  <% # If there are test cases, they will be added after each of the sub-categories %>
+  <% if @testcases.empty? %>
+    newDivs += '<div class="treeNoData">Category does not contain test cases</div>';
+  <% end %>
+<% else %>
+  <% @categories.each do |category| %>
+    <% # When we list categories we must generate the link to the category details %>
+    <% # To do this we need to access the name route feature. This was enabled in the categories module folder %>
+    categoryLink = '<a href="<%= list_test_plan_category_children_path(@plan_id, category) %>" class="treeLink" data-remote="true"><%= category.name %></a>';
+    newDivs += '<div class="treeChild" id="treeChild<%= category.id.to_s %>"><i class="icon-chevron-right"></i> ' + categoryLink + '</div>';
+  <% end %>
+<% end %>
+
+<% unless @testcases.empty? %>
+  var testCaseLink ="";
+  var editLink = "";
+  
+  newDivs += '<div class="treeNode"><table class="treeTable">';
+  newDivs += '<tr><th>Name</th><th>Description</th><th>Version</th><th>Tags</th><th></th></tr>';
+  
+  <% @testcases.each do |testcase| %>
+    <% # We only add the test case if it is not already selected on the test plan %>
+    <% unless PlanCase.where(:test_plan_id => @plan_id, :test_case_id => testcase.id).first %>
+      addLink = '<%= link_to "Add Case", add_test_case_to_plan_path(@plan_id, testcase), :class => "addCase", :remote => true %>';
+      var caseName = '<%= testcase.deprecated ? "<del>".html_safe + testcase.name + "</del>".html_safe : testcase.name %>';
+      newDivs +=  '<tr><td>' + caseName + '</td><td><%= escape_javascript(testcase.description) %></td><td><%= testcase.version %></td><td><%= escape_javascript(list_of_test_case_tags(testcase.tags)) %></td><td>' + addLink + '</td></tr>';
+    <% end %>
+  <% end %>
+  newDivs += '</table></div>';
+  
+<% end %>
+
+$("#treeChild<%= @category_id %>").append(newDivs);
+
+/* Make sure the newly added test case links are set to actualy add */  
+$(".treeTable").delegate("a", "click", function(){
+    $(this).parents('tr:first').remove();
+});
