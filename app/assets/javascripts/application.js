@@ -2,7 +2,7 @@
 // This file is automatically included by javascript_include_tag :defaults
 //= require jquery
 //= require jquery_ujs
-//= require twitter/bootstrap
+//= require bootstrap
 //= require jquery.ui.all
 //= require_tree .
 
@@ -232,6 +232,12 @@ jQuery(function($) {
     }
   });
 })
+
+jQuery(function() {
+  $("a[rel=popover]").popover();
+  $(".tooltip").tooltip();
+  $("a[rel=tooltip]").tooltip();
+});
 
 function remove_steps(link) {
   $(link).prev("input[type=hidden]").val("1");
