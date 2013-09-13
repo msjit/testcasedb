@@ -6,7 +6,7 @@ This describes how to perform a production install of TestCaseDB. If you have is
 
 These instructions are for Ubuntu. For detailed CentOS and Ubuntu instructions, download the administration guide.
 1. Update the packages 'sudo apt-get update'
-2. Install required packages 'sudo apt-get install openssh-server ruby1.9.1-full build-essential libopenssl-ruby1.9.1 imagemagick libxml2 libxml2-dev libxslt1-dev libssl-dev apache2 apache2-mpm-prefork apache2-prefork-dev libapache2-mod-xsendfile nodejs mysql-server mysql-client libmysqlruby1.9.1 libmysqlclient-dev apache2-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev'
+2. Install required packages 'sudo apt-get install openssh-server ruby1.9.1-full build-essential libopenssl-ruby1.9.1 imagemagick libxml2 libxml2-dev libxslt1-dev libssl-dev apache2 apache2-threaded-dev libapache2-mod-xsendfile nodejs mysql-server mysql-client libmysql-ruby1.9.1 libmysqlclient-dev apache2-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev'
 3. Update Ruby Gems 'sudo gem install rubygems-update'
 4. Install Phusion Passenger 'sudo gem install passenger'
 5. Compile Passenger and follow its instructions 'sudo passenger-install-apache2-module'
