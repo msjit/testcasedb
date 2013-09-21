@@ -2,7 +2,7 @@ $('.treeForm').html("Category created successfully.").delay(2000).fadeOut(1000).
   $(this).remove(); 
 });
 
-var categoryLink = '<a href="<%= escape_javascript(list_category_children_path(@category)) %>" class="treeLink" data-remote="true"><%= escape_javascript(@category.name) %></a>';
+var categoryLink = '<i class="icon-chevron-right"></i> <a href="<%= escape_javascript(list_category_children_path(@category)) %>" class="treeLink" data-remote="true"><%= escape_javascript(@category.name) %></a> ';
 var addSubCategoryLink = '<%= link_to image_tag("add_folder.png", :alt => "Create Category"), new_subcategory_path(@category.id), :remote => true %>';
 var editCategoryLink = '<%= link_to image_tag("edit_folder.png", :alt => "Edit Category"), edit_category_path(@category.id), :remote => true %> ';
 var deleteCategoryLink = '<%= link_to image_tag("remove_folder.png", :alt => "Delete Category"), @category, :confirm => "Are you sure?", :method => :delete, :remote => true %>';
