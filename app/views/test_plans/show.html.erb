@@ -141,6 +141,7 @@
 <% end %>
 <% if can? :create, @test_plan %>
 <%= link_to "New Version", create_new_test_plan_version_path(@test_plan), :class => "btn btn-success"  %>
+<%= link_to "Copy", copy_test_plan_path(@test_plan), :class => "btn btn-success"  %>
 <% end %>
 <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
 <%= link_to "Export PDF", test_plan_path(@test_plan, :format => "pdf"), :class => "btn btn-info"%>

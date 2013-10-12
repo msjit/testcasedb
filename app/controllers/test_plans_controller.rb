@@ -203,7 +203,23 @@ class TestPlansController < ApplicationController
       end
     end
   end
-
+  
+  # GET /test_plans/copy/1
+  def copy
+    # begin 
+      original_test_plan = TestPlan.find( params[:id] )
+      
+      # Verify user can view this test case. Must be in his product
+      authorize_product!(original_test_plan.product)
+      
+      @test_plan = original_test_plan.duplicate_plan
+      
+      redirect_to edit_test_plan_path(@test_plan), :notice => "Test plan copied successfully"
+    # rescue
+    #   redirect_to test_plans_path, :flash => {:warning => 'There was an error copying the test plan.'}
+    # end
+  end
+  
   # GET /test_plans/search/
   def search
     authorize! :read, TestPlan

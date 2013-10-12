@@ -90,7 +90,8 @@ TestDB::Application.routes.draw do
   match 'test_plans/:plan_id/add_case/:id', :controller => 'test_plans', :action => 'add_test_case', :as => 'add_test_case_to_plan'
   # Remove a test case from a test plan
   match 'test_plans/:plan_id/remove_case/:id', :controller => 'test_plans', :action => 'remove_test_case', :as => 'remove_test_case_from_plan'
-
+  match 'test_plans/copy/:id', :controller => 'test_plans', :action => 'copy', :as => 'copy_test_plan'
+	
   # URLs for logging in and out of the application    
   match "login", :controller => "user_sessions", :action => "new", :as => "login"
   match "logout", :controller => "user_sessions", :action => "destroy"

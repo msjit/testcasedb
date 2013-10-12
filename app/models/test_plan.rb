@@ -36,4 +36,23 @@ class TestPlan < ActiveRecord::Base
       self.test_case_ids = nil
     end
   end
+  
+  def duplicate_plan
+    # clone the test case
+    test_plan = self.dup
+    # Remember to increate the version value
+    test_plan.name = test_plan.name + " COPY"
+    test_plan.version = 1
+    test_plan.save
+    
+    # Make a clone of each plan_case to link test cases to this test plan
+    self.plan_cases.each do |plan_case|
+      new_plan_case = plan_case.dup
+      new_plan_case.test_plan_id = test_plan.id
+      new_plan_case.save
+    end
+    
+    #Return the duplicate
+    test_plan
+  end
 end
