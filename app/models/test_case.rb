@@ -39,4 +39,23 @@ class TestCase < ActiveRecord::Base
       find(:all)
     end
   end
+  
+  def duplicate_case
+    # clone the test case
+    test_case = self.dup
+    # Remember to increate the version value
+    test_case.name = test_case.name + " COPY"
+    test_case.version = 1
+    test_case.parent_id = nil
+    test_case.save
+    
+    # Make a clone of each step for this test case
+    self.steps.each do |step|
+      new_step = step.dup
+      new_step.test_case_id = test_case.id
+      new_step.save
+    end
+    
+    test_case
+  end
 end

@@ -377,19 +377,7 @@ class TestCasesController < ApplicationController
       authorize_product!(original_test_case.product)
       
       # clone the test case
-      @test_case = original_test_case.dup
-      # Remember to increate the version value
-      @test_case.name = @test_case.name + " COPY"
-      @test_case.version = 1
-      @test_case.parent_id = nil
-      @test_case.save
-      
-      # Make a clone of each step for this test case
-      original_test_case.steps.each do |step|
-        new_step = step.dup
-        new_step.test_case_id = @test_case.id
-        new_step.save
-      end
+      @test_case = original_test_case.duplicate_case
       
       redirect_to edit_test_case_path(@test_case), :notice => "Test case copied successfully"
     rescue
