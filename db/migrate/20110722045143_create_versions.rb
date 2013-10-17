@@ -3,7 +3,7 @@ class CreateVersions < ActiveRecord::Migration
     create_table :versions do |t|
       t.string :version
       t.text :description
-      t.string :product_id
+      t.integer :product_id
 
       t.timestamps
     end

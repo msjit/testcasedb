@@ -6,7 +6,7 @@ class CreateStencils < ActiveRecord::Migration
       t.text :description
       t.integer :version, :limit => 2, :default => 1
       t.integer :status, :limit => 2
-      t.boolean :deprecated, :default => 0
+      t.boolean :deprecated, default: false
       t.integer :created_by_id
       t.integer :modified_by_id
 
