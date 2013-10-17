@@ -55,16 +55,15 @@ module ReportsHelper
   def release_progress_daily_series(product_id, version_id, result, start_time, end_time)
     # Get a count of number of executed items for a given day.
     # Only count results with the desired result
-    results_by_day = Result.where(:assignment_id => Assignment.where(:product_id => product_id, :version_id => version_id).collect(&:id) ).
+    results_by_day = Result.select("date(results.executed_at), count(id) as total_executed").where(:assignment_id => Assignment.where(:product_id => product_id, :version_id => version_id).collect(&:id) ).
       where(:result => result, :executed_at => start_time.beginning_of_day..end_time.end_of_day).
-      group("date(executed_at)").
-      select("executed_at, count(id) as total_executed")
+      group("date(results.executed_at)")
 
     # Count the cumulative total for all items and place in to an array that is returned
     cumulative_total = 0
     output = []
     (start_time..end_time).map do |date|
-      result = results_by_day.detect { |result| result.executed_at.to_date == date }      
+      result = results_by_day.detect { |result| result.date.to_date == date }      
       if result then cumulative_total += result.total_executed.to_i end
       output.push [date.to_time.to_i * 1000, cumulative_total]
     end
