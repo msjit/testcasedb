@@ -170,7 +170,7 @@ class ReportsController < ApplicationController
         
         elsif @report.report_type == "Release Current State - By User"
           # We find a list of all assignments related to this product/version and group by user id and save task numbers
-          assignment_ids = Assignment.where(:product_id => @report.product_id, :version_id => @report.version_id).joins(:task).group("tasks.user_id").collect(&:id)
+          assignment_ids = Assignment.where(:product_id => @report.product_id, :version_id => @report.version_id).joins(:task).select('tasks.user_id').group("tasks.user_id").collect(&:user_id)
           # Using the list of task ids we collect the list of user ids
           user_ids = Task.where(:assignment_id => assignment_ids).collect(&:user_id)
           # using the user IDs, we find the users
