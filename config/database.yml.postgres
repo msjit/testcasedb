@@ -1,0 +1,26 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: tcdb_development
+  pool: 5
+  host: localhost
+  username: marc
+  password:
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: tcdb_test
+  pool: 5
+  host: localhost
+  username: marc
+  password:
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  host: localhost
+  database: tcdb_production
+  pool: 5
+  username: marc
+  password:
