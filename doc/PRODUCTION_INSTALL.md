@@ -46,3 +46,8 @@ These instructions are for Ubuntu. For detailed CentOS and Ubuntu instructions, 
 13. Visit your site and login with default user admin/ChangeMe
 14. Change the default password for the administrator!
 
+## Postgres Support
+If you plan on using Postgres in place of MySQL please use these notes below.
+
+1. Create a DB in you Postgres for the application
+2. In the config folder, copy the file database.yml.postgres to database.yml in order to configure your database.
