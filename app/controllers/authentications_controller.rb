@@ -4,7 +4,7 @@ class AuthenticationsController < ApplicationController
     omniauth = request.env['omniauth.auth']
     authentication = Authentication.find_by_provider_and_uid(omniauth['provider'], omniauth['uid'])  
 
-    if authentication 
+    if authentication && !current_user
       # Sign in from login page. check if account active
       if authentication.user.active
         flash[:notice] = "Signed in successfully."
@@ -13,11 +13,15 @@ class AuthenticationsController < ApplicationController
         redirect_to login_path, :flash => {:error => "Your account is not active"}
       end
 
-    elsif current_user
+    elsif current_user && !authentication
       # Add google auth when someone already signed in
       current_user.authentications.create(:provider => omniauth['provider'], :uid => omniauth['uid'])  
       redirect_to my_settings_path, :notice => "Authentication successful."  
 
+    elsif current_user && authentication
+      # Came from my settings to add auth, but it's already used by someone else
+      redirect_to my_settings_path, :flash => {:error => "The Google account you've chosen is already in use."}
+        
     elsif matching_user = User.active.find_by_email(omniauth["info"]["email"])
       # Bind to account with matching email (but only if it's active)
       matching_user.authentications.create(:provider => omniauth['provider'], :uid => omniauth['uid'])  
