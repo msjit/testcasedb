@@ -51,6 +51,8 @@ gem "spreadsheet"
 gem "rake", '>=0.9.2'
 
 gem 'authlogic'
+gem 'omniauth'
+gem 'omniauth-google-oauth2'
 gem 'cancan'
 
 gem 'kaminari'

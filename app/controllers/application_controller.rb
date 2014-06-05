@@ -103,4 +103,8 @@ class ApplicationController < ActionController::Base
     end
   end
   
+  def google_auth_enabled
+    @google_auth_enabled = Setting.find_by_name('Google Auth enabled').value == '1'
+  end
+  
 end

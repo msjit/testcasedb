@@ -3,6 +3,7 @@ class UserSessionsController < ApplicationController
   # a redirect loop to this page  
   skip_before_filter :require_login
   skip_before_filter :set_user_time_zone
+  before_filter :google_auth_enabled
   
   def new
     @user_session = UserSession.new

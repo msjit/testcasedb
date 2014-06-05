@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
   validates :username, :uniqueness => true
   validates :email, :presence => true
   validates :role, :presence => true
+  has_many :authentications  
   has_many :reports
   has_many :tasks
   has_many :schedule_users
@@ -18,5 +19,10 @@ class User < ActiveRecord::Base
   
   def name_with_email
       "#{last_name}, #{first_name} - #{email}"
+  end
+  
+  # Returns an authorization for a provider type
+  def auth_for(auth_provider)
+    self.authentications.where(:Provider => auth_provider).first
   end
 end

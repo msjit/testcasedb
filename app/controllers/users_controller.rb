@@ -1,7 +1,8 @@
 class UsersController < ApplicationController
   # The sortable method requires these
   helper_method :sort_column, :sort_direction
-  
+  before_filter :google_auth_enabled, :only => [:my_settings]
+
   # GET /users
   def index
     authorize! :read, User

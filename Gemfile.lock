@@ -87,10 +87,14 @@ GEM
     factory_girl_rails (4.2.1)
       factory_girl (~> 4.2.0)
       railties (>= 3.0.0)
+    faraday (0.9.0)
+      multipart-post (>= 1.2, < 3)
     fssm (0.2.10)
     hashery (2.1.0)
+    hashie (1.2.0)
     hexdump (0.2.3)
     hike (1.2.3)
+    httpauth (0.2.1)
     i18n (0.6.5)
     journey (1.0.4)
     jquery-rails (3.0.4)
@@ -101,6 +105,8 @@ GEM
       railties (>= 3.1.0)
     json (1.8.0)
     json_pure (1.8.0)
+    jwt (0.1.13)
+      multi_json (>= 1.5)
     kaminari (0.14.1)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -116,10 +122,26 @@ GEM
     mime-types (1.24)
     mini_portile (0.5.1)
     multi_json (1.7.9)
+    multipart-post (2.0.0)
     mysql2 (0.3.13)
     nifty-generators (0.4.6)
     nokogiri (1.6.0)
       mini_portile (~> 0.5.0)
+    oauth2 (0.8.1)
+      faraday (~> 0.8)
+      httpauth (~> 0.1)
+      jwt (~> 0.1.4)
+      multi_json (~> 1.0)
+      rack (~> 1.2)
+    omniauth (1.1.3)
+      hashie (~> 1.2)
+      rack
+    omniauth-google-oauth2 (0.2.4)
+      omniauth (~> 1.0)
+      omniauth-oauth2 (~> 1.1)
+    omniauth-oauth2 (1.1.1)
+      oauth2 (~> 0.8.0)
+      omniauth (~> 1.0)
     paperclip (2.7.5)
       activerecord (>= 2.3.0)
       activesupport (>= 2.3.2)
@@ -235,6 +257,8 @@ DEPENDENCIES
   mysql2
   nifty-generators
   nokogiri
+  omniauth
+  omniauth-google-oauth2
   paperclip (~> 2.7.2)
   pg
   prawn
