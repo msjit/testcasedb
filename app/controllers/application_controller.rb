@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
   end
   
   # For all pages, require that the user be logged in
-  # Note that this filter is ignored in the user_session controller
+  # Note that this filter is ignored in the user_session and authentication controller
   # As it would break login
   before_filter :require_login
   before_filter :set_user_time_zone
@@ -64,7 +64,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # Authoprize product raises an exception if user tries to a access a product that they do not have access to
+  # Authorize product raises an exception if user tries to a access a product that they do not have access to
   # This is used in controller. The check for views is in the application helper
   def authorize_product!(product)
     unless current_user.products.include?(product)
@@ -101,6 +101,10 @@ class ApplicationController < ActionController::Base
     else
       return get_product_id_from_category_id(category.category_id)
     end
+  end
+  
+  def google_auth_enabled
+    @google_auth_enabled = Setting.find_by_name('Google Auth enabled').value == '1'
   end
   
 end

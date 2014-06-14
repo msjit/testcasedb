@@ -7,9 +7,19 @@
       <%= f.input :password %>
       <%= f.input :password_confirmation %>
   	  <%= f.input :time_zone, priority: /US/ %>
-
 	
       <%= f.submit nil, :class => "btn btn-success" %>
     <% end %>
   </div>
+  <% if @google_auth_enabled %>
+    <div class="span12">
+      <% if @user.auth_for('google_oauth2') %>
+        <p>Unlink existing authentication:</p>
+        <%= link_to image_tag("auth/google_oauth2_64.png"), delete_auth_for(@user, 'google_oauth2') %>
+      <% else %>
+        <%= link_to "Link your account with Google", "/auth/google_oauth2" %>
+      <% end %>
+    </div>
+  <% end %>
+  
 </div>

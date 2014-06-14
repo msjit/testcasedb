@@ -101,6 +101,12 @@ TestDB::Application.routes.draw do
   
   resources :user_sessions
 
+  resources :authentications, :except => :destroy do
+    get :delete, :action => :destroy
+  end
+  match '/auth/:provider/callback', to: 'authentications#create'
+  match '/auth/failure', to: 'authentications#failure'
+
   resources :users
   get 'users/:id/reset', :controller => 'users', :action => 'reset', :as => 'reset_user'
   match "/my_settings" => "users#my_settings", :as => 'my_settings'
