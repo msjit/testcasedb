@@ -14,7 +14,7 @@ class Setting < ActiveRecord::Base
     entry = Setting.find(:first, :conditions => ['name = ?', name])
     
     if !entry 
-      return nil
+      return false
     elsif entry.value == "Enabled"
       return true
     elsif entry.value == "Disabled"
