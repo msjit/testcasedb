@@ -1,7 +1,7 @@
 namespace :install do
   desc "Base install"
   task :base => :environment do
-    if Setting.count > 0 or User.count > 0 or Product.count > 0 or Version.count > 0
+    if User.count > 0 or Product.count > 0 or Version.count > 0
       puts "Script could not be run." 
     else
       Setting.find_or_create_by_name(:name => 'SystemID', :value => (0...12).map{ ('A'..'Z').to_a[rand(26)] }.join, :description => 'System ID String.')
