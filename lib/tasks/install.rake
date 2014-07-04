@@ -30,6 +30,9 @@ namespace :install do
       Setting.find_or_create_by_name(:name => 'Sikuli Working Directory', :value => 'none', :description => 'The Sikuli working directory on the Sikuli host. Sikuli should save all logs to this folder. This is where TestCaseDB will run commands from. A full path should be provided. ex. /home/sikuli/working')
       Setting.find_or_create_by_name(:name => 'Sikuli Application Path', :value => 'none', :description => 'Location of the Sikuli start script on the Sikuli host. Can be relative to the working directory (ex. Sikuli-IDE/sikuli-ide.sh) or a complete path (ex. /home/tcdb/Sikulix.y.z/Sikuli-IDE/sikuli-ide.sh)')
       Setting.find_or_create_by_name(:name => 'Sikuli Max Execution Time', :value => '5', :description => 'The maximum execution time for a Sikuli test in minutes. If the test runs longer than this time it will be marked as failed.')    
+      Setting.find_or_create_by_name(:name => 'Google Auth enabled', :value => 'Disabled', :description => 'Enable Google Auth.')
+      Setting.find_or_create_by_name(:name => 'Google Auth Client ID', :value => 'none')
+      Setting.find_or_create_by_name(:name => 'Google Auth Secret', :value => 'none', :description => 'Google Auth Secret')
       
       User.create(:username => 'admin', :email => 'test@testcasedb.com', :first_name => 'Admin', :last_name => 'User', :password => 'ChangeMe', :password_confirmation => 'ChangeMe', :time_zone => 'Eastern Time (US & Canada)', :role => 10, :active => true)
       TestType.find_or_create_by_name(:name => 'Manual', :description => 'For manually executed test cases.')
