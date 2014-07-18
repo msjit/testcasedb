@@ -4,6 +4,6 @@ Rails.application.config.middleware.use OmniAuth::Builder do
       provider :google_oauth2, Setting.value('Google Auth Client ID'), Setting.value('Google Auth Secret')
     end
   rescue
-    puts "Settings table not defined yet"
+   #  puts "Settings table not defined yet"
   end
 end
