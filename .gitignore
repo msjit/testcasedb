@@ -6,3 +6,4 @@ tmp/**/*
 assets/*
 config/app_config.yml
 .sass-cache/
+public/assets/
