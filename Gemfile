@@ -1,8 +1,10 @@
 source 'http://rubygems.org'
 
 gem 'rails', '3.2.14'
-gem 'mysql2'
-gem 'pg'
+gem 'mysql2', group: :mysql
+gem 'pg', group: :postgres
+
+gem "unicorn", "~> 4.8.2"
 
 # Gems used only for assets and not required
 # in production environments by default.
