@@ -18,7 +18,7 @@ var newDivs = '<div class="rectangle" style="display: block"></div>';
       editLink ="";
     <% end %>
     
-    newDivs +=  "<tr class='<%= cycle('even', 'odd') %> rowLink'><td><%= testplan.id %></td><td>" + testPlanLink + "</td><td>" + description + "</td><td>" + version + "</td><td>"+  editLink + "</td></tr>";
+    newDivs +=  "<tr class='<%= cycle('even', 'odd') %> rowLink'><td align=center><%= testplan.id %></td><td align=center>" + testPlanLink + "</td><td align=center>" + description + "</td><td align=center>" + version + "</td><td align=center>"+  editLink + "</td></tr>";
   <% end %>
   newDivs += '</tbody></table></div>';
 <% end %>
