@@ -46,8 +46,8 @@ if options[:production] == false
   system "bundle exec rake install:base"
 else
   puts "Migrating production database"
-  system "RAILS_ENV=production bundle exec rake db:migrate"
+  system "bundle exec rake db:migrate RAILS_ENV=production"
   puts "Installing base function"
-  system "RAILS_ENV=production bundle exec rake install:base"
+  system "bundle exec rake install:base RAILS_ENV=production"
 end
 
