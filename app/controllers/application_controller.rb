@@ -67,8 +67,10 @@ class ApplicationController < ActionController::Base
   # Authorize product raises an exception if user tries to a access a product that they do not have access to
   # This is used in controller. The check for views is in the application helper
   def authorize_product!(product)
-    unless current_user.products.include?(product)
-      raise Exceptions::ProductAccessDenied
+    unless product.nil?
+      unless current_user.products.include?(product)
+        raise Exceptions::ProductAccessDenied
+      end
     end
   end
   

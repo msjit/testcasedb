@@ -24,6 +24,6 @@ class User < ActiveRecord::Base
   
   # Returns an authorization for a provider type
   def auth_for(auth_provider)
-    self.authentications.where(:Provider => auth_provider).first
+    self.authentications.where(:provider => auth_provider).first
   end
 end

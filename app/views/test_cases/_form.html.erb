@@ -10,7 +10,7 @@
     <% end %>
 
      <div id="productCategories" class="field">
-        <%= render :partial => 'categories' %>
+        <%= render :partial => 'categories', locals: { f: f } %>
      </div>
 
 	  <%= f.association :test_type, collection: test_type_list %>
