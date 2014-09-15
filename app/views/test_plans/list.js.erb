@@ -4,7 +4,7 @@ var newDivs = '<div class="rectangle" style="display: block"></div>';
   newDivs += '<div class="treeNoData">Product does not have any test plans</div>';
 <% else %>
   newDivs += "<div class='treeNode'><table class='treeTable' id='table_<%= @product_id%>'>";
-  newDivs += "<thead><tr class='sortableHeader'><th class='type-int'>Id</th><th class='type-string'>Name</th><th class='type-string'>Description</th><th class='type-int'>Version</th><th></th></tr></thead><tbody>";
+  newDivs += "<thead><tr class='sortableHeader'><th class='type-int' , align='left'>Id</th><th class='type-string' , align='left'>Name</th><th class='type-string' , align='left'>Description</th><th class='type-int' , align='left'>Version</th><th></th></tr></thead><tbody>";
 
   <% @test_plans.each do |testplan| %>
     var planName = "<%= testplan.deprecated ? '<del>'.html_safe + escape_javascript(testplan.name) + '</del>'.html_safe : testplan.name %>";

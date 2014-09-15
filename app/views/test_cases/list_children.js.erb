@@ -27,7 +27,7 @@ var categoryLink = "";
   var caseName = "";
   
   newDivs += '<div class="treeNode"><table class="treeTable" id="table_<%= @category_id %>">';
-  newDivs += '<thead><tr class="sortableHeader"><th></th><th class="type-int">Id</th><th class="type-string">Name</th><th class="type-string">Description</th><th class="type-int">Version</th><th>Tags</th><th></th></tr></thead><tbody>';
+  newDivs += '<thead><tr class="sortableHeader"><th></th><th class="type-int" , align="left">Id</th><th class="type-string" , align="left">Name</th><th class="type-string" , align="left">Description</th><th class="type-int" , align="left">Version</th><th align="left">Tags</th><th></th></tr></thead><tbody>';
   
   <% @testcases.each do |testcase| %>
     caseName = '<%= testcase.deprecated ? "<del>".html_safe + testcase.name + "</del>".html_safe : testcase.name %>';
