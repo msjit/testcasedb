@@ -601,7 +601,7 @@ class TestCasesController < ApplicationController
 
       # data rows
       test_cases.each do |tc|
-        csv << [tc.name, tc.product.name, tc.category.name, tc.version.to_s, tc.description, tc.test_type.name, tc.deprecated ? "Yes" : "No", tc.created_by ? tc.created_by.first_name + ' ' + tc.created_by.last_name : ' ', tc.modified_by ? tc.modified_by.first_name + ' ' + tc.modified_by.last_name : ' ', '', '']
+        csv << [tc.name, tc.product.name, tc.category.name, tc.version.to_s, tc.description, tc.test_type ? tc.test_type.name : '' , tc.deprecated ? "Yes" : "No", tc.created_by ? tc.created_by.first_name + ' ' + tc.created_by.last_name : ' ', tc.modified_by ? tc.modified_by.first_name + ' ' + tc.modified_by.last_name : ' ', '', '']
         
         tc.steps.each do |step|
           csv << ['', '', '', '', '', '', '', '', '', step.action, step.result]
