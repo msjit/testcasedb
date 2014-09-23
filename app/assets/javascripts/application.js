@@ -231,6 +231,10 @@ jQuery(function($) {
       $('#targetModule').hide();
     }
   });
+  $('#result-toggle').children().click(function() {
+    $(this).parent().children().removeClass('active');
+    $(this).addClass('active');
+  });
 })
 
 jQuery(function() {
