@@ -11,11 +11,11 @@ jQuery(function($) {
   
   // Proved select all/deselect all behaviour for test case tree node
   $('input[name$="treenode_selectall"]').click( function()  {
-    $('.treeNode').filter(':visible').find('input:checkbox').attr('checked', true);
+    $('.treeNode').filter(':visible').find('input:checkbox').prop('checked', true);
     return false;
   });
   $('input[name$="treenode_deselectall"]').click( function()  {
-    $('.treeNode').filter(':visible').find('input:checkbox').attr('checked', false);
+    $('.treeNode').filter(':visible').find('input:checkbox').prop('checked', false);
     return false;
   });
   
