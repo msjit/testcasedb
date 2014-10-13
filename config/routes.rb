@@ -107,6 +107,7 @@ TestDB::Application.routes.draw do
   match '/auth/:provider/callback', to: 'authentications#create'
   match '/auth/failure', to: 'authentications#failure'
 
+  match 'users/import/', :controller => 'users', :action => 'import', :as => 'import_user'
   resources :users
   get 'users/:id/reset', :controller => 'users', :action => 'reset', :as => 'reset_user'
   match "/my_settings" => "users#my_settings", :as => 'my_settings'

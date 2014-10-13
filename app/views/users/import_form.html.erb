@@ -1,0 +1,27 @@
+<legend>Test Case Upload</legend>
+<%= form_for("user", :html => { :multipart => true }, :url => import_user_path, :class => "form-horizontal") do |f| %>
+
+    <% if defined? @errors %>
+      <div class="alert alert-error">
+        <p>There were issues importing the following lines.</p>
+        <ul>
+          <% @errors.each do |k,v| %>
+            <li><%= "Line: #{k}"%>
+              <ul>
+                <% v.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+              </ul>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+   <div class="field">
+     File: <%= f.file_field :upload, :accept => 'application/vnd.ms-excel' %>
+   </div>
+
+  <%= f.submit "Import Users", :class => "btn btn-success" %>
+  <%= link_to "Download Sample Spreadsheet", asset_path("import_users_sample.xls"), :class => "btn btn-default" %>
+  
+<% end %>

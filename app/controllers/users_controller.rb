@@ -64,6 +64,20 @@ class UsersController < ApplicationController
     end
   end
   
+  def import
+    if request.post?
+      # open the spread sheet and prepare variables
+      @errors = User.import(params[:user][:upload])
+      if @errors.blank?
+        redirect_to users_path, notice: "Users imported."
+      else
+        render "import_form"
+      end
+    else
+      render "import_form"
+    end
+  end
+  
   # /my_settings
   def my_settings
     @user = User.find(current_user.id)

@@ -64,7 +64,7 @@ gem 'prawn'
 gem 'soap4r-ruby1.9'
 
 gem 'simple_form'
-
+gem 'roo'
 # This gem is not directly used by the application
 # However, it is common to automate items using this
 # We simplify our clients' lives by including it in the package
