@@ -43,4 +43,17 @@ module TestCasesHelper
   def test_type_list
     TestType.find(:all).collect {|d| [ d.name, d.id ]}
   end
+  
+  # Takes a test case and figures out if it is the parent
+  # Return value is the parent id
+  def find_test_case_parent_id(test_case)
+    # Figure out if this is the parent
+    # If the test cases's parent_id is blank, its ID is the parent ID
+    if test_case.parent_id.nil?
+      parent_id = test_case.id
+    # otherwise, the parent id is the one listed on the test case
+    else
+      parent_id = test_case.parent_id
+    end
+  end
 end

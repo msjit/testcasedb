@@ -37,8 +37,39 @@
   	    <%= f.association :stencil, collection: stencils_list(@assignment), prompt: ' ' %>
   	  <% end %>
     </div>
-
     <%= f.input :notes, :input_html => { :rows => 5, :class => "input-xxlarge"}%>    
+
+	<% if CustomField.where(:item_type => 'assignment', :active => true).count > 0 %>
+		<legend>Custom Fields</legend>
+		<%= f.fields_for :custom_items do |custom_item|%>
+		  <div class="control-group">
+			<%= custom_item.hidden_field :custom_field_id %>
+			<label class="control-label" for="modified_by"><%= CustomField.where(:id => custom_item.object.custom_field_id).first.field_name %></label>
+			<div class="controls">
+			  <% field_type = CustomField.where(:id => custom_item.object.custom_field_id).first.field_type %>
+			  <% if field_type == 'string' %>
+				<%= custom_item.text_field :value %>
+			  <% elsif field_type == 'drop_down' %>
+				<%= custom_item.select :value, CustomField.where(:id => custom_item.object.custom_field_id).first.accepted_values.split(','), :include_blank => true %>
+			  <% elsif field_type == 'check_box' %>
+				<%= custom_item.check_box :value %>
+			  <% elsif field_type == 'number' %>
+				<%= custom_item.number_field :value, :step => 0.000001 %>
+			  <% elsif field_type == 'radio_button' %>
+				<% CustomField.where(:id => custom_item.object.custom_field_id).first.accepted_values.split(',').each do |radio_value| %>
+				  <label class="radio">
+				    <%= custom_item.radio_button :value, radio_value %>
+				    <%= custom_item.label :value, radio_value %>
+				  </label>
+				<% end %>
+			  <% elsif field_type == 'link' %>
+			  	<%= custom_item.text_field :value %>
+			  <% end %>
+			</div>
+		  </div>
+		<% end %>
+	<% end %>
+
     <legend>Task Components</legend>
 
     <%= f.simple_fields_for :task do |task| %>

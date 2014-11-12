@@ -43,6 +43,35 @@
   </div>
 </div>
 
+<% if @assignment.custom_items.count > 0 %>
+  <div class="row-fluid">
+    <div class="span12">
+      <legend class="show">Custom Fields</legend>
+      <table class="table">
+        <tbody>
+          <% @assignment.custom_items.each do |custom_item|%>
+            <tr>
+              <td class="title"><%= custom_item.custom_field.field_name %></td>
+              <td>
+                <% if custom_item.custom_field.field_type == 'check_box' %>  
+                  <% if custom_item.value == '1' %>
+                    True
+                  <% else %>
+                    False
+                  <% end %>
+			   	<% elsif custom_item.custom_field.field_type == 'link' %>	
+			  		<%= link_to custom_item.value.split(',').map(&:strip).first, custom_item.value.split(',').map(&:strip).last, :target => "_blank" %>
+                <% else %>
+                  <%= custom_item.value %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+  </div> <!-- end module div -->
+<% end %>
+
 <% if @assignment.task != nil%>
   <div class="row-fluid">
     <div class="span12">
