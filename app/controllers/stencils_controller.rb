@@ -24,7 +24,7 @@ class StencilsController < ApplicationController
     authorize_product!(@stencil.product)
     
     # Find the parent test case ID
-    parent_id = find_stencil_parent_id(@stencil)
+    parent_id = view_context.find_stencil_parent_id(@stencil)
     
     # Find the list of related test case versions
     @stencils = Stencil.where( "id = ? OR parent_id = ?", parent_id, parent_id ).where("id <> ?", @stencil.id)
@@ -154,7 +154,7 @@ class StencilsController < ApplicationController
       authorize_product!(original_stencil.product)
       
       # Find the parent test case ID
-      parent_id = find_stencil_parent_id(original_stencil)
+      parent_id = view_context.find_stencil_parent_id(original_stencil)
     
       # Find the current max version for this parent id
       max_version = Stencil.where( "id = ? OR parent_id = ?", parent_id, parent_id ).maximum(:version)
@@ -198,18 +198,6 @@ class StencilsController < ApplicationController
   end
   
   private
-  
-  # Take a stencil and figure out the id of the parent stencil
-  def find_stencil_parent_id(stencil)
-    # Figure out if this is the parent
-    # If the stencil's parent_id is blank, its ID is the parent ID
-    if stencil.parent_id.nil?
-      parent_id = stencil.id
-    # otherwise, the parent id is the one listed on the stencil
-    else
-      parent_id = stencil.parent_id
-    end
-  end
   
   # Functions for sorting columns
   # Among other things, these prevent SQL injection

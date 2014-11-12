@@ -7,8 +7,7 @@
         <%= f.input :item_type, as: :select, collection: custom_field_item_types_list%>
         <%= f.input :field_name %>
         <%= f.input :field_type, as: :select, collection: custom_field_types_list %>
-        <%= f.input :accepted_values, :input_html => { :rows => 5, :class => "input-xxlarge"}, :hint => "For radio buttons and drop downs. Enter comma separated values. Ex. Option 1,Option 2,Option 3" %>
-
+        <%= f.input :accepted_values, :input_html => { :rows => 5, :class => "input-xxlarge"}, :hint => "For radio buttons and drop downs. Enter comma separated values. Ex. Option 1,Option 2,Option 3.<br />For links, when setting the custom field in the item's edit page (not here in the 'Accepted values' text box), enter the display name and the destination url separated by a comma. Ex. Guidebook, http://www.guidebook.com" %>
         <%= f.input :active %>
         <div class="actions">
           <%= f.submit nil, :class => "btn btn-success" %>

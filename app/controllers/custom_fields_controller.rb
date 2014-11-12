@@ -74,4 +74,16 @@ class CustomFieldsController < ApplicationController
       end
     end
   end
+
+  # DELETE /custom_fields/1
+  # DELETE /custom_fields/1.xml
+  def destroy
+    @custom_field = CustomField.find(params[:id])
+    authorize! :update, @custom_field
+    
+	@custom_field.destroy
+    respond_to do |format|
+      format.html { redirect_to(custom_fields_url) }
+	end
+  end
 end

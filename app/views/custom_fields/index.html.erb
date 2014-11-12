@@ -10,6 +10,7 @@
         <th>Accepted values</th>
         <th>Active</th>
         <th></th>
+		<th></th>
       </tr>
 
     <% @custom_fields.each do |custom_field| %>
@@ -20,6 +21,7 @@
         <td><%= custom_field.accepted_values %></td>
         <td><%= custom_field.active == true ? 'Yes' : 'No' %></td>
         <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_custom_field_path(custom_field) %></td>
+		<td><%= link_to '<i class="icon-remove"></i> Delete'.html_safe, custom_field, :confirm => 'Are you sure?', :method => :delete %></td>
       </tr>
     <% end %>
     </table>

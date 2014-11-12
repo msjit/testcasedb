@@ -33,7 +33,9 @@
                                  first.accepted_values.split(',').each do |radio_value| %>
                     <%= custom_item.radio_button :value, radio_value %> <%= custom_item.label :value, radio_value %>  
                   <% end %>
-                <% end %>
+			  	<% elsif field_type == 'link' %>
+			  		<%= custom_item.text_field :value %>
+			  	<% end %>
               </div>
             </div>
           <% end %>
