@@ -1,7 +1,7 @@
 class CreateTestCases < ActiveRecord::Migration
   def self.up
     create_table :test_cases do |t|
-      t.string :name
+      t.text :name
       t.text :description
 
       t.timestamps
