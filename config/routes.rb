@@ -25,7 +25,12 @@ TestDB::Application.routes.draw do
 
   resources :custom_fields
 
+  # Web API v1 route
   post "webapi/run"
+  
+  # Web API v2 routes
+  post 'api/:object/:endpoint', to: 'webapiv2#run',       via: [:post]
+  post 'api/*other',            to: 'webapiv2#invalid',   via: [:post]
 
   resources :tasks do
     resources :comments

@@ -94,9 +94,9 @@ gem 'selenium-client'
 # end
 # gem "mocha", :group => :test
 gem 'blitz'
-
-gem "rspec-rails", :group => [:test, :development]
-group :test do
+group :development, :test do
+  gem 'rspec-rails', '~> 3.0.0'
   gem "factory_girl_rails"
-  gem "capybara"
+  gem "capybara", '>= 2.2.0'
+  gem 'database_cleaner'
 end
