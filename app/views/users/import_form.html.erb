@@ -18,7 +18,7 @@
       </div>
     <% end %>
    <div class="field">
-     File: <%= f.file_field :upload, :accept => 'application/vnd.ms-excel' %>
+     File: <%= f.file_field :upload, :accept => 'application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv' %>
    </div>
 
   <%= f.submit "Import Users", :class => "btn btn-success" %>
