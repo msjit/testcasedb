@@ -99,10 +99,7 @@
     <legend>Result</legend>
 
     <p>
-	    <% if @result.errors.empty? and @result.result %>
-		<%= f.hidden_field :result %>
-        <button type="button" class="btn"><%= @result.result %></button>
-      <% else %>
+      <% if @result.errors.empty? and @result.result %>
         <%= f.hidden_field :result %>
         <div id="result-toggle" class="btn-group" data-toggle="buttons-radio">
           <button type="button" class="btn" data-result="Passed">Passed</button>
