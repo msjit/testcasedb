@@ -20,4 +20,16 @@ module StencilsHelper
   def link_to_remove_test_plans(name, f)
     f.hidden_field(:_destroy) + button_to_function(name, "remove_test_plans(this)", :class => "btn btn-danger btn-small")
   end
+  
+  # Take a stencil and figure out the id of the parent stencil
+  def find_stencil_parent_id(stencil)
+    # Figure out if this is the parent
+    # If the stencil's parent_id is blank, its ID is the parent ID
+    if stencil.parent_id.nil?
+      parent_id = stencil.id
+    # otherwise, the parent id is the one listed on the stencil
+    else
+      parent_id = stencil.parent_id
+    end
+  end  
 end

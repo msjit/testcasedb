@@ -59,7 +59,9 @@
                 <%= custom_item.label :value, radio_value %>
               </label>
             <% end %>
-          <% end %>
+		  <% elsif field_type == 'link' %>
+		  	<%= custom_item.text_field :value %>
+		  <% end %>
         </div>
       </div>
     <% end %>
