@@ -111,10 +111,10 @@
   </div>
 <% end %>
 
-
-
+<% # Only show the edit link if there is no result or setting to allow edit after set is enabled %>
+<% if !@result.result || Setting.value('Allow Result Edit After Set') == true %>
 <%= link_to "Edit", edit_result_path(@result), :class => "btn btn-primary"  %>
-
+<% end %>
 <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
 
 <%= render 'uploads' %>
