@@ -57,7 +57,7 @@
                   <% else %>
                     False
                   <% end %>
-			   	<% elsif custom_item.custom_field.field_type == 'link' %>	
+			   	<% elsif custom_item.custom_field.field_type == 'link' && custom_item.value.split(',').count == 2 %>	
 			  		<%= link_to custom_item.value.split(',').map(&:strip).first, custom_item.value.split(',').map(&:strip).last, :target => "_blank" %>
                 <% else %>
                   <%= custom_item.value %>
@@ -111,10 +111,10 @@
   </div>
 <% end %>
 
-
-
+<% # Only show the edit link if there is no result or setting to allow edit after set is enabled %>
+<% if !@result.result || Setting.value('Allow Result Edit After Set') == true %>
 <%= link_to "Edit", edit_result_path(@result), :class => "btn btn-primary"  %>
-
+<% end %>
 <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>
 
 <%= render 'uploads' %>
