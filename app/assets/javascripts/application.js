@@ -258,12 +258,12 @@ function add_steps(link, association, content) {
   var regexp = new RegExp("new_" + association, "g")
   var highStep=0;
   $(".step_number").each(function(i,inputItem ){
-    if(inputItem.value>highStep){
-      highStep=inputItem.value;
+    if(parseInt(inputItem.value)>highStep){
+      highStep=parseInt(inputItem.value);
     }
   });
   $(link).before(content.replace(regexp, new_id));
-  $('[name="test_case[steps_attributes][' + new_id + '][step_number]"]').val(parseInt(highStep)+1);
+  $('[name="test_case[steps_attributes][' + new_id + '][step_number]"]').val(highStep+1);
   $('[name="test_case[steps_attributes][' + new_id + '][action]"]').focus();
 }
 
