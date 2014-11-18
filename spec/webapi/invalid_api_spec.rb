@@ -46,6 +46,51 @@ RSpec.describe 'Invalid API calls', :type => :request do
     }
     post "api/users/search.json", params, request_headers
     expect(response.status).to eq(401) 
+  end
+  
+  it "returns error if no request symbol provided" do
+    params = {
+      "api_key" => 'wrongkey'
+    }.to_json    
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/users/search", params, request_headers
+    expect(response.status).to eq(400) 
+  end
+  
+  it "returns error if invalid request symbol provided" do
+    params = {
+      "api_key" => 'wrongkey'
+    }.to_json    
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/users/search.html", params, request_headers
+    expect(response.status).to eq(400) 
   end   
+  
+  it "returns error if invalid JSON data provided" do  
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/users/search.json", '1', request_headers
+    expect(response.status).to eq(400) 
+  end 
+  
+  it "returns error if invalid XML data provided" do  
+    params = {
+      "api_key" => 'wrongkey'
+    }.to_json       
+    request_headers = {
+      "Accept" => "application/xml",
+      "Content-Type" => "application/xml"
+    }
+    post "api/users/search.xml", params, request_headers
+    expect(response.status).to eq(400) 
+  end          
       
 end
