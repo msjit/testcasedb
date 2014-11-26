@@ -9,7 +9,7 @@ var newDivs = '<div class="rectangle" style="display: block"></div>';
   <% @test_plans.each do |testplan| %>
     var planName = "<%= testplan.deprecated ? '<del>'.html_safe + escape_javascript(testplan.name) + '</del>'.html_safe : testplan.name %>";
     var testPlanLink = "<a href='<%= test_plan_path(testplan) %>'>" + planName + "</a>";
-    var description = "<%= escape_javascript(testplan.description) %>";
+    var description = "<%= escape_javascript( truncate(testplan.description) ) %>";
     var version = "<%= testplan.version %>";
     
     <% if can? :update, @test_plan %>

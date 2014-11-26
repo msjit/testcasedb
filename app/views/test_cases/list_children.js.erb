@@ -42,7 +42,7 @@ var categoryLink = "";
     var tags ='<%= escape_javascript(list_of_test_case_tags(testcase.tags)) %>';
 
     <% # .gsub below is used to strip newlines %>
-    newDivs +=  '<tr class="<%= cycle("even", "odd") %> rowLink"><td class="treeTableCheck"><%= check_box_tag testcase.id, "1", false, :class => "checkbox" %></td><td><%= testcase.id %><td>' + testCaseLink + '</td><td><%= escape_javascript(testcase.description) %></td><td><%= testcase.version %></td><td>' + tags + '</td><td>' + editLink + '</td></tr>';
+    newDivs +=  '<tr class="<%= cycle("even", "odd") %> rowLink"><td class="treeTableCheck"><%= check_box_tag testcase.id, "1", false, :class => "checkbox" %></td><td><%= testcase.id %><td>' + testCaseLink + '</td><td><%= escape_javascript( truncate(testcase.description) ) %></td><td><%= testcase.version %></td><td>' + tags + '</td><td>' + editLink + '</td></tr>';
   <% end %>
   newDivs += '</tbody></table></div>';
 <% end %>

@@ -2,13 +2,55 @@ require 'json'
 
 class Webapiv2Controller < ApplicationController
   skip_before_filter :require_login
+
+  def validate_request(request)
+    request_ok = false
+    request_data = nil
+    if request.format.symbol  =~ /json/
+      begin
+        request_data = JSON.parse(request.body.read)
+        request_ok = true
+      rescue
+        message = 'Unable to parse JSON request data.'
+        status = 400 
+      end
+    elsif request.format.symbol  =~ /xml/
+      begin
+        request_data = Hash.from_xml(request.body.read)
+        request_ok = true
+      rescue
+        message = 'Unable to parse XML request data.'
+        status = 400         
+      end      
+    else
+      message = 'Request format symbol was blank or invalid. Must be ".json" or ".xml".'
+      status = 400   
+    end
+    if !request_ok
+      respond_to do |format|
+        format.json {
+          render :json => {'message' => message},
+                 :status => status
+        }
+        format.xml {
+          render :xml => {'message' => message}.to_xml(:root => 'response', :skip_types => true),
+                 :status => status
+        }
+        format.all {
+          render :text => message,
+                 :status => status
+        }        
+      end
+    end
+    return request_ok, request_data
+  end
   
-  def authenticate_api_user(request_params)
+  def authenticate_api_user(request_data)
     authenticated = false
     message = nil
     status = nil   
-    if request_params && request_params.key?('api_key')
-      api_key = request_params['api_key']     
+    if request_data && request_data.key?('api_key')
+      api_key = request_data['api_key']     
       user = User.where(:single_access_token => api_key,
                         :role => 11)
       if user != []
@@ -29,7 +71,7 @@ class Webapiv2Controller < ApplicationController
                  :status => status
         }
         format.xml {
-          render :xml => {'message' => message},
+          render :xml => {'message' => message}.to_xml(:root => 'response', :skip_types => true),
                  :status => status
         }                   
       end     
@@ -39,36 +81,31 @@ class Webapiv2Controller < ApplicationController
   
   def run
     response_hash = nil
-    request_params = nil
-    if request.format.symbol  =~ /json/
-      request_params = JSON.parse(request.body.read)
-    elsif request.format.symbol  =~ /xml/
-      request_params = Hash.from_xml(request.body.read)
-    end    
-    return if !authenticate_api_user(request_params)    
+    request_ok, request_data = validate_request(request)    
+    return if !request_ok || !authenticate_api_user(request_data)    
     case params[:object]
     when 'products'
-      response_hash = _products(params[:endpoint], request_params)
+      response_hash = _products(params[:endpoint], request_data)
     when 'users'
-      response_hash = _users(params[:endpoint], request_params)
+      response_hash = _users(params[:endpoint], request_data)
     when 'versions'
-      response_hash = _versions(params[:endpoint], request_params)
+      response_hash = _versions(params[:endpoint], request_data)
     when 'devices'
-      response_hash = _devices(params[:endpoint], request_params)
+      response_hash = _devices(params[:endpoint], request_data)
     when 'categories'
-      response_hash = _categories(params[:endpoint], request_params)
+      response_hash = _categories(params[:endpoint], request_data)
     when 'tags'
-      response_hash = _tags(params[:endpoint], request_params)
+      response_hash = _tags(params[:endpoint], request_data)
     when 'test_cases'
-      response_hash = _test_cases(params[:endpoint], request_params)
+      response_hash = _test_cases(params[:endpoint], request_data)
     when 'test_plans'
-      response_hash = _test_plans(params[:endpoint], request_params)     
+      response_hash = _test_plans(params[:endpoint], request_data)     
     when 'stencils'
-      response_hash = _stencils(params[:endpoint], request_params)       
+      response_hash = _stencils(params[:endpoint], request_data)       
     when 'assignments'
-      response_hash = _assignments(params[:endpoint], request_params)
+      response_hash = _assignments(params[:endpoint], request_data)
     when 'results'
-      response_hash = _results(params[:endpoint], request_params)                                                                                                  
+      response_hash = _results(params[:endpoint], request_data)                                                                                                  
     end
     if response_hash.nil?
       response_hash = {'response' => {'message' => 'Invalid API endpoint.'}, 'status' => 400}
@@ -79,7 +116,7 @@ class Webapiv2Controller < ApplicationController
                :status => response_hash['status']
       }
       format.xml {
-        render :xml => response_hash['response'],
+        render :xml => response_hash['response'].to_xml(:root => 'response', :skip_types => true),
                :status => response_hash['status']
       }
       format.all {
@@ -94,7 +131,7 @@ class Webapiv2Controller < ApplicationController
                :status => 500
       }
       format.xml {
-        render :xml => {'message' => 'Exception'},
+        render :xml => {'message' => 'Exception'}.to_xml(:root => 'response', :skip_types => true),
                :status => 500
       }          
     end      
@@ -107,7 +144,7 @@ class Webapiv2Controller < ApplicationController
                :status => 400
       }
       format.xml {
-        render :xml => {'message' => 'Invalid API endpoint.'},
+        render :xml => {'message' => 'Invalid API endpoint.'}.to_xml(:root => 'response', :skip_types => true),
                :status => 400
       }      
       format.all {
@@ -119,74 +156,74 @@ class Webapiv2Controller < ApplicationController
 
   private
   
-  def _products(endpoint, request_params)
+  def _products(endpoint, request_data)
     case endpoint
     when "search"
-      return _products_search(request_params)
+      return _products_search(request_data)
     when 'create'
-      return _products_create(request_params)      
+      return _products_create(request_data)      
     end
     return nil      
   end
 
-  def _users(endpoint, request_params)
+  def _users(endpoint, request_data)
     case endpoint
     when "search"
-      return _users_search(request_params)
+      return _users_search(request_data)
     when "roles"
-      return _users_roles(request_params)      
+      return _users_roles(request_data)      
     end
     return nil      
   end
   
-  def _versions(endpoint, request_params)
+  def _versions(endpoint, request_data)
     case endpoint
     when 'search'
-      return _versions_search(request_params)
+      return _versions_search(request_data)
     when 'create'
-      return _versions_create(request_params)
+      return _versions_create(request_data)
     end
     return nil
   end  
 
-  def _devices(endpoint, request_params)
+  def _devices(endpoint, request_data)
     case endpoint
     when 'search'
-      return _devices_search(request_params)
+      return _devices_search(request_data)
     when 'create'
-      return _devices_create(request_params)
+      return _devices_create(request_data)
     end
     return nil  
   end
 
-  def _categories(endpoint, request_params)
+  def _categories(endpoint, request_data)
     case endpoint
     when 'search'
-      return _categories_search(request_params)
+      return _categories_search(request_data)
     when 'create'
-      return _categories_create(request_params)
+      return _categories_create(request_data)
     end
     return nil   
   end
 
-  def _tags(endpoint, request_params)
+  def _tags(endpoint, request_data)
     case endpoint
     when 'search'
-      return _tags_search(request_params)
+      return _tags_search(request_data)
     when 'create'
-      return _tags_create(request_params)
+      return _tags_create(request_data)
     end
     return nil   
   end
 
-  def _test_cases(endpoint, request_params)
+  def _test_cases(endpoint, request_data)
     case endpoint
     when 'search'
-      return _test_cases_search(request_params)
+      return _test_cases_search(request_data)
     when 'create'
-      return _test_cases_handler(request_params, 'create')
+      return _test_cases_handler(request_data, 'create')
     when 'update'
-      return _test_cases_handler(request_params, 'update')
+      return _test_cases_handler(request_data, 'update')
     when "statuses"
       return _item_statuses()
     when "types"
@@ -195,57 +232,57 @@ class Webapiv2Controller < ApplicationController
     return nil   
   end
 
-  def _test_plans(endpoint, request_params)
+  def _test_plans(endpoint, request_data)
     case endpoint
     when 'search'
-      return _test_plans_search(request_params)
+      return _test_plans_search(request_data)
     when 'create'
-      return _test_plans_create(request_params)
+      return _test_plans_create(request_data)
     when 'update'
-      return _test_plans_update(request_params)
+      return _test_plans_update(request_data)
     when "statuses"
       return _item_statuses()               
     end
     return nil   
   end
 
-  def _stencils(endpoint, request_params)
+  def _stencils(endpoint, request_data)
     case endpoint
     when 'search'
-      return _stencils_search(request_params)
+      return _stencils_search(request_data)
     when 'create'
-      return _stencils_create(request_params)
+      return _stencils_create(request_data)
     when 'update'
-      return _stencils_update(request_params)
+      return _stencils_update(request_data)
     when "statuses"
       return _item_statuses()            
     end
     return nil   
   end
 
-  def _assignments(endpoint, request_params)
+  def _assignments(endpoint, request_data)
     case endpoint
     when 'search'
-      return _assignments_search(request_params)
+      return _assignments_search(request_data)
     when 'create'
-      return _assignments_create(request_params)
+      return _assignments_create(request_data)
     end
     return nil   
   end
   
-  def _results(endpoint, request_params)
+  def _results(endpoint, request_data)
     case endpoint
     when 'get'
-      return _results_get(request_params)
+      return _results_get(request_data)
     when 'set'
-      return _results_set(request_params)
+      return _results_set(request_data)
     end
     return nil   
   end
   
   # handle creation and update of the custom fields
   # returns true or false and a message
-  def _handle_custom_fields(request_params, item_type, item)  
+  def _handle_custom_fields(request_data, item_type, item)  
     if item_type != "test_case" \
        && item_type != "test_plan" \
        && item_type != "assignment" \
@@ -255,14 +292,14 @@ class Webapiv2Controller < ApplicationController
     end
     success = false
     message = ""   
-    if request_params['custom_fields'].is_a?(Hash) \
-       && !request_params['custom_fields'].empty?
-      incorrect_fields = request_params['custom_fields'].map {|k,v| (v.is_a?(Hash) && !v.empty?) ? nil : k.to_s}.compact
+    if request_data['custom_fields'].is_a?(Hash) \
+       && !request_data['custom_fields'].empty?
+      incorrect_fields = request_data['custom_fields'].map {|k,v| (v.is_a?(Hash) && !v.empty?) ? nil : k.to_s}.compact
       if incorrect_fields.count > 0
         return false, "One or more passed custom_fields were not of the correct type or empty"
       end                                
       # create custom field(s) if necessary
-      request_params['custom_fields'].each do |key, value|
+      request_data['custom_fields'].each do |key, value|
         if value.key?('name') && value.key?('type')
           type = value['type']
           if type == "string" \
@@ -297,7 +334,7 @@ class Webapiv2Controller < ApplicationController
                                         :active => true)    
       # set custom field for item
       if custom_fields.count > 0
-        request_params['custom_fields'].each do |key, value|
+        request_data['custom_fields'].each do |key, value|
           # verify that the custom field has a name and value
           if value.key?('name') && value.key?('value')
             # if the custom field passed with the request exists then add it to the result
@@ -330,15 +367,15 @@ class Webapiv2Controller < ApplicationController
     return success, message
   end  
   
-  def _handle_test_case_tags(request_params, test_case)  
-    if request_params['tags'].is_a?(Array) \
-       && !request_params['tags'].empty?
-      incorrect_tags = request_params['tags'].map {|x| (x.is_a?(String) || x.is_a?(Integer))  ? nil : x.to_s}.compact
+  def _handle_test_case_tags(request_data, test_case)  
+    if request_data['tags'].is_a?(Array) \
+       && !request_data['tags'].empty?
+      incorrect_tags = request_data['tags'].map {|x| (x.is_a?(String) || x.is_a?(Integer))  ? nil : x.to_s}.compact
       if incorrect_tags.count > 0 
         message = 'One or more passed tags were neither of type String or Integer'         
         return false, message        
       end               
-      request_params['tags'].each do |tag|
+      request_data['tags'].each do |tag|
         if tag.is_a?(String)
           response_hash = _tags_create({'name' => tag})
           if response_hash['status'] != 201 \
@@ -404,8 +441,8 @@ class Webapiv2Controller < ApplicationController
     return nil  
   end   
   
-  def _get_status(request_params)
-    status = request_params['status']
+  def _get_status(request_data)
+    status = request_data['status']
     if status
       if status.is_a?(Integer) \
          && (I18n.t :item_status).key?(status)
@@ -479,17 +516,17 @@ class Webapiv2Controller < ApplicationController
     return plan_cases 
   end
   
-  def _products_search(request_params)
+  def _products_search(request_data)
     response_hash = {}  
-    if request_params['name'] == nil \
-       && request_params['id'] == nil 
+    if request_data['name'] == nil \
+       && request_data['id'] == nil 
       response_hash["message"] = "No search parameters provided. Please specify one or more of the following: " \
-                                 "%s." %[request_params['indirect_call'] ? "'product_name', 'product_id'" : "'name', 'id'"]
+                                 "%s." %[request_data['indirect_call'] ? "'product_name', 'product_id'" : "'name', 'id'"]
       return {'response' => response_hash,
               'status' => 400}   
     end
-    conditions = {:name => request_params['name'],
-                  :id => request_params['id'] }
+    conditions = {:name => request_data['name'],
+                  :id => request_data['id'] }
     conditions.delete_if {|k,v| v.blank? }    
     products = Product.find(:all, :conditions => conditions)
     if products != []
@@ -510,11 +547,11 @@ class Webapiv2Controller < ApplicationController
             'status' => 200}    
   end   
   
-  def _products_create(request_params)
-    response_hash = _products_search(request_params)   
+  def _products_create(request_data)
+    response_hash = _products_search(request_data)   
     if response_hash["status"] == 200 && !response_hash['response']['found'] 
-      product = Product.new(:name => request_params['name'],
-                            :description => request_params['description'] )
+      product = Product.new(:name => request_data['name'],
+                            :description => request_data['description'] )
       if product.save
         response_hash = {
           'response' => {
@@ -535,23 +572,23 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end   
   
-  def _users_search(request_params)
+  def _users_search(request_data)
     response_hash = {}  
-    if request_params['id'] == nil \
-       && request_params['username'] == nil \
-       && request_params['email'] == nil \
-       && request_params['first_name'] == nil \
-       && request_params['last_name'] == nil
+    if request_data['id'] == nil \
+       && request_data['username'] == nil \
+       && request_data['email'] == nil \
+       && request_data['first_name'] == nil \
+       && request_data['last_name'] == nil
       response_hash["message"] = "No search parameters provided. Please specify one or more of the following: " \
                                  "'id', 'username', 'email', 'first_name', 'last_name'."
       return {'response' => response_hash,
               'status' => 400}   
     end
-    conditions = {:id => request_params['id'],
-                  :username => request_params['username'],
-                  :email => request_params['email'],
-                  :first_name => request_params['first_name'],
-                  :last_name => request_params['last_name'] }
+    conditions = {:id => request_data['id'],
+                  :username => request_data['username'],
+                  :email => request_data['email'],
+                  :first_name => request_data['first_name'],
+                  :last_name => request_data['last_name'] }
     conditions.delete_if {|k,v| v.blank? }    
     users = User.find(:all, :conditions => conditions)
     if users != []
@@ -574,29 +611,29 @@ class Webapiv2Controller < ApplicationController
             'status' => 200}    
   end  
   
-  def _users_roles(request_params)
+  def _users_roles(request_data)
     return {'response' => {'message' => (I18n.t :user_roles)},
             'status' => 200}
   end
   
-  def _versions_search(request_params)
+  def _versions_search(request_data)
     response_hash = {}
-    if request_params['product_name'] || request_params['product_id']
-      response_hash = _products_search({'name' => request_params['product_name'],
-                                        'id' => request_params['product_id'],
+    if request_data['product_name'] || request_data['product_id']
+      response_hash = _products_search({'name' => request_data['product_name'],
+                                        'id' => request_data['product_id'],
                                         'indirect_call' => true})
       if !(response_hash["status"] == 200 && response_hash['response']['found'])
         return response_hash
       end
       product = response_hash['product']
-    elsif request_params['version'].nil? && request_params['id'].nil?
+    elsif request_data['version'].nil? && request_data['id'].nil?
       response_hash["message"] = "No search parameters provided. Please specify one or more of the following: " \
-                                 "%s." %[request_params['indirect_call'] ? "'product_version', 'product_version_id'" : "'version', 'id'"]
+                                 "%s." %[request_data['indirect_call'] ? "'product_version', 'product_version_id'" : "'version', 'id'"]
       return {'response' => response_hash,
               'status' => 400}                
     end      
-    conditions = {:id => request_params['id'],
-                  :version => request_params['version'],
+    conditions = {:id => request_data['id'],
+                  :version => request_data['version'],
                   :product_id => product ? product.id : nil}
     conditions.delete_if {|k,v| v.blank?}    
     versions = Version.find(:all, :conditions => conditions, :order => "id ASC") 
@@ -626,21 +663,21 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end
   
-  def _versions_create(request_params)
-    if request_params['product_name'].nil? && request_params['product_id'].nil? 
+  def _versions_create(request_data)
+    if request_data['product_name'].nil? && request_data['product_id'].nil? 
       response_hash["message"] = "No product_name or product_id parameter provided"
       return {'response' => response_hash,
               'status' => 400}
     end    
-    response_hash = _versions_search({'product_name' => request_params['product_name'],
-                                      'product_id' => request_params['product_id'],
-                                      'version' => request_params['version'],
-                                      'version_id' => request_params['version_id'],
+    response_hash = _versions_search({'product_name' => request_data['product_name'],
+                                      'product_id' => request_data['product_id'],
+                                      'version' => request_data['version'],
+                                      'version_id' => request_data['version_id'],
                                       'indirect_call' => true})  
     if response_hash["status"] == 200 && !response_hash['response']['found']
-      version = Version.new(:version => request_params['version'],
+      version = Version.new(:version => request_data['version'],
                             :product_id => response_hash['product'].id,
-                            :description => request_params['description'])
+                            :description => request_data['description'])
       if version.save
         response_hash = {
           'response' => {
@@ -662,17 +699,17 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end 
   
-  def _devices_search(request_params)
+  def _devices_search(request_data)
     response_hash = {}  
-    if request_params['name'] == nil \
-       && request_params['id'] == nil
+    if request_data['name'] == nil \
+       && request_data['id'] == nil
       response_hash["message"] = "No search parameters provided. Please specify one or more of the following: " \
                                  "'name', 'id'."
       return {'response' => response_hash,
               'status' => 400}   
     end
-    conditions = {:name => request_params['name'],
-                  :id => request_params['id']}
+    conditions = {:name => request_data['name'],
+                  :id => request_data['id']}
     conditions.delete_if {|k,v| v.blank? }    
     devices = Device.find(:all, :conditions => conditions)
     if devices != []
@@ -693,14 +730,14 @@ class Webapiv2Controller < ApplicationController
             'status' => 200}
   end
 
-  def _devices_create(request_params)                      
-    response_hash = _devices_search(request_params)
+  def _devices_create(request_data)                      
+    response_hash = _devices_search(request_data)
     if response_hash["status"] == 200 && !response_hash['response']['found'] 
-      device = Device.new(:name => request_params['name'],
+      device = Device.new(:name => request_data['name'],
                           :active => true,
-                          :description =>  request_params['description'])
-      if request_params.key?('custom_fields')
-        success, message = _handle_custom_fields(request_params, "device", device)
+                          :description =>  request_data['description'])
+      if request_data.key?('custom_fields')
+        success, message = _handle_custom_fields(request_data, "device", device)
         if !success
           response_hash = {
             'response' => {'message' => message},
@@ -731,17 +768,17 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end  
   
-  def _categories_search(request_params)
-    response_hash = _products_search({'name' => request_params['product_name'],
-                                      'id' => request_params['product_id'],
+  def _categories_search(request_data)
+    response_hash = _products_search({'name' => request_data['product_name'],
+                                      'id' => request_data['product_id'],
                                       'indirect_call' => true})
     if response_hash["status"] == 200 && response_hash['response']['found'] 
       product = response_hash['product']
       parent_category = nil
       current_category = nil
       all_categories = nil       
-      if request_params['category'] != nil
-        categories = request_params['category'].split(/[\\\/]/)
+      if request_data['category'] != nil
+        categories = request_data['category'].split(/[\\\/]/)
         all_categories = categories.clone            
       else
         response_hash = {
@@ -802,8 +839,8 @@ class Webapiv2Controller < ApplicationController
     return response_hash     
   end
  
-  def _categories_create(request_params)    
-    response_hash = _categories_search(request_params)    
+  def _categories_create(request_data)    
+    response_hash = _categories_search(request_data)    
     if response_hash["status"] == 200 && !response_hash['response']['found']
       categories = response_hash['categories']
       product = response_hash['product']     
@@ -857,17 +894,17 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end  
   
-   def _tags_search(request_params)
+   def _tags_search(request_data)
     response_hash = {}  
-    if request_params['name'] == nil \
-       && request_params['id'] == nil 
+    if request_data['name'] == nil \
+       && request_data['id'] == nil 
       response_hash["message"] = "No search parameters provided. Please specify one or more of the following: " \
                                  "'name', 'id'."
       return {'response' => response_hash,
               'status' => 400}   
     end
-    conditions = {:name => request_params['name'],
-                  :id => request_params['id'] }
+    conditions = {:name => request_data['name'],
+                  :id => request_data['id'] }
     conditions.delete_if {|k,v| v.blank? }    
     tags = Tag.find(:all, :conditions => conditions)
     if tags != []
@@ -886,16 +923,16 @@ class Webapiv2Controller < ApplicationController
             'status' => 200}    
   end   
   
-  def _tags_create(request_params)
-    response_hash = _tags_search(request_params)   
+  def _tags_create(request_data)
+    response_hash = _tags_search(request_data)   
     if response_hash['status'] == 200 && !response_hash['response']['found']
-      if !request_params['name']
+      if !request_data['name']
         return {
           'response' => {'message' => 'No name provided to create tag from.'},
           'status' => 400
         }         
       end
-      tag = Tag.new(:name => request_params['name'])
+      tag = Tag.new(:name => request_data['name'])
       if tag.save
         response_hash = {
           'response' => {
@@ -915,23 +952,23 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end 
   
-  def _test_cases_search(request_params)
-    response_hash = _categories_search(request_params)
+  def _test_cases_search(request_data)
+    response_hash = _categories_search(request_data)
     test_case = nil
     if response_hash["status"] == 200 && response_hash['response']['found']
       category = response_hash['current_category']
       product = response_hash['product']
       categories = response_hash['categories']
       response_hash = {}        
-      if request_params['test_case_name'] == nil \
-         && request_params['test_case_id'] == nil 
+      if request_data['test_case_name'] == nil \
+         && request_data['test_case_id'] == nil 
         response_hash["message"] = "No search parameters provided. Please specify one or more of the following: " \
                                    "'test_case_name', 'test_case_id'."
         return {'response' => response_hash,
                 'status' => 400}   
       end
-      conditions = {:name => request_params['test_case_name'],
-                    :id => request_params['test_case_id'] }             
+      conditions = {:name => request_data['test_case_name'],
+                    :id => request_data['test_case_id'] }             
       if categories.length > 1
         conditions[:category_id] = category.id
       else
@@ -942,7 +979,7 @@ class Webapiv2Controller < ApplicationController
       if test_case == []
         response_hash = {
           'response' => {'message' => 'Test case "%s" not found for product "%s" in category hierarchy "%s".' \
-                                      %[request_params['test_case_name'] || request_params['test_case_id'], product.name, categories.join('/')],
+                                      %[request_data['test_case_name'] || request_data['test_case_id'], product.name, categories.join('/')],
                          'found' => false},
           'status' => 200,
           'product' => product,
@@ -994,17 +1031,17 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end
 
-  def _test_cases_handler(request_params, action)
-    if request_params.key?('test_cases')
-      if request_params['test_cases'].is_a?(Hash) \
-         && !request_params['test_cases'].empty?
-        incorrect_fields = request_params['test_cases'].map {|k,v| (v.is_a?(Hash) && !v.empty?) ? nil : k.to_s}.compact
+  def _test_cases_handler(request_data, action)
+    if request_data.key?('test_cases')
+      if request_data['test_cases'].is_a?(Hash) \
+         && !request_data['test_cases'].empty?
+        incorrect_fields = request_data['test_cases'].map {|k,v| (v.is_a?(Hash) && !v.empty?) ? nil : k.to_s}.compact
         if incorrect_fields.count > 0        
           return {'response' => {'message' => 'One or more passed test_cases were not of the correct type or empty.'},
                   'status' => 400}        
         end       
         response_hash = {'test_cases' => []}
-        request_params['test_cases'].each do |key, value|
+        request_data['test_cases'].each do |key, value|
           if action == 'create'
             result = _test_cases_create(value)
             response_hash['message'] = 'Successfully created all test cases'
@@ -1026,18 +1063,18 @@ class Webapiv2Controller < ApplicationController
       end
     else
       if action == 'create'
-        return _test_cases_create(request_params)
+        return _test_cases_create(request_data)
       elsif action == 'update'
-        return _test_cases_update(request_params)
+        return _test_cases_update(request_data)
       end
     end
   end
 
-  def _test_cases_create(request_params)
-    if !request_params['new_version']
-      request_params.delete('test_case_id')
+  def _test_cases_create(request_data)
+    if !request_data['new_version']
+      request_data.delete('test_case_id')
     end
-    response_hash = _test_cases_search(request_params)
+    response_hash = _test_cases_search(request_data)
     product = response_hash['product']
     test_case = response_hash['test_case']
     category = response_hash['category']    
@@ -1048,7 +1085,7 @@ class Webapiv2Controller < ApplicationController
       category = response_hash['category']
       categories = response_hash['category']     
       if response_hash['response']['found']
-        if request_params['new_version']
+        if request_data['new_version']
           # Find the parent test case ID
           original_test_case = test_case         
           parent_id = view_context.find_test_case_parent_id(original_test_case)         
@@ -1106,20 +1143,20 @@ class Webapiv2Controller < ApplicationController
           }              
         end
       else          
-        if request_params['new_version']
+        if request_data['new_version']
           return {'response' => {'message' => 'Test case "%s" not found for product "%s" in category hierarchy "%s" to create new version from.' \
-                                  %[request_params['test_case_name'] || request_params['test_case_id'], product.name, categories],
+                                  %[request_data['test_case_name'] || request_data['test_case_id'], product.name, categories],
                                   'found' => false},
                   'status' => 400}                            
         end        
-        if request_params['test_case_name'] == nil
+        if request_data['test_case_name'] == nil
           return {'response' => {'message' => 'No test_case_name provided.'},
                   'status' => 400}   
         end
-        if request_params['test_type_id'] \
-           || request_params['test_type_name']
-          response_hash = _test_types(request_params['test_type_name'],
-                                      request_params['test_type_id'])
+        if request_data['test_type_id'] \
+           || request_data['test_type_name']
+          response_hash = _test_types(request_data['test_type_name'],
+                                      request_data['test_type_id'])
           if response_hash["status"] == 200 && response_hash['response']['found']
             test_type_id = response_hash['response']['test_types'].first['id']
           else
@@ -1127,7 +1164,7 @@ class Webapiv2Controller < ApplicationController
             return response_hash
           end                                      
         end
-        created_by_id = request_params['created_by_id']
+        created_by_id = request_data['created_by_id']
         if created_by_id
           response_hash = _users_search({'id' => created_by_id})
           if !response_hash['response']['found']
@@ -1135,13 +1172,13 @@ class Webapiv2Controller < ApplicationController
             return response_hash
           end          
         end
-        status, message = _get_status(request_params)
+        status, message = _get_status(request_data)
         if !status
           return {'response' => {'message' => message},
                   'status' => 400}          
         end
-        test_case = TestCase.new(:name => request_params['test_case_name'],
-                                 :description => request_params['description'],
+        test_case = TestCase.new(:name => request_data['test_case_name'],
+                                 :description => request_data['description'],
                                  :category_id => category ? category.id : nil,
                                  :product_id => product.id,
                                  :status => status,
@@ -1150,8 +1187,8 @@ class Webapiv2Controller < ApplicationController
         test_case.steps.build(:step_number => 1)
         test_case.test_case_targets.build
         # handle custom fields if any  
-        if request_params.key?('custom_fields')
-          success, message = _handle_custom_fields(request_params, "test_case", test_case)
+        if request_data.key?('custom_fields')
+          success, message = _handle_custom_fields(request_data, "test_case", test_case)
           if !success
             response_hash = {
               'response' => {'message' => message},
@@ -1162,8 +1199,8 @@ class Webapiv2Controller < ApplicationController
         end                  
         if test_case.save
           # handle tags
-          if request_params.key?('tags')          
-            success, message = _handle_test_case_tags(request_params, test_case)
+          if request_data.key?('tags')          
+            success, message = _handle_test_case_tags(request_data, test_case)
             if !success
               response_hash = {
                 'response' => {'message' => message},
@@ -1207,21 +1244,21 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end
 
-  def _test_cases_update(request_params)
-    if request_params['to_update'] == nil \
-       && request_params['new_values'] == nil
+  def _test_cases_update(request_data)
+    if request_data['to_update'] == nil \
+       && request_data['new_values'] == nil
       return {'response' => {'message' => "No to_update or new_values passed."},
               'status' => 400}   
     end     
-    response_hash = _test_cases_search(request_params['to_update'])     
+    response_hash = _test_cases_search(request_data['to_update'])     
     if response_hash["status"] == 200 && response_hash['response']['found']
       product = response_hash['product']
       test_case = response_hash['test_case']
       category = response_hash['category']     
-      test_case.name = request_params['new_values']['test_case_name'] || test_case.name
-      test_case.description = request_params['new_values']['description'] || test_case.description       
-      if request_params['new_values']["category"] || request_params["category_id"]           
-        response_hash = _categories_search(request_params['new_values'])
+      test_case.name = request_data['new_values']['test_case_name'] || test_case.name
+      test_case.description = request_data['new_values']['description'] || test_case.description       
+      if request_data['new_values']["category"] || request_data["category_id"]           
+        response_hash = _categories_search(request_data['new_values'])
         if response_hash["status"] == 200 && response_hash['response']['found']
           test_case.category =  response_hash['current_category']
           test_case.category_id = response_hash['response']['id']
@@ -1231,18 +1268,18 @@ class Webapiv2Controller < ApplicationController
           return response_hash
         end
       end
-      if request_params['new_values']['status']
-        status, message = _get_status(request_params['new_values'])
+      if request_data['new_values']['status']
+        status, message = _get_status(request_data['new_values'])
         if !status
           return {'response' => {'message' => message},
                   'status' => 400}          
         end
         test_case.status = status
       end                        
-      if request_params['new_values']['test_type_id'] \
-         || request_params['new_values']['test_type_name']
-        response_hash = _test_types(request_params['new_values']['test_type_name'],
-                                    request_params['new_values']['test_type_id'])
+      if request_data['new_values']['test_type_id'] \
+         || request_data['new_values']['test_type_name']
+        response_hash = _test_types(request_data['new_values']['test_type_name'],
+                                    request_data['new_values']['test_type_id'])
         if response_hash["status"] == 200 && response_hash['response']['found']
           test_case.test_type_id = response_hash['response']['test_types'].first['id']
         else
@@ -1250,7 +1287,7 @@ class Webapiv2Controller < ApplicationController
           return response_hash
         end                                    
       end
-      created_by_id = request_params['new_values']['created_by_id']
+      created_by_id = request_data['new_values']['created_by_id']
       if created_by_id
         response_hash = _users_search({'id' => created_by_id})
         if response_hash["status"] == 200 && response_hash['response']['found']
@@ -1261,11 +1298,11 @@ class Webapiv2Controller < ApplicationController
         end          
       end                
       # handle custom fields if any
-      if request_params['new_values']['overwrite_custom_fields']
+      if request_data['new_values']['overwrite_custom_fields']
         test_case.custom_fields.destroy_all
       end        
-      if request_params['new_values'].key?('custom_fields')
-        success, message = _handle_custom_fields(request_params['new_values'], "test_case", test_case)
+      if request_data['new_values'].key?('custom_fields')
+        success, message = _handle_custom_fields(request_data['new_values'], "test_case", test_case)
         if !success
           response_hash = {
             'response' => {'message' => message},
@@ -1275,11 +1312,11 @@ class Webapiv2Controller < ApplicationController
         end
       end                  
       # handle tags
-      if request_params['new_values']['overwrite_tags']
+      if request_data['new_values']['overwrite_tags']
         test_case.tags.delete_all
       end      
-      if request_params['new_values'].key?('tags')          
-        success, message = _handle_test_case_tags(request_params['new_values'], test_case)
+      if request_data['new_values'].key?('tags')          
+        success, message = _handle_test_case_tags(request_data['new_values'], test_case)
         if !success
           response_hash = {
             'response' => {'message' => message},
@@ -1324,21 +1361,21 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end
 
-  def _test_plans_search(request_params)
-    if request_params['id'] == nil \
-       && request_params['product_id'] == nil \
-       && request_params['name'] == nil 
+  def _test_plans_search(request_data)
+    if request_data['id'] == nil \
+       && request_data['product_id'] == nil \
+       && request_data['name'] == nil 
       response_hash = {}                 
       response_hash["message"] = "No search parameters provided. One or more of the following are required: "\
                                  "'product_id', %s, and optionally 'deprecated'" \
-                                 %[request_params['indirect_call'] ? "'name', 'id'" : "'test_plan_name', 'test_plan_id'"]
+                                 %[request_data['indirect_call'] ? "'name', 'id'" : "'test_plan_name', 'test_plan_id'"]
       return {'response' => response_hash,
               'status' => 400}   
     end     
-    conditions = {:id => request_params['id'],
-                  :product_id => request_params['product_id'],
-                  :name => request_params['name'],
-                  :deprecated => request_params['deprecated']}                  
+    conditions = {:id => request_data['id'],
+                  :product_id => request_data['product_id'],
+                  :name => request_data['name'],
+                  :deprecated => request_data['deprecated']}                  
     conditions.delete_if {|k,v| v.blank?}    
     test_plans = TestPlan.find(:all, :conditions => conditions, :order => "id ASC")     
     if test_plans == []
@@ -1442,18 +1479,18 @@ class Webapiv2Controller < ApplicationController
     end  
   end
 
-  def _test_plans_create(request_params)
-    if request_params['new_version']
-      request_params['deprecated'] = 0
+  def _test_plans_create(request_data)
+    if request_data['new_version']
+      request_data['deprecated'] = 0
     end
-    response_hash = _test_plans_search({'id' => request_params['test_plan_id'],
-                                       'name' => request_params['test_plan_name'],
-                                       'product_id' => request_params['product_id'],
-                                       'deprecated' => request_params['deprecated'],
+    response_hash = _test_plans_search({'id' => request_data['test_plan_id'],
+                                       'name' => request_data['test_plan_name'],
+                                       'product_id' => request_data['product_id'],
+                                       'deprecated' => request_data['deprecated'],
                                        'indirect_call' => true})                                      
     if response_hash["status"] == 200 
       if response_hash['response']['found']
-        if request_params['new_version']
+        if request_data['new_version']
           test_plan = TestPlan.where(:id => response_hash['response']['test_plans'].first['id']).first
           test_plan = _test_plans_create_new_version(test_plan)
           test_plan_custom_fields = _get_custom_fields('test_plan', test_plan)
@@ -1474,21 +1511,21 @@ class Webapiv2Controller < ApplicationController
           }                             
         end
       else
-        if request_params['new_version']
+        if request_data['new_version']
           return {'response' => {'message' => 'No test plan found to create new version from.'},
                   'status' => 400}                            
         end       
-        response_hash = _products_search({'id' => request_params['product_id'],
+        response_hash = _products_search({'id' => request_data['product_id'],
                                           'indirect_call' => true})        
         if !(response_hash["status"] == 200 && response_hash['response']['found'])
           response_hash['status'] = 400
           return response_hash
         end              
-        if request_params['test_plan_name'] == nil
+        if request_data['test_plan_name'] == nil
           return {'response' => {'message' => 'No test_plan_name provided.'},
                   'status' => 400}   
         end        
-        created_by_id = request_params['created_by_id']
+        created_by_id = request_data['created_by_id']
         if created_by_id
           response_hash = _users_search({'id' => created_by_id})
           if !response_hash['response']['found']
@@ -1496,19 +1533,19 @@ class Webapiv2Controller < ApplicationController
             return response_hash
           end          
         end        
-        status, message = _get_status(request_params)
+        status, message = _get_status(request_data)
         if !status
           return {'response' => {'message' => message},
                   'status' => 400}          
         end                
-        test_plan = TestPlan.new(:product_id => request_params['product_id'],
-                                 :name => request_params['test_plan_name'],
+        test_plan = TestPlan.new(:product_id => request_data['product_id'],
+                                 :name => request_data['test_plan_name'],
                                  :status => status,
-                                 :description => request_params['description'],
+                                 :description => request_data['description'],
                                  :created_by_id => created_by_id != nil ? created_by_id : 1)
         # handle custom fields if any  
-        if request_params.key?('custom_fields')
-          success, message = _handle_custom_fields(request_params, "test_plan", test_plan)
+        if request_data.key?('custom_fields')
+          success, message = _handle_custom_fields(request_data, "test_plan", test_plan)
           if !success
             response_hash = {
               'response' => {'message' => message},
@@ -1518,8 +1555,8 @@ class Webapiv2Controller < ApplicationController
           end
         end                  
         if test_plan.save
-          if request_params['test_cases']       
-            success, test_plan, message = _handle_plancases(test_plan, request_params['test_cases'])
+          if request_data['test_cases']       
+            success, test_plan, message = _handle_plancases(test_plan, request_data['test_cases'])
             if !success
               return {'response' => {'message' => message},
                       'status' => 400} 
@@ -1553,37 +1590,37 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end
 
-  def _test_plans_update(request_params)
-    if request_params['to_update'] == nil \
-       && request_params['new_values'] == nil
+  def _test_plans_update(request_data)
+    if request_data['to_update'] == nil \
+       && request_data['new_values'] == nil
       return {'response' => {'message' => "No to_update or new_values passed."},
               'status' => 400}   
     end     
-    response_hash = _test_plans_search({'id' => request_params['to_update']['test_plan_id'],
-                                       'name' => request_params['to_update']['test_plan_name'],
-                                       'product_id' => request_params['to_update']['product_id'],
-                                       'deprecated' => request_params['to_update']['deprecated'],
+    response_hash = _test_plans_search({'id' => request_data['to_update']['test_plan_id'],
+                                       'name' => request_data['to_update']['test_plan_name'],
+                                       'product_id' => request_data['to_update']['product_id'],
+                                       'deprecated' => request_data['to_update']['deprecated'],
                                        'indirect_call' => true})
     if response_hash["status"] == 200 && response_hash['response']['found'] 
       test_plan = TestPlan.where(:id => response_hash['response']['test_plans'].first['id']).first  
-      test_plan.name = request_params['new_values']['test_plan_name'] || test_plan.name
-      test_plan.description = request_params['new_values']['description'] || test_plan.description
-      if request_params['new_values']['product_id']
-        response_hash = _products_search({'name' => request_params['new_values']['product_name'],
-                                          'id' => request_params['new_values']['product_id'],
+      test_plan.name = request_data['new_values']['test_plan_name'] || test_plan.name
+      test_plan.description = request_data['new_values']['description'] || test_plan.description
+      if request_data['new_values']['product_id']
+        response_hash = _products_search({'name' => request_data['new_values']['product_name'],
+                                          'id' => request_data['new_values']['product_id'],
                                           'indirect_call' => true})        
         if !(response_hash["status"] == 200 && response_hash['response']['found']) 
           return response_hash
         end
-        test_plan.product_id = request_params['new_values']['product_id']    
+        test_plan.product_id = request_data['new_values']['product_id']    
       end
-      status, message = _get_status(request_params['new_values'])
+      status, message = _get_status(request_data['new_values'])
       if !status
         return {'response' => {'message' => message},
                 'status' => 400}          
       end
       test_plan.status = status
-      created_by_id = request_params['new_values']['created_by_id']
+      created_by_id = request_data['new_values']['created_by_id']
       if created_by_id
         response_hash = _users_search({'id' => created_by_id})
         if !response_hash['response']['found']
@@ -1593,11 +1630,11 @@ class Webapiv2Controller < ApplicationController
         test_plan.created_by_id = created_by_id         
       end         
       # handle custom fields if any
-      if request_params['new_values']['overwrite_custom_fields']
+      if request_data['new_values']['overwrite_custom_fields']
         test_plan.custom_fields.destroy_all
       end        
-      if request_params['new_values'].key?('custom_fields')
-        success, message = _handle_custom_fields(request_params['new_values'], "test_plan", test_plan)
+      if request_data['new_values'].key?('custom_fields')
+        success, message = _handle_custom_fields(request_data['new_values'], "test_plan", test_plan)
         if !success
           response_hash = {
             'response' => {'message' => message},
@@ -1607,8 +1644,8 @@ class Webapiv2Controller < ApplicationController
         end
       end                          
       if test_plan.save
-        if request_params['new_values']['test_cases']       
-          success, test_plan, message = _handle_plancases(test_plan, request_params['new_values']['test_cases'])
+        if request_data['new_values']['test_cases']       
+          success, test_plan, message = _handle_plancases(test_plan, request_data['new_values']['test_cases'])
           if !success
             return {'response' => {'message' => message},
                     'status' => 400} 
@@ -1652,21 +1689,21 @@ class Webapiv2Controller < ApplicationController
     return stencil_test_plans 
   end
 
-  def _stencils_search(request_params)
-    if request_params['id'] == nil \
-       && request_params['product_id'] == nil \
-       && request_params['name'] == nil 
+  def _stencils_search(request_data)
+    if request_data['id'] == nil \
+       && request_data['product_id'] == nil \
+       && request_data['name'] == nil 
       response_hash = {}                 
       response_hash["message"] = "No search parameters provided. One or more of the following are required: "\
                                  "'product_id', %s, and optionally 'deprecated'" \
-                                 %[request_params['indirect_call'] ? "'name', 'id'" : "'stencil_name', 'stencil_id'"]
+                                 %[request_data['indirect_call'] ? "'name', 'id'" : "'stencil_name', 'stencil_id'"]
       return {'response' => response_hash,
               'status' => 400}   
     end     
-    conditions = {:id => request_params['id'],
-                  :product_id => request_params['product_id'],
-                  :name => request_params['name'],
-                  :deprecated => request_params['deprecated']}                  
+    conditions = {:id => request_data['id'],
+                  :product_id => request_data['product_id'],
+                  :name => request_data['name'],
+                  :deprecated => request_data['deprecated']}                  
     conditions.delete_if {|k,v| v.blank?}    
     stencils = Stencil.find(:all, :conditions => conditions, :order => "id ASC")     
     if stencils == []
@@ -1787,18 +1824,18 @@ class Webapiv2Controller < ApplicationController
     end  
   end
 
-  def _stencils_create(request_params)
-    if request_params['new_version']
-      request_params['deprecated'] = 0
+  def _stencils_create(request_data)
+    if request_data['new_version']
+      request_data['deprecated'] = 0
     end
-    response_hash = _stencils_search({'id' => request_params['stencil_id'],
-                                      'name' => request_params['stencil_name'],
-                                      'product_id' => request_params['product_id'],
-                                      'deprecated' => request_params['deprecated'],
+    response_hash = _stencils_search({'id' => request_data['stencil_id'],
+                                      'name' => request_data['stencil_name'],
+                                      'product_id' => request_data['product_id'],
+                                      'deprecated' => request_data['deprecated'],
                                       'indirect_call' => true})                                      
     if response_hash["status"] == 200    
       if response_hash['response']['found']        
-        if request_params['new_version'] 
+        if request_data['new_version'] 
           stencil = Stencil.where(:id => response_hash['response']['stencils'].first['id']).first
           stencil = _stencils_create_new_version(stencil)         
           stencil_test_plans = get_stencil_test_plans(stencil)                   
@@ -1817,21 +1854,21 @@ class Webapiv2Controller < ApplicationController
           }                                  
         end
       else        
-        if request_params['new_version']
+        if request_data['new_version']
           return {'response' => {'message' => 'No stencil found to create new version from'},
                   'status' => 400}                            
         end
-        response_hash = _products_search({'id' => request_params['product_id'],
+        response_hash = _products_search({'id' => request_data['product_id'],
                                           'indirect_call' => true})        
         if !(response_hash["status"] == 200 && response_hash['response']['found'])
           response_hash['status'] = 400
           return response_hash
         end     
-        if request_params['stencil_name'] == nil
+        if request_data['stencil_name'] == nil
           return {'response' => {'message' => 'No stencil_name provided.'},
                   'status' => 400}   
         end       
-        created_by_id = request_params['created_by_id']
+        created_by_id = request_data['created_by_id']
         if created_by_id
           response_hash = _users_search({'id' => created_by_id})
           if !response_hash['response']['found']
@@ -1839,19 +1876,19 @@ class Webapiv2Controller < ApplicationController
             return response_hash
           end          
         end
-        status, message = _get_status(request_params)
+        status, message = _get_status(request_data)
         if !status
           return {'response' => {'message' => message},
                   'status' => 400}          
         end           
-        stencil = Stencil.new(:product_id => request_params['product_id'],
-                              :name => request_params['stencil_name'],
+        stencil = Stencil.new(:product_id => request_data['product_id'],
+                              :name => request_data['stencil_name'],
                               :status => status,
-                              :description => request_params['description'],
+                              :description => request_data['description'],
                               :created_by_id => created_by_id != nil ? created_by_id : 1)                                                                           
         if stencil.save
-          if request_params['test_plans']       
-            success, stencil, message = _handle_stencil_test_plans(stencil, request_params['test_plans'])
+          if request_data['test_plans']       
+            success, stencil, message = _handle_stencil_test_plans(stencil, request_data['test_plans'])
             if !success
               return {'response' => {'message' => message},
                       'status' => 400} 
@@ -1883,37 +1920,37 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end
 
-  def _stencils_update(request_params)
-    if request_params['to_update'] == nil \
-       && request_params['new_values'] == nil
+  def _stencils_update(request_data)
+    if request_data['to_update'] == nil \
+       && request_data['new_values'] == nil
       return {'response' => {'message' => "No to_update or new_values passed."},
               'status' => 400}   
     end    
-    response_hash = _stencils_search({'id' => request_params['to_update']['test_plan_id'],
-                                      'name' => request_params['to_update']['test_plan_name'],
-                                      'product_id' => request_params['to_update']['product_id'],
-                                      'deprecated' => request_params['to_update']['deprecated'],
+    response_hash = _stencils_search({'id' => request_data['to_update']['test_plan_id'],
+                                      'name' => request_data['to_update']['test_plan_name'],
+                                      'product_id' => request_data['to_update']['product_id'],
+                                      'deprecated' => request_data['to_update']['deprecated'],
                                       'indirect_call' => true})                                       
     if response_hash["status"] == 200 && response_hash['response']['found']
       stencil = Stencil.where(:id => response_hash['response']['stencils'].first['id']).first     
-      stencil.name = request_params['new_values']['stencil_name'] || stencil.name
-      stencil.description = request_params['new_values']['description'] || stencil.description     
-      if request_params['new_values']['product_id']
-        response_hash = _products_search({'name' => request_params['new_values']['product_name'],
-                                          'id' => request_params['new_values']['product_id'],
+      stencil.name = request_data['new_values']['stencil_name'] || stencil.name
+      stencil.description = request_data['new_values']['description'] || stencil.description     
+      if request_data['new_values']['product_id']
+        response_hash = _products_search({'name' => request_data['new_values']['product_name'],
+                                          'id' => request_data['new_values']['product_id'],
                                           'indirect_call' => true})        
         if !(response_hash["status"] == 200 && response_hash['response']['found']) 
           return response_hash
         end
-        stencil.product_id = request_params['new_values']['product_id']    
+        stencil.product_id = request_data['new_values']['product_id']    
       end         
-      status, message = _get_status(request_params['new_values'])
+      status, message = _get_status(request_data['new_values'])
       if !status
         return {'response' => {'message' => message},
                 'status' => 400}          
       end
       stencil.status = status 
-      created_by_id = request_params['new_values']['created_by_id']
+      created_by_id = request_data['new_values']['created_by_id']
       if created_by_id
         response_hash = _users_search({'id' => created_by_id})
         if !response_hash['response']['found']
@@ -1923,9 +1960,9 @@ class Webapiv2Controller < ApplicationController
         stencil.created_by_id = created_by_id         
       end                               
       if stencil.save
-        if request_params['new_values']['test_plans']
-          new_version = request_params.key?('new_version') ? request_params['new_version'] : true                  
-          success, stencil, message = _handle_stencil_test_plans(stencil, request_params['new_values']['test_plans'], new_version)
+        if request_data['new_values']['test_plans']
+          new_version = request_data.key?('new_version') ? request_data['new_version'] : true                  
+          success, stencil, message = _handle_stencil_test_plans(stencil, request_data['new_values']['test_plans'], new_version)
           if !success
             return {'response' => {'message' => message},
                     'status' => 400} 
@@ -1956,22 +1993,22 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end
 
-  def _assignments_search(request_params)
+  def _assignments_search(request_data)
     response_hash = {}  
-    if request_params['id'] == nil \
-       && request_params['product_id'] == nil \
-       && request_params['test_plan_id'] == nil \
-       && request_params['stencil_id'] == nil 
+    if request_data['id'] == nil \
+       && request_data['product_id'] == nil \
+       && request_data['test_plan_id'] == nil \
+       && request_data['stencil_id'] == nil 
       response_hash["message"] = "No search parameters provided. id and product_id " \
                                  "are required along with either stencil_id or test_plan_id"
       return {'response' => response_hash,
               'status' => 400}   
     end
-    conditions = {:id => request_params['id'],
-                  :product_id => request_params['product_id'],
-                  :version_id => request_params['product_version_id'],
-                  :test_plan_id => request_params['test_plan_id'],
-                  :stencil_id => request_params['stencil_id']}
+    conditions = {:id => request_data['id'],
+                  :product_id => request_data['product_id'],
+                  :version_id => request_data['product_version_id'],
+                  :test_plan_id => request_data['test_plan_id'],
+                  :stencil_id => request_data['stencil_id']}
     conditions.delete_if {|k,v| v.blank?}    
     assignments = Assignment.find(:all, :conditions => conditions, :order => "id ASC")    
     if assignments != []
@@ -1999,11 +2036,11 @@ class Webapiv2Controller < ApplicationController
             'status' => 200}    
   end
    
-  def _assignments_create(request_params)    
-    response_hash = _versions_search({'id' => request_params['product_version_id'],
-                                      'version' => request_params['product_version'],
-                                      'product_name' => request_params['product_name'],
-                                      'product_id' => request_params['product_id'],
+  def _assignments_create(request_data)    
+    response_hash = _versions_search({'id' => request_data['product_version_id'],
+                                      'version' => request_data['product_version'],
+                                      'product_name' => request_data['product_name'],
+                                      'product_id' => request_data['product_id'],
                                       'indirect_call' => true})                                       
     if !(response_hash["status"] == 200 && response_hash['response']['found'])
       response_hash['status'] = 400
@@ -2014,21 +2051,21 @@ class Webapiv2Controller < ApplicationController
     template_type = nil
     test_plan_id = nil
     stencil_id = nil
-    if request_params['test_plan_id'].nil? && request_params['stencil_id'].nil?
+    if request_data['test_plan_id'].nil? && request_data['stencil_id'].nil?
       return {'response' => {'message' => "No 'test_plan_id' or 'stencil_id' provided."},
               'status' => 400}
-    elsif request_params['test_plan_id'] != nil
-      response_hash = _test_plans_search({'id' => request_params['test_plan_id'],
-                                         'name' => request_params['test_plan_name'],
-                                         'product_id' => request_params['product_id'],
-                                         'deprecated' => request_params['deprecated'],
+    elsif request_data['test_plan_id'] != nil
+      response_hash = _test_plans_search({'id' => request_data['test_plan_id'],
+                                         'name' => request_data['test_plan_name'],
+                                         'product_id' => request_data['product_id'],
+                                         'deprecated' => request_data['deprecated'],
                                          'indirect_call' => true})
       template_type = 'test_plan'      
     else
-      response_hash = _stencils_search({'id' => request_params['stencil_id'],
-                                        'name' => request_params['stencil_name'],
-                                        'product_id' => request_params['product_id'],
-                                        'deprecated' => request_params['deprecated'],
+      response_hash = _stencils_search({'id' => request_data['stencil_id'],
+                                        'name' => request_data['stencil_name'],
+                                        'product_id' => request_data['product_id'],
+                                        'deprecated' => request_data['deprecated'],
                                         'indirect_call' => true})      
       template_type = 'stencil'
     end    
@@ -2037,16 +2074,16 @@ class Webapiv2Controller < ApplicationController
         assignment = Assignment.new(:product_id => product_id,
                                     :version_id => version_id,
                                     :test_plan_id => response_hash['response']['test_plans'][0]['id'],
-                                    :notes => request_params['notes'])
+                                    :notes => request_data['notes'])
       else       
         assignment = Assignment.new(:product_id => product_id,
                                     :version_id => version_id,
                                     :stencil_id => response_hash['response']['stencils'][0]['id'],
-                                    :notes => request_params['notes'])                                          
+                                    :notes => request_data['notes'])                                          
       end
       # handle custom fields if any
-      if request_params.key?('custom_fields')
-        success, message = _handle_custom_fields(request_params, "assignment", assignment)
+      if request_data.key?('custom_fields')
+        success, message = _handle_custom_fields(request_data, "assignment", assignment)
         if !success
           response_hash["error"] = "Yes"
           response_hash["details"] = message
@@ -2095,22 +2132,21 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end
 
-
-  def _results_get(request_params)
+  def _results_get(request_data)
     response_hash = {}  
-    if request_params['id'] == nil \
-       && request_params['assignment_id'] == nil \
-       && request_params['device_id'] == nil \
-       && request_params['test_case_id'] == nil
+    if request_data['id'] == nil \
+       && request_data['assignment_id'] == nil \
+       && request_data['device_id'] == nil \
+       && request_data['test_case_id'] == nil
       response_hash["message"] = "No search parameters provided. Please provide one or more of the following: " \
                                  "id, assignment_id, device_id, test_case_id"
       return {'response' => response_hash,
               'status' => 400}   
     end
-    conditions = {:id => request_params['id'],
-                  :assignment_id => request_params['assignment_id'],
-                  :device_id => request_params['device_id'],
-                  :test_case_id => request_params['test_case_id']}
+    conditions = {:id => request_data['id'],
+                  :assignment_id => request_data['assignment_id'],
+                  :device_id => request_data['device_id'],
+                  :test_case_id => request_data['test_case_id']}
     conditions.delete_if {|k,v| v.blank?}    
     results = Result.find(:all, :conditions => conditions, :order => "id ASC")
     if results != []
@@ -2139,20 +2175,20 @@ class Webapiv2Controller < ApplicationController
             'status' => 200}       
   end
 
-  def _results_set(request_params)
-    if !request_params.key?('results')
+  def _results_set(request_data)
+    if !request_data.key?('results')
       return {'response' => {'message' => 'No results passed to be set.'},
               'status' => 400}       
     end
-    if request_params['results'].is_a?(Hash) \
-       && !request_params['results'].empty?
-      incorrect_fields = request_params['results'].map {|k,v| (v.is_a?(Hash) && !v.empty?) ? nil : k.to_s}.compact
+    if request_data['results'].is_a?(Hash) \
+       && !request_data['results'].empty?
+      incorrect_fields = request_data['results'].map {|k,v| (v.is_a?(Hash) && !v.empty?) ? nil : k.to_s}.compact
       if incorrect_fields.count > 0        
         return {'response' => {'message' => 'One or more passed results were not of the correct type or empty.'},
                 'status' => 400}        
       end               
       response_hash = {'results' => []}
-      request_params['results'].each do |key, value| 
+      request_data['results'].each do |key, value| 
         if !value.key?('result')
           return {'response' => {'message' => 'Passed result with id %s did not contain a result element.' %[key]},
                   'status' => 400}         
