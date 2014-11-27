@@ -16,8 +16,16 @@
     <% @stencils.each do |stencil| %>
       <tr class="<%= cycle('odd', 'even') %> rowLink">
         <td><%= stencil.id %></td>
-        <td><%= stencil.product.name %></td>
-        <td><%= link_to stencil.name, stencil %></td>
+        <td>
+          <%= stencil.deprecated ? '<del>'.html_safe : '' %>
+            <%= stencil.product.name %>
+          <%= stencil.deprecated ? '</del>'.html_safe : '' %>
+        </td>
+        <td>
+          <%= stencil.deprecated ? '<del>'.html_safe : '' %>
+            <%= link_to stencil.name, stencil %>
+          <%= stencil.deprecated ? '</del>'.html_safe : '' %>
+        </td>
         <td><%= stencil.description %></td>
         <td><%= stencil.version %></td>
         <td><%= link_to '<i class="icon-edit"></i> Edit'.html_safe, edit_stencil_path(stencil) %></td>

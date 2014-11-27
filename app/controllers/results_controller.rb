@@ -58,6 +58,12 @@ class ResultsController < ApplicationController
     authorize! :create, Result
     @result = Result.new
 
+    # Make a list of all applicable custom fields and add to the result item
+    custom_fields = CustomField.where(:item_type => 'result', :active => true)
+    custom_fields.each do |custom_field|
+      @result.custom_items.build(:custom_field_id => custom_field.id)
+    end
+
     respond_to do |format|
       format.html # new.html.erb
     end
@@ -71,6 +77,17 @@ class ResultsController < ApplicationController
     # For results, we verify that the actual assignment product is visible
     # Verify user can view items for this product. Must be in his product
     authorize_product!(@result.assignment.product)
+
+  	# We need to make sure that all custom fields exist on this item. If not, we add them.
+  	# Find all applicable custom fields
+  	custom_fields = CustomField.where(:item_type => 'result', :active => true)
+  	custom_fields.each do |custom_field|
+    # If an entry for the current field doesn't exist, add it.
+    	if @result.custom_items.where(:custom_field_id => custom_field.id).first == nil
+   		   @result.custom_items.build(:custom_field_id => custom_field.id)
+    	end
+  	end
+
   end
 
   # POST /results

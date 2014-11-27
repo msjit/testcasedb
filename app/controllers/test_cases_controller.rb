@@ -42,7 +42,7 @@ class TestCasesController < ApplicationController
     authorize_product!(@test_case.product)
     
     # Find the parent test case ID
-    parent_id = find_test_case_parent_id(@test_case)
+    parent_id = view_context.find_test_case_parent_id(@test_case)
   
     # Find the list of related test case versions
     @test_cases = TestCase.where( "id = ? OR parent_id = ?", parent_id, parent_id ).where("id <> ?", @test_case.id)
@@ -337,7 +337,7 @@ class TestCasesController < ApplicationController
       authorize_product!(original_test_case.product)
       
       # Find the parent test case ID
-      parent_id = find_test_case_parent_id(original_test_case)
+      parent_id = view_context.find_test_case_parent_id(original_test_case)
     
       # Find the current max version for this parent id
       max_version = TestCase.where( "id = ? OR parent_id = ?", parent_id, parent_id ).maximum(:version)
@@ -579,19 +579,6 @@ class TestCasesController < ApplicationController
     return step
   end
   
-  # Takes a test case and figures out if it is the parent
-  # Return value is the parent id
-  def find_test_case_parent_id(test_case)
-    # Figure out if this is the parent
-    # If the test cases's parent_id is blank, its ID is the parent ID
-    if test_case.parent_id.nil?
-      parent_id = test_case.id
-    # otherwise, the parent id is the one listed on the test case
-    else
-      parent_id = test_case.parent_id
-    end
-  end
-  
   # Takes an array of test cases and exports them as a CSV
   def generate_csv(test_cases)
     require 'csv'
@@ -601,7 +588,7 @@ class TestCasesController < ApplicationController
 
       # data rows
       test_cases.each do |tc|
-        csv << [tc.name, tc.product.name, tc.category.name, tc.version.to_s, tc.description, tc.test_type.name, tc.deprecated ? "Yes" : "No", tc.created_by ? tc.created_by.first_name + ' ' + tc.created_by.last_name : ' ', tc.modified_by ? tc.modified_by.first_name + ' ' + tc.modified_by.last_name : ' ', '', '']
+        csv << [tc.name, tc.product.name, tc.category.name, tc.version.to_s, tc.description, tc.test_type ? tc.test_type.name : '' , tc.deprecated ? "Yes" : "No", tc.created_by ? tc.created_by.first_name + ' ' + tc.created_by.last_name : ' ', tc.modified_by ? tc.modified_by.first_name + ' ' + tc.modified_by.last_name : ' ', '', '']
         
         tc.steps.each do |step|
           csv << ['', '', '', '', '', '', '', '', '', step.action, step.result]

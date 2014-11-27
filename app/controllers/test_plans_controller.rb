@@ -29,7 +29,7 @@ class TestPlansController < ApplicationController
     authorize_product!(@test_plan.product)
     
     # Find the parent test case ID
-    parent_id = find_test_plan_parent_id(@test_plan)
+    parent_id = view_context.find_test_plan_parent_id(@test_plan)
   
     # Find the list of related test case versions
     @test_plans = TestPlan.where( "id = ? OR parent_id = ?", parent_id, parent_id ).where("id <> ?", @test_plan.id)
@@ -242,7 +242,7 @@ class TestPlansController < ApplicationController
       authorize_product!(original_test_plan.product)
       
       # Find the parent test case ID
-      parent_id = find_test_plan_parent_id(original_test_plan)
+      parent_id = view_context.find_test_plan_parent_id(original_test_plan)
     
       # Find the current max version for this parent id
       max_version = TestPlan.where( "id = ? OR parent_id = ?", parent_id, parent_id ).maximum(:version)
@@ -308,7 +308,7 @@ class TestPlansController < ApplicationController
     # in a test plan
     @plan_id = params[:plan_id]
     
-    # Add the test case to the test plan
+    # Remove the test case from the test plan
     test_plan = TestPlan.find(@plan_id)
     test_plan.test_cases.delete @test_case
     
@@ -407,19 +407,6 @@ class TestPlansController < ApplicationController
   end
   
   private
-  
-  # Takes a test plan and figures out if it is the parent
-  # Return value is the parent id
-  def find_test_plan_parent_id(test_plan)
-    # Figure out if this is the parent
-    # If the test plan's parent_id is blank, its ID is the parent ID
-    if test_plan.parent_id.nil?
-      parent_id = test_plan.id
-    # otherwise, the parent id is the one listed on the test case
-    else
-      parent_id = test_plan.parent_id
-    end
-  end
   
   def generate_rtf(test_plan)
     colours = [RTF::Colour.new(0, 0, 0),

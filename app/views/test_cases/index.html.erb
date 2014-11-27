@@ -9,6 +9,10 @@
 
 
 <legend>Test Case Tree View</legend>
+<div class="addLink">
+  <input type="submit" name="treenode_selectall" value="Select All Visible", class="btn btn-small btn-inverse" />
+  <input type="submit" name="treenode_deselectall" value="Deselect All Visible", class="btn btn-small btn-inverse" />
+</div>
 <%= form_tag( {:action => "index", :format => :csv }, :method => 'GET') do %>
   <div id="treeView">
     <% if @products.count > 0 %>

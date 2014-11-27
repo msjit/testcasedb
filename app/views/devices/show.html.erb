@@ -30,6 +30,8 @@
                   <% else %>
                     False
                   <% end %>
+			   	<% elsif custom_item.custom_field.field_type == 'link' && custom_item.value.split(',').count == 2 %>	
+			  		<%= link_to custom_item.value.split(',').map(&:strip).first, custom_item.value.split(',').map(&:strip).last, :target => "_blank" %>
                 <% else %>
                   <%= custom_item.value %>
                 <% end %>

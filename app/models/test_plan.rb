@@ -1,5 +1,5 @@
 class TestPlan < ActiveRecord::Base
-  attr_accessible :name, :description, :product_id, :status, :custom_items_attributes
+  attr_accessible :name, :description, :product_id, :status, :custom_items_attributes, :created_by_id
   
 	belongs_to :product
 	belongs_to :created_by, :class_name => "User", :foreign_key => "created_by_id"

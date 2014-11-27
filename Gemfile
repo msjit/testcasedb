@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.2.14'
+gem 'rails', '3.2.21'
 gem 'mysql2', group: :mysql
 gem 'pg', group: :postgres
 
@@ -64,7 +64,7 @@ gem 'prawn'
 gem 'soap4r-ruby1.9'
 
 gem 'simple_form'
-
+gem 'roo'
 # This gem is not directly used by the application
 # However, it is common to automate items using this
 # We simplify our clients' lives by including it in the package
@@ -94,9 +94,9 @@ gem 'selenium-client'
 # end
 # gem "mocha", :group => :test
 gem 'blitz'
-
-gem "rspec-rails", :group => [:test, :development]
-group :test do
+group :development, :test do
+  gem 'rspec-rails', '~> 3.0.0'
   gem "factory_girl_rails"
-  gem "capybara"
+  gem "capybara", '>= 2.2.0'
+  gem 'database_cleaner'
 end

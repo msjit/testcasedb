@@ -34,5 +34,8 @@
 </div><!-- end module-->
 
 <% if can? :create, User %>
-  <div class="addLink"><%= link_to "New User", new_user_path, :class => "btn btn-primary" %></div>
+  <div class="addLink">
+    <%= link_to "New User", new_user_path, :class => "btn btn-primary" %>
+    <%= link_to "Import Users", import_user_path, :class => "btn btn-primary" %>
+  </div>
 <% end %>

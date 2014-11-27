@@ -18,7 +18,7 @@ en:
     3: "QA Manager"
     4: "Developer"
     10: "Admin"
-    11: "XML API User"
+    11: "Web API User"
     
   # history_actions none must not be deleted
   # Used to fill the 0 value item of the map of values
@@ -66,6 +66,8 @@ en:
   custom_field_item_types:
     'test_case': "Test Case"
     'test_plan': "Test Plan"
+    'assignment': "Test Assignment"
+    'result': "Result"
     'device': "Device"
 
   custom_field_types:
@@ -73,7 +75,8 @@ en:
     'drop_down': "Drop Down"
     'check_box': "Check Box"
     'radio_button': "Radio Button"
-    'number': "Number" 
+    'number': "Number"
+    'link': "Link" 
   
   # Content types for test case targets
   content_types:

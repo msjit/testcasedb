@@ -41,6 +41,35 @@
   </div>
 </div> <!-- end test result overview module -->	
 
+<% if @result.custom_items.count > 0 %>
+  <div class="row-fluid">
+    <div class="span12">
+      <legend class="show">Custom Fields</legend>
+      <table class="table">
+        <tbody>
+          <% @result.custom_items.each do |custom_item|%>
+            <tr>
+              <td class="title"><%= custom_item.custom_field.field_name %></td>
+              <td>
+                <% if custom_item.custom_field.field_type == 'check_box' %>  
+                  <% if custom_item.value == '1' %>
+                    True
+                  <% else %>
+                    False
+                  <% end %>
+			   	<% elsif custom_item.custom_field.field_type == 'link' && custom_item.value.split(',').count == 2 %>	
+			  		<%= link_to custom_item.value.split(',').map(&:strip).first, custom_item.value.split(',').map(&:strip).last, :target => "_blank" %>
+                <% else %>
+                  <%= custom_item.value %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+  </div> <!-- end module div -->
+<% end %>
+
 <div class="row-fluid">
   <div class="span12">
     <legend class="show">Result</legend>
@@ -82,9 +111,8 @@
   </div>
 <% end %>
 
-
-<% # Only show the edit link if there is no result %>
-<% unless @result.result %>
+<% # Only show the edit link if there is no result or setting to allow edit after set is enabled %>
+<% if !@result.result || Setting.value('Allow Result Edit After Set') == true %>
 <%= link_to "Edit", edit_result_path(@result), :class => "btn btn-primary"  %>
 <% end %>
 <a href='#' onclick='history.go(-1);return false;', class="btn btn-inverse">Back</a>

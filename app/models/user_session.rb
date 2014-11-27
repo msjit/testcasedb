@@ -15,7 +15,8 @@ class UserSession < Authlogic::Session::Base
   
   # single_access_allowed_request_types 
   # only allow token access for xml requests
-  single_access_allowed_request_types ["application/xml"]
+  single_access_allowed_request_types ["application/json",
+                                       "application/xml"]
   
   # We now logout users after timeout
   logout_on_timeout true # default if false
