@@ -38,7 +38,22 @@ class UploadsController < ApplicationController
   def show
     @upload = Upload.find(params[:id])
   end
-  
+ 
+  def update
+    @upload = Upload.find(params[:id])
+    authorize! :update, @upload
+    
+    respond_to do |format|
+      if @upload.update_attributes(params[:upload])        
+        format.html { redirect_to(@upload, :notice => 'Product was successfully updated.') }
+        format.json { respond_with_bip(@upload) }
+      else
+        format.html { render :action => "edit" }
+        format.json { respond_with_bip(@upload) }
+      end
+    end
+  end
+   
   def destroy
     @upload = Upload.find(params[:id])
     authorize! :destroy, Upload

@@ -18,6 +18,8 @@ group :assets do
   gem 'therubyracer', :platforms => :ruby
 end
 
+gem 'best_in_place', '~> 3.0.1'
+gem 'jquery-fileupload-rails'
 gem 'sass-rails',   '~> 3.2.3'
 gem 'bootstrap-sass', '~> 2.3.2.1'
 

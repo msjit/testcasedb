@@ -126,7 +126,7 @@ TestDB::Application.routes.draw do
   get 'uploads/:id/executable' => 'uploads#executable', :as => 'make_upload_executable'
   delete 'uploads/:id' => 'uploads#destroy'
   get 'uploads/:id' => 'uploads#show', :as => 'upload'
-
+  put 'uploads/:id' => 'uploads#update', :as => 'update_upload'
   resources :versions
 
 	get '/test_plans/search/', :controller => 'test_plans', :action => 'search', :as => 'test_plan_search'

@@ -1,5 +1,7 @@
 class Upload < ActiveRecord::Base
-  has_attached_file :upload, :url => ":class/:id/:style/:filename", :path => ':rails_root/assets/:class/:id_partition/:style_:filename', :styles => { :thumb => "75x75>" }
+  has_attached_file :upload, :url => ":class/:id/:style/:filename", 
+                    :path => ':rails_root/assets/:class/:id_partition/:style_:filename', 
+                    :styles => { :preview => "600x600>", :thumb => "75x75>" }
   
   validates_attachment_presence :upload
   validates_attachment_size :upload, :less_than => 10.megabytes
