@@ -6,6 +6,8 @@ gem 'pg', group: :postgres
 
 gem "unicorn", "~> 4.8.2"
 
+gem 'sidekiq'
+
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
@@ -58,6 +60,7 @@ gem 'authlogic'
 gem 'omniauth'
 gem 'omniauth-google-oauth2'
 gem 'cancan'
+gem 'redis-rails'
 
 gem 'kaminari'
 
