@@ -13,8 +13,7 @@ class Upload < ActiveRecord::Base
     user != :guest
   end
   
-  belongs_to :test_case
-  belongs_to :result
+  belongs_to :uploadable, polymorphic: true
   
   def image?
     supported_image_formats = ["image/jpeg", "image/png", "image/gif", "image/bmp"]

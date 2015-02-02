@@ -4,39 +4,19 @@ class UploadsController < ApplicationController
   def create
     authorize! :create, Upload    
     
-    if params[:test_case_id]
-  	  @test_case = TestCase.find(params[:test_case_id])
-      @upload = @test_case.uploads.build(params[:upload])
+    @upload = Upload.new(params[:upload])
 
-      respond_to do |format|
-        if @upload.save
-          # History.create(:test_case_id => @test_case.id, :action => 7, :user_id => current_user.id)
-          format.html { redirect_to( @test_case, :notice => 'Upload was successfully added.') }
-          format.js
-        else
-          format.html { render :action => "new" }
-          format.js { render "create_error"}
+    respond_to do |format|
+      if @upload.save
+        format.js do
+          render action: 'create'
         end
-      end
-    elsif params[:result_id]
-  	  @result = Result.find(params[:result_id])
-      @upload = @result.uploads.build(params[:upload])
-
-      respond_to do |format|
-        if @upload.save
-          #History.create(:test_plan_id => @test_plan.id, :action => 7, :user_id => current_user.id)
-         format.html { redirect_to edit_result_path(@result) , :notice => 'Upload was successfully added.' }
-         format.js
-       else
-         format.html { render :action => "new" }
-         format.js { render "create_error"}
+      else
+        format.js do
+          render action: 'create_error'
         end
       end
     end
-  end
-
-  def show
-    @upload = Upload.find(params[:id])
   end
  
   def update
@@ -58,23 +38,11 @@ class UploadsController < ApplicationController
     @upload = Upload.find(params[:id])
     authorize! :destroy, Upload
     @upload_id = @upload.id
+    @upload.destroy
     
     respond_to do |format|    
-      # We only allow attachments that belong to test cases to be deleted
-      # Attachments belong to test cases cannot be deleted
-      if @upload.test_case != nil
-        test_case = @upload.test_case
-        @upload.destroy
-
-        format.html { redirect_to test_case, :notice => 'Attachement has been deleted.' }
-        format.js
-      elsif @upload.result != nil
-        result = @upload.result
-        @upload.destroy
-      
-        format.html { redirect_to result, :notice => 'Attachement has been deleted.' }
-        format.js
-      end
+      format.html { redirect_to test_case, :notice => 'Attachement has been deleted.' }
+      format.js
     end
   end
   

@@ -16,7 +16,7 @@ class TestCase < ActiveRecord::Base
 	has_many :test_plans, :through => :plan_cases
 	has_many :results, :dependent => :destroy
 	has_many :test_results, :through => :result_cases
-	has_many :uploads, :dependent => :destroy
+	has_many :uploads, :as => :uploadable, :dependent => :destroy
 	has_many :custom_items, :dependent => :destroy
 	has_many :custom_fields, :through => :custom_items
 	has_many :tag_test_cases, :dependent => :destroy
