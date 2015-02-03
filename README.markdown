@@ -6,7 +6,7 @@ More details can be found at http://www.testcasedb.com/ and in the manual.
 
 ## Development Install
 
-TestCaseDB was built on Ruby 1.9.3.
+TestCaseDB supports Ruby 1.9.3 and 2.0.0.
 
 To get your system up and running run the install script 'script/setup'.
 

@@ -1,9 +1,0 @@
-<h1>New Upload</h1>
-
-<% if params[:test_case_id] %>
-  <%= render 'form_test_case' %>
-  <%= link_to 'Back', @test_case %>
-<% elsif params[:result_id] %>
-  <%= render 'form_result' %>
-  <%= link_to 'Back', @result %>
-<% end %>

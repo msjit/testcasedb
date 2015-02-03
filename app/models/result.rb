@@ -7,7 +7,7 @@ class Result < ActiveRecord::Base
   has_one :task, :through => :assignment
   has_one :test_plan, :through => :assignment
   has_many :plan_cases, :through => :assignment, :source => :test_plan, :order => 'case_order'
-  has_many :uploads, :dependent => :destroy
+	has_many :uploads, :as => :uploadable, :dependent => :destroy
   has_many :custom_items, :dependent => :destroy
   has_many :custom_fields, :through => :custom_items
   has_many :result_statistics, :dependent => :destroy

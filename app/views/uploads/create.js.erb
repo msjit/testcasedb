@@ -3,22 +3,22 @@
   $('#upload_upload').val("");
   $('#upload_description').val("");
   
-  var newRow =  '<tr class="even upload_<%= @upload.id %>"><td width=95><%= generate_link_with_thumbnail(@upload) %></td>';
-  newRow += '<td><%= link_to @upload.upload.original_filename, home_url + @upload.upload.url %></td>';
-  newRow += '<td><%= @upload.description %></td>';
-  <% if @upload.test_case_id != nil %>
-    newRow += '<td class="executable"><%= File.executable?(@upload.upload.path) ? "Yes" : "No" %></td>';
-    <% if can? :execute, Upload %>
-	    newRow += '<td><%= link_to "Make Executable", make_upload_executable_path(@upload), :remote => true %></td>';
-  	<% end %>
-  <% end %>
+  var newRow =  '<tr class="even upload_<%= @upload.id %>"><td width=420><%= generate_link_with_thumbnail(@upload) %></td>';
+  newRow += '<td><%= best_in_place @upload, :description %></td>';
+  newRow += '<td>';
 	<% if can? :destroy, Upload %>
-	  newRow += '<td><%= link_to "<i class=icon-remove></i> Delete", @upload, :confirm => "This will permanently delete the file. Are you sure?", :method => :delete, :remote => true %></td>';
+	  newRow += '<%= link_to "<i class=icon-trash></i>".html_safe, @upload, :confirm => "This will permanently delete the file. Are you sure?", :method => :delete, :remote => true %>';
 	<% end %>
-  newRow += '</tr>';
+	<% if @upload.uploadable_type == "TestCase" %>
+	  <% if can? :execute, Upload %>
+	    newRow += '<br><br><%= link_to "Make Executable", executable_upload_path(@upload), :remote => true %>';
+	  <% end %>
+	<% end %>
+  newRow += '</td></tr>';
   $('#uploadsTable').append(newRow);
   reset_row_classes();
   
   $('#ajaxAlert').hide();
+  $('#best_in_place_upload_<%= @upload.id %>_description').best_in_place();
 <% end %>
 
