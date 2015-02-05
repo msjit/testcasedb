@@ -189,6 +189,8 @@ jQuery(function($) {
       }
     });
     jQuery(".best_in_place").best_in_place();
+    
+    online_help();
 
   });
   
@@ -328,5 +330,30 @@ function reset_row_classes() {
     else {
       $(this).addClass('odd');
     }
+  });
+}
+
+function online_help() {
+  var currentHelpUrl = currentHelpUrl || "";
+  
+  $('a#help-link').click(function(event){
+      if (!$('#help-modal').is(":visible")) {
+        console.log(currentHelpUrl);
+        console.log( window.location.pathname);
+        if (currentHelpUrl !=  window.location.pathname) {
+          $.ajax({
+            url: "/help",
+            context: document.body,
+            data: {
+              page_path: window.location.pathname
+            }
+          }).success(function( data ) {
+            $("#help-content").html( data );
+          });
+          currentHelpUrl =  window.location.pathname;
+        }
+      }
+      event.preventDefault();
+      $('#help-modal').toggle( "slide", {direction:'right'}, 1000 );
   });
 }
