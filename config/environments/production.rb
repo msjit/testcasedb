@@ -10,7 +10,11 @@ TestDB::Application.configure do
   config.action_controller.perform_caching = true
 
   # Specifies the header that your server uses for sending files
-  config.action_dispatch.x_sendfile_header = "X-Sendfile"
+  # For Apache we use X-Sendfile. For notes setting it up, please review the install instructions
+  config.action_dispatch.x_sendfile_header = "X-Sendfile" # For Apache
+  # If you're using Nginx, please comment out the previous line and uncomment the line below.
+  # Note that you will have to configure nzginx to use X-Accel-Redirect
+  # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
 
   # For nginx:
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
