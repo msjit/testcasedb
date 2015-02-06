@@ -76,6 +76,9 @@ module TestDB
     # Default is 1 hour (60 minutes)
     config.session_timeout = 60
     
+    if APP_CONFIG['redis'] == 'enabled'
+      config.cache_store = :redis_store, "redis://#{APP_CONFIG['redis_host']}:#{APP_CONFIG['redis_port']}/0/cache", { expires_in: 90.minutes }
+    end
     # SSL Enabled option
     config.ssl_enabled = true
     

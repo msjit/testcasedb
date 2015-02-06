@@ -186,6 +186,9 @@ jQuery(function($) {
           progress = parseInt(data.loaded / data.total * 100, 10);
           return data.context.find('.bar').css('width', progress + '%');
         }
+      },
+      done: function(e, data) {
+        return data.context.find('.bar').remove();
       }
     });
     jQuery(".best_in_place").best_in_place();

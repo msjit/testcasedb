@@ -1,2 +1,7 @@
 session_key: "_tcdb_session"
 session_secret: PLEASECHANGETHISTOARANDOMSTRINGALSODONEBYSETUPAUTOMATICALLY
+# Set redis: to enabled to use Redis
+# Default redis value is disabled
+redis: disabled
+redis_host: 127.0.0.1
+redis_port: '6379'
