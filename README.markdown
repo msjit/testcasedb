@@ -20,6 +20,24 @@ To add a larger data set run 'rake install:largedemo'.
 
 Detailed install instructions are available in the documentation and in the doc folder. Download the latest guide at http://www.testcasedb.com/download.php.
 
+## Enable Redis
+
+TestCaseDB is designed to work with Redis. Redis is optional, but can provide several benefits.
+
+Redis is used for session storage, caching and pulling email delivery out of the main web workflow.
+
+To enable Redis, Follow these steps.
+
+1. Install Redis on your TestCaseDB server or a separate server.
+  * Install structions can be found at https://www.linode.com/docs/databases/redis/redis-on-ubuntu-12-04-precise-pangolin
+
+2. Open config/app_config.yml from the root TCDB directory with your favorite text editor.
+
+3. Add the following three lines, replacing 127.0.0.1 with your Redis server IP  and a different port if you configured an alternative.
+  redis: enabled
+  redis_host: 127.0.0.1
+  redis_port: '6379'
+  
 ## Enable Google OAuth
 
 To utilize Google's OAuth you need to follow a few steps.
