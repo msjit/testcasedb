@@ -518,6 +518,7 @@ RSpec.describe 'Attachments API', :focus, :type => :request do
     }
     post "api/attachments/update.json", params, request_headers
     expect(response.status).to eq(200)
+    expect(JSON.parse(response.body)['attachments'].count).to eq(2)
     expect(JSON.parse(response.body)['attachments'][0]['description']).to eq(new_description)
     expect(JSON.parse(response.body)['attachments'][0]['content_type']).to eq(new_content_type)
     expect(JSON.parse(response.body)['attachments'][0]['parent_id']).to eq(@result_2.id)
@@ -539,7 +540,62 @@ RSpec.describe 'Attachments API', :focus, :type => :request do
     }
     post "api/attachments/delete.json", params, request_headers
     expect(response.status).to eq(400)
-    expect(JSON.parse(response.body)['message']).to eq('TODO')
+  end
+ 
+  it "delete successful" do
+    @upload_png = Upload.create(@upload_attr_hash_png)
+    params = {
+      "api_key" => @user.single_access_token,
+      'id' => @upload_png.id
+    }.to_json
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    expect(File.exist?(@upload_png.upload.path)).to eq(true)
+    post "api/attachments/delete.json", params, request_headers
+    expect(response.status).to eq(200)
+    post "api/attachments/search.json", params, request_headers
+    expect(response.status).to eq(200)
+    expect(JSON.parse(response.body)['found']).to eq(false)
+    expect(File.exist?(@upload_png.upload.path)).to eq(false)
+  end
+ 
+  it "delete multiple successful" do
+    @upload_png = Upload.create(@upload_attr_hash_png)
+    @upload_jpg = Upload.create(@upload_attr_hash_jpg)
+    params = {
+      "api_key" => @user.single_access_token,
+      'attachments' => [
+        {'id' => @upload_png.id},
+        {'id' => @upload_jpg.id},
+      ]
+    }.to_json
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    expect(File.exist?(@upload_png.upload.path)).to eq(true)
+    expect(File.exist?(@upload_jpg.upload.path)).to eq(true)
+    post "api/attachments/delete.json", params, request_headers
+    expect(response.status).to eq(200)
+    expect(JSON.parse(response.body)['attachments'].count).to eq(2)
+    params = {
+      "api_key" => @user.single_access_token,
+      'id' => @upload_png.id
+    }.to_json    
+    post "api/attachments/search.json", params, request_headers
+    expect(response.status).to eq(200)
+    expect(JSON.parse(response.body)['found']).to eq(false)
+    expect(File.exist?(@upload_png.upload.path)).to eq(false)
+    params = {
+      "api_key" => @user.single_access_token,
+      'id' => @upload_jpg.id
+    }.to_json      
+    post "api/attachments/search.json", params, request_headers
+    expect(response.status).to eq(200)
+    expect(JSON.parse(response.body)['found']).to eq(false)
+    expect(File.exist?(@upload_jpg.upload.path)).to eq(false)    
   end
  
   after(:each) do

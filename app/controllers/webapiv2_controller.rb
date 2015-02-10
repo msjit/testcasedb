@@ -2517,9 +2517,15 @@ class Webapiv2Controller < ApplicationController
     return response_hash            
   end
 
-  def _attachments_delete(request_data)   
-    return {'response' => {'message' => 'TODO'},
-            'status' => 400}
+  def _attachments_delete(request_data)
+    attachment = Upload.where(:id => request_data['id']).first
+    if attachment.nil?
+      return {'response' => {'message' => "No attachment with id %s found" %[request_data['id']]},
+              'status' => 400}
+    end
+    attachment.destroy
+    return {'response' => {'message' => 'Successfully deleted attachment with id "%s".' %[request_data['id']]},
+            'status' => 200}    
   end
 
 end
