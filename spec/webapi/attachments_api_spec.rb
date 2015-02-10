@@ -14,6 +14,7 @@ end
 RSpec.describe 'Attachments API', :focus, :type => :request do
   
   before(:each) do
+    @result = Result.create(FactoryGirl.attributes_for(:result))
     @upload_attr_hash_png = FactoryGirl.attributes_for(:upload_png)
     @upload_attr_hash_jpg = FactoryGirl.attributes_for(:upload_jpg)
     @upload_attr_hash_bmp = FactoryGirl.attributes_for(:upload_bmp)     
@@ -371,18 +372,160 @@ RSpec.describe 'Attachments API', :focus, :type => :request do
     expect(response.status).to eq(400)
   end
  
-  it "update not found" do
+  it "upload for non-Result object failure" do
+    params = {
+      'api_key' => @user.single_access_token,
+      'description' => 'test description',
+      'file_name' => 'test.png',
+      'parent_id' => 1,
+      'parent_type' => 'Device',
+      'data' => 0
+    }.to_json
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/attachments/upload.json", params, request_headers
+    expect(response.status).to eq(400)
+  end
+ 
+  it "upload for non-existent Result object failure" do
+    params = {
+      'api_key' => @user.single_access_token,
+      'description' => 'test description',
+      'file_name' => 'test.png',
+      'parent_id' => 2,
+      'parent_type' => 'Result',
+      'data' => 0
+    }.to_json
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/attachments/upload.json", params, request_headers
+    expect(response.status).to eq(400)
+  end
+ 
+  it "update attachment not found" do
     params = {
       "api_key" => @user.single_access_token,
-      'id' => 1
+      'to_update' => {
+        'id' => 1,            
+      },
+      'new_values' => {  
+        'description' => 'test description',
+        'content_type' => 'image/png',
+        'parent_id' => 1, 
+        'parent_type' => 'Result',      
+      }
     }.to_json
     request_headers = {
       "Accept" => "application/json",
       "Content-Type" => "application/json"
     }
     post "api/attachments/update.json", params, request_headers
-    expect(response.status).to eq(400)
-    expect(JSON.parse(response.body)['message']).to eq('TODO') 
+    expect(response.status).to eq(400) 
+  end
+
+  it "update Result not found" do
+    @upload_png = Upload.create(@upload_attr_hash_png)
+    params = {
+      "api_key" => @user.single_access_token,
+      'to_update' => {
+        'id' => 1,            
+      },
+      'new_values' => {  
+        'description' => 'test description',
+        'content_type' => 'image/png',
+        'parent_id' => 2, 
+        'parent_type' => 'Result',      
+      }
+    }.to_json
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/attachments/update.json", params, request_headers
+    expect(response.status).to eq(400) 
+  end
+
+  it "update successful" do
+    @upload_png = Upload.create(@upload_attr_hash_png)
+    @result_2 = Result.create(FactoryGirl.attributes_for(:result_2))
+    new_description = 'test description 2'
+    new_content_type = 'image/jpeg'
+    params = {
+      "api_key" => @user.single_access_token,
+      'to_update' => {
+        'id' => @upload_png.id,            
+      },
+      'new_values' => {  
+        'description' => new_description,
+        'content_type' => new_content_type,
+        'parent_id' => @result_2.id, 
+        'parent_type' => 'Result',
+      }
+    }.to_json
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/attachments/update.json", params, request_headers
+    expect(response.status).to eq(200)
+    expect(JSON.parse(response.body)['description']).to eq(new_description)
+    expect(JSON.parse(response.body)['content_type']).to eq(new_content_type)
+    expect(JSON.parse(response.body)['parent_id']).to eq(@result_2.id)
+    expect(JSON.parse(response.body)['parent_type']).to eq('Result')    
+  end
+
+
+  it "update multiple successful" do
+    @upload_png = Upload.create(@upload_attr_hash_png)
+    @upload_jpg = Upload.create(@upload_attr_hash_jpg)
+    @result_2 = Result.create(FactoryGirl.attributes_for(:result_2))
+    new_description = 'test description 3'
+    new_content_type = 'image/test'
+    params = {
+      "api_key" => @user.single_access_token,
+      'attachments' => [
+        {
+          'to_update' => {
+            'id' => @upload_png.id,            
+          },
+          'new_values' => {  
+            'description' => new_description,
+            'content_type' => new_content_type,
+            'parent_id' => @result_2.id, 
+            'parent_type' => 'Result',
+          }
+        },
+        {
+          'to_update' => {
+            'id' => @upload_jpg.id,            
+          },
+          'new_values' => {  
+            'description' => new_description,
+            'content_type' => new_content_type,
+            'parent_id' => @result_2.id, 
+            'parent_type' => 'Result',
+          }
+         }        
+      ]
+    }.to_json
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/attachments/update.json", params, request_headers
+    expect(response.status).to eq(200)
+    expect(JSON.parse(response.body)['attachments'][0]['description']).to eq(new_description)
+    expect(JSON.parse(response.body)['attachments'][0]['content_type']).to eq(new_content_type)
+    expect(JSON.parse(response.body)['attachments'][0]['parent_id']).to eq(@result_2.id)
+    expect(JSON.parse(response.body)['attachments'][0]['parent_type']).to eq('Result')
+    expect(JSON.parse(response.body)['attachments'][1]['description']).to eq(new_description)
+    expect(JSON.parse(response.body)['attachments'][1]['content_type']).to eq(new_content_type)
+    expect(JSON.parse(response.body)['attachments'][1]['parent_id']).to eq(@result_2.id)
+    expect(JSON.parse(response.body)['attachments'][1]['parent_type']).to eq('Result')           
   end
 
   it "delete not found" do

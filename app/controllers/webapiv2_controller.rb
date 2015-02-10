@@ -2400,6 +2400,7 @@ class Webapiv2Controller < ApplicationController
       response_hash["found"] = false
     end
     return {'response' => response_hash,
+            'attachment' => uploads.first,
             'status' => 200}    
   end
 
@@ -2409,6 +2410,19 @@ class Webapiv2Controller < ApplicationController
       response_hash = {"message" => "No description, file_name, content_type, parent_type, parent_id, or data parameter provided."}
       return {'response' => response_hash,
               'status' => 400}
+    end
+    request_data['parent_type'] = request_data['parent_type'].titleize 
+    # only allow Result attachments for now
+    if request_data['parent_type'] != "Result"
+        return {'response' => {'message' => "Currently, only Result attachment uploads are supported via the web api. Please specify 'Result'" \
+                                            " as the 'parent_type' and a valid Result object id for 'parent_id'."},
+                'status' => 400}
+    end
+    # make sure the result object exists
+    result = Result.where(:id => request_data['parent_id']).first
+    if result.nil?
+      return {'response' => {'message' => "No result with id %s found" %[request_data['parent_id']]},
+              'status' => 400}          
     end
     begin
       temp_dir = Dir.mktmpdir
@@ -2448,9 +2462,59 @@ class Webapiv2Controller < ApplicationController
     return response_hash
   end
 
-  def _attachments_update(request_data)   
-    return {'response' => {'message' => 'TODO'},
-            'status' => 400}
+  def _attachments_update(request_data)
+    if request_data['to_update'] == nil \
+       && request_data['new_values'] == nil
+      return {'response' => {'message' => "No to_update or new_values passed."},
+              'status' => 400}
+    end
+    response_hash = _attachments_search(request_data['to_update'])
+    if response_hash["status"] == 200 && response_hash['response']['found']
+      attachment = response_hash['attachment']
+      attachment.description = request_data['new_values']['description'] || attachment.description
+      attachment.upload_content_type = request_data['new_values']['content_type'] || attachment.upload_content_type
+      # only allow Result attachments for now
+      if request_data['new_values']['parent_type'] && request_data['new_values']['parent_type'] != "Result"
+          return {'response' => {'message' => "Currently, only Result attachment uploads are supported via the web api. Please specify 'Result'" \
+                                              " as the 'parent_type' and a valid Result object id for 'parent_id'."},
+                  'status' => 400}
+      end      
+      # make sure the result object exists
+      result = Result.where(:id => request_data['new_values']['parent_id']).first
+      if result.nil?
+        return {'response' => {'message' => "No result with id %s found" %[request_data['new_values']['parent_id']]},
+                'status' => 400}          
+      end
+      attachment.uploadable_id = request_data['new_values']['parent_id'] || attachment.uploadable_id
+      if attachment.save
+        attachment.reload           
+        response_hash = {
+          'response' => {'message' => 'Successfully updated attachment "%s" with id "%s".' \
+                                      %[attachment.description, attachment.id],
+                         'id' => attachment.id,          
+                         'description' => attachment.description,
+                         'file_name' => attachment.upload_file_name,
+                         'content_type' => attachment.upload_content_type,
+                         'size' => attachment.upload_file_size,
+                         'parent_id' => attachment.uploadable_id,
+                         'parent_type' => attachment.uploadable_type,
+                         'created_at' => attachment.created_at,
+                         'updated_at' => attachment.updated_at                       
+                         },
+          'status' => 200
+        }                       
+      else
+        response_hash = {
+          'response' => {'message' => 'Error updating attachment "%s" with id "%s".' \
+                                      %[attachment.description, attachment.id]},
+          'status' => 500
+        }           
+      end
+    else
+      response_hash['status'] = 400
+      response_hash['response']['message'] += ' Failed to update using %s.' %[request_data['to_update']]
+    end
+    return response_hash            
   end
 
   def _attachments_delete(request_data)   
