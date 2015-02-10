@@ -188,7 +188,7 @@ jQuery(function($) {
         }
       },
       done: function(e, data) {
-        return data.context.find('.bar').remove();
+        return data.context.remove();
       }
     });
     jQuery(".best_in_place").best_in_place();
