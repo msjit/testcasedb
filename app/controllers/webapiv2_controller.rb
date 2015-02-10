@@ -1,4 +1,6 @@
 require 'json'
+require 'base64'
+require 'fileutils'
 
 class Webapiv2Controller < ApplicationController
   skip_before_filter :require_login
@@ -106,6 +108,8 @@ class Webapiv2Controller < ApplicationController
       response_hash = _assignments(params[:endpoint], request_data)
     when 'results'
       response_hash = _results(params[:endpoint], request_data)                                                                                                  
+    when 'attachments'
+      response_hash = _attachments(params[:endpoint], request_data)                                                                                                  
     end
     if response_hash.nil?
       response_hash = {'response' => {'message' => 'Invalid API endpoint.'}, 'status' => 400}
@@ -276,6 +280,22 @@ class Webapiv2Controller < ApplicationController
       return _results_get(request_data)
     when 'set'
       return _results_set(request_data)
+    end
+    return nil   
+  end
+
+  def _attachments(endpoint, request_data)
+    case endpoint      
+    when 'upload'
+      return _attachments_handler(request_data, 'upload')
+    when 'download'
+      return _attachments_search(request_data, download=true)      
+    when 'search'
+      return _attachments_search(request_data)
+    when 'update'
+      return _attachments_handler(request_data, 'update')
+    when 'delete'
+      return _attachments_handler(request_data, 'delete')
     end
     return nil   
   end
@@ -2291,6 +2311,147 @@ class Webapiv2Controller < ApplicationController
       return {'response' => {'message' => 'Passed results list was empty or invalid.'},
               'status' => 400}
     end
+  end
+
+  def _attachments_handler(request_data, action)     
+    if request_data.key?('attachments')
+      if request_data['attachments'].is_a?(Hash) \
+         && !request_data['attachments'].empty?
+        incorrect_fields = request_data['attachments'].map {|k,v| (v.is_a?(Hash) && !v.empty?) ? nil : k.to_s}.compact
+        if incorrect_fields.count > 0        
+          return {'response' => {'message' => 'One or more passed attachments were not of the correct type or empty.'},
+                  'status' => 400}        
+        end       
+        response_hash = {'attachments' => []}
+        request_data['attachments'].each do |key, value|
+          if action == 'upload'
+            result = _attachments_upload(value)
+            response_hash['message'] = 'Successfully uploaded all attachments'
+          elsif action == 'update'
+            result = _attachments_update(value)
+            response_hash['message'] = 'Successfully updated all attachments'
+          elsif action == 'delete'
+            result = _attachments_delete(value)
+            response_hash['message'] = 'Successfully deleted all attachments'            
+          end
+          if result['status'] == 200 || result['status'] == 201
+            response_hash['attachments'].push(result['response'])
+          else
+            return result
+          end          
+        end
+        return {'response' => response_hash,
+                'status' => 200}    
+      else
+        return {'response' => {'message' => 'Passed attachments list was empty or invalid.'},
+                'status' => 400}
+      end
+    else
+      case action      
+      when 'upload'
+        return _attachments_upload(request_data)
+      when 'update'
+        return _attachments_update(request_data)        
+      when 'delete'
+        return _attachments_delete(request_data)
+      end
+    end      
+  end
+
+  def _attachments_search(request_data, download=false)
+    response_hash = {}  
+    if request_data['description'] == nil \
+       && request_data['id'] == nil \
+       && request_data['file_name'] == nil \
+       && request_data['content_type'] == nil \
+       && request_data['parent_id'] == nil \
+       && request_data['parent_type'] == nil
+      response_hash["message"] = "No search parameters provided. Please specify one or more of the following: " \
+                                 "'id', 'description', 'file_name', 'content_type', 'parent_id', 'parent_type'"
+      return {'response' => response_hash,
+              'status' => 400}   
+    end
+    conditions = {:description => request_data['description'],
+                  :id => request_data['id'],
+                  :upload_file_name => request_data['file_name'],
+                  :upload_content_type => request_data['upload_content_type'],
+                  :uploadable_id => request_data['parent_id'],
+                  :uploadable_type => request_data['parent_type'] }
+    conditions.delete_if {|k,v| v.blank? }    
+    uploads = Upload.find(:all, :conditions => conditions)
+    if uploads != []
+      response_hash["attachments"] = 
+        uploads.map do |u|
+          { id: u[:id],
+            description: u[:description],
+            parent_id: u.uploadable_id,
+            parent_type: u.uploadable_type,
+            file_name: u.upload_file_name,
+            content_type: u.upload_content_type,
+            size: u.upload_file_size,
+            data: (Base64.encode64(File.read(u.upload.path)) if download) }.reject{ |k,v| v.nil? }
+        end      
+      response_hash["message"] = "Attachments(s) found."
+      response_hash["found"] = true
+    else
+      response_hash["message"] = "No attachments(s) found. Try searching based on another parameter."
+      response_hash["found"] = false
+    end
+    return {'response' => response_hash,
+            'status' => 200}    
+  end
+
+  def _attachments_upload(request_data)
+    if request_data['description'].nil? || request_data['file_name'].nil? || request_data['data'].nil? \
+       || request_data['parent_type'].nil? || request_data['parent_id'].nil?
+      response_hash = {"message" => "No description, file_name, content_type, parent_type, parent_id, or data parameter provided."}
+      return {'response' => response_hash,
+              'status' => 400}
+    end
+    begin
+      temp_dir = Dir.mktmpdir
+      temp_file = File.new('%s/%s' %[temp_dir, request_data['file_name']], 'w+')
+      File.open(temp_file.path, 'wb') do |f|
+          f.write Base64.decode64(request_data['data'])
+      end
+      upload = Upload.new(:description => request_data['description'],
+                          :uploadable_id => request_data['parent_id'],
+                          :uploadable_type => request_data['parent_type'])
+      upload.upload = temp_file
+      if upload.save
+        response_hash = {
+          'response' => {
+            'message' => 'Attachment successfully uploaded.',
+            'id' => upload.id,          
+            'description' => upload.description,
+            'file_name' => upload.upload_file_name,
+            'content_type' => upload.upload_content_type,
+            'size' => upload.upload_file_size,
+            'parent_id' => upload.uploadable_id,
+            'parent_type' => upload.uploadable_type
+          },
+          'status' => 201
+        }        
+      else
+        response_hash = {
+          'response' => {'message' => 'Error uploading attachment.  Make sure the data was Base64 encoded.'},
+          'status' => 500
+        }
+      end
+    ensure
+      FileUtils.remove_entry temp_dir
+    end
+    return response_hash
+  end
+
+  def _attachments_update(request_data)   
+    return {'response' => {'message' => 'TODO'},
+            'status' => 400}
+  end
+
+  def _attachments_delete(request_data)   
+    return {'response' => {'message' => 'TODO'},
+            'status' => 400}
   end
 
 end
