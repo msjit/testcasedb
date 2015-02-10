@@ -2315,15 +2315,15 @@ class Webapiv2Controller < ApplicationController
 
   def _attachments_handler(request_data, action)     
     if request_data.key?('attachments')
-      if request_data['attachments'].is_a?(Hash) \
+      if request_data['attachments'].is_a?(Array) \
          && !request_data['attachments'].empty?
-        incorrect_fields = request_data['attachments'].map {|k,v| (v.is_a?(Hash) && !v.empty?) ? nil : k.to_s}.compact
+        incorrect_fields = request_data['attachments'].map {|x| (x.is_a?(Hash) && !x.empty?) ? nil : x}.compact
         if incorrect_fields.count > 0        
           return {'response' => {'message' => 'One or more passed attachments were not of the correct type or empty.'},
                   'status' => 400}        
         end       
         response_hash = {'attachments' => []}
-        request_data['attachments'].each do |key, value|
+        request_data['attachments'].each do |value|
           if action == 'upload'
             result = _attachments_upload(value)
             response_hash['message'] = 'Successfully uploaded all attachments'
@@ -2389,7 +2389,9 @@ class Webapiv2Controller < ApplicationController
             file_name: u.upload_file_name,
             content_type: u.upload_content_type,
             size: u.upload_file_size,
-            data: (Base64.encode64(File.read(u.upload.path)) if download) }.reject{ |k,v| v.nil? }
+            data: (Base64.encode64(File.read(u.upload.path)) if download),
+            created_at: u.created_at,
+            updated_at: u.updated_at }.reject{ |k,v| v.nil? }
         end      
       response_hash["message"] = "Attachments(s) found."
       response_hash["found"] = true
@@ -2428,7 +2430,9 @@ class Webapiv2Controller < ApplicationController
             'content_type' => upload.upload_content_type,
             'size' => upload.upload_file_size,
             'parent_id' => upload.uploadable_id,
-            'parent_type' => upload.uploadable_type
+            'parent_type' => upload.uploadable_type,
+            'created_at' => upload.created_at,
+            'updated_at' => upload.updated_at
           },
           'status' => 201
         }        
