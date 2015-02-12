@@ -32,7 +32,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     params = {
       "api_key" => @user.single_access_token,
       'product_id' => 1,
-      'test_plan_id' => 1
+      'id' => 1
     }.to_json
     request_headers = {
       "Accept" => "application/json",
@@ -60,7 +60,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     params = {
       "api_key" => @user.single_access_token,
       'product_id' => 1,
-      'test_plan_id' => 1
+      'id' => 1
     }.to_json
     request_headers = {
       "Accept" => "application/json",
@@ -74,7 +74,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     params = {
       "api_key" => @user.single_access_token,
       'product_id' => 1,
-      'test_plan_name' => @test_plan.name
+      'name' => @test_plan.name
     }.to_json
     request_headers = {
       "Accept" => "application/json",
@@ -142,7 +142,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     name = 'Test Plan'
     params = {
       "api_key" => @user.single_access_token,
-      'test_plan_name' => name,
+      'name' => name,
       'product_id' => 'nonexistent product',      
     }.to_json
     request_headers = {
@@ -157,7 +157,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     name = 'Test Plan'
     params = {
       "api_key" => @user.single_access_token,
-      'test_plan_name' => name,      
+      'name' => name,      
       'product_id' => 1,
       'created_by_id' => 2
     }.to_json
@@ -182,7 +182,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     }
     params = {
       "api_key" => @user.single_access_token,
-      'test_plan_name' => name,
+      'name' => name,
       'product_id' => 1,      
       'description' => description,
       'custom_fields' => custom_fields
@@ -212,7 +212,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     }
     params = {
       "api_key" => @user.single_access_token,
-      'test_plan_name' => name,
+      'name' => name,
       'product_id' => 1,      
       'description' => description,
       'custom_fields' => custom_fields 
@@ -240,7 +240,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     params = {
       "api_key" => @user.single_access_token,
       'product_id' => 1,
-      'test_plan_id' => 1
+      'id' => 1
     }
     request_headers = {
       "Accept" => "application/json",
@@ -262,7 +262,6 @@ RSpec.describe 'Test Plans API', :type => :request do
     # update
     name = 'Updated name'
     description = 'updated description'
-    version = 5
     params['overwrite_custom_fields'] = true
     custom_fields = {
       'field 1'=> {'name' => 'custom field 1',
@@ -275,11 +274,11 @@ RSpec.describe 'Test Plans API', :type => :request do
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
-        'test_plan_id' => @test_plan.id,
+        'id' => @test_plan.id,
         'product_id' => 1,            
       },
       'new_values' => {  
-        'test_plan_name' => name,
+        'name' => name,
         'product_id' => 1, 
         'description' => description,
         'custom_fields' => custom_fields,
@@ -306,7 +305,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     description = 'test plan'
     params = {
       "api_key" => @user.single_access_token,
-      'test_plan_name' => name,
+      'name' => name,
       'product_id' => 1,      
       'description' => description,
       'test_cases' => [2,1]
@@ -330,7 +329,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     description = 'test plan'
     params = {
       "api_key" => @user.single_access_token,
-      'test_plan_name' => name,
+      'name' => name,
       'product_id' => 1,      
       'description' => description      
     }
@@ -346,7 +345,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
-        'test_plan_id' => @test_plan.id,
+        'id' => @test_plan.id,
         'product_id' => 1,            
       },
       'new_values' => {  
@@ -371,7 +370,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     description = 'test plan'
     params = {
       "api_key" => @user.single_access_token,
-      'test_plan_name' => name,
+      'name' => name,
       'product_id' => 1,      
       'description' => description      
     }
@@ -393,7 +392,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
-        'test_plan_id' => @test_plan.id,
+        'id' => @test_plan.id,
         'product_id' => 1,            
       },
       'new_values' => {  
@@ -418,7 +417,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     description = 'test plan'
     params = {
       "api_key" => @user.single_access_token,
-      'test_plan_name' => name,
+      'name' => name,
       'product_id' => 1,      
       'description' => description      
     }
@@ -440,7 +439,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
-        'test_plan_id' => @test_plan.id,
+        'id' => @test_plan.id,
         'product_id' => 1,            
       },
       'new_values' => {  
@@ -463,7 +462,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     description = 'test plan'
     params = {
       "api_key" => @user.single_access_token,
-      'test_plan_name' => name,
+      'name' => name,
       'product_id' => 1,      
       'description' => description      
     }
@@ -485,7 +484,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
-        'test_plan_id' => @test_plan.id,
+        'id' => @test_plan.id,
         'product_id' => 1,            
       },
       'new_values' => {  

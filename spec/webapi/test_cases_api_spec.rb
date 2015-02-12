@@ -45,7 +45,7 @@ RSpec.describe 'Test Cases API', :type => :request do
       "api_key" => @user.single_access_token,
       'category' => 'Test Category',
       'product_id' => 1,
-      'test_case_name' => 'Test Case'
+      'name' => 'Test Case'
     }.to_json
     request_headers = {
       "Accept" => "application/json",
@@ -62,7 +62,7 @@ RSpec.describe 'Test Cases API', :type => :request do
       "api_key" => @user.single_access_token,
       'category' => @category.name,
       'product_id' => 1,
-      'test_case_name' => 'Test Case'
+      'name' => 'Test Case'
     }.to_json
     request_headers = {
       "Accept" => "application/json",
@@ -77,7 +77,7 @@ RSpec.describe 'Test Cases API', :type => :request do
     name = 'Test Case'
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => @category.name,
       'product_name' => 'nonexistent product',      
     }.to_json
@@ -94,7 +94,7 @@ RSpec.describe 'Test Cases API', :type => :request do
     category = 'Nonexistent Category'
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => category,
       'product_id' => 1,      
     }.to_json
@@ -110,7 +110,7 @@ RSpec.describe 'Test Cases API', :type => :request do
     name = 'Test Case'
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => @category.name,      
       'product_id' => 1,
       'created_by_id' => 2
@@ -127,7 +127,7 @@ RSpec.describe 'Test Cases API', :type => :request do
     name = 'Test Case'
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => @category.name,      
       'product_id' => 1,
       'test_type_id' => 2
@@ -153,7 +153,7 @@ RSpec.describe 'Test Cases API', :type => :request do
     }
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => @category.name,
       'product_id' => 1,      
       'description' => description,
@@ -189,7 +189,7 @@ RSpec.describe 'Test Cases API', :type => :request do
     }
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => category,
       'product_id' => 1,      
       'description' => description,
@@ -219,7 +219,7 @@ RSpec.describe 'Test Cases API', :type => :request do
     }
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => @category.name,
       'product_id' => 1,      
       'description' => description,
@@ -249,7 +249,7 @@ RSpec.describe 'Test Cases API', :type => :request do
     @test_case = TestCase.create(@test_case_attr_hash)
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => @test_case.name,
+      'name' => @test_case.name,
       'category' => @category.name,
       'product_id' => 1,      
       'description' => @test_case.description,
@@ -290,12 +290,12 @@ RSpec.describe 'Test Cases API', :type => :request do
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
-        'test_case_name' => @test_case.name,
+        'name' => @test_case.name,
         'category' => @category.name,
         'product_id' => 1,            
       },
       'new_values' => {  
-        'test_case_name' => name,
+        'name' => name,
         'category' => category,
         'product_id' => 1, 
         'description' => description,
@@ -326,10 +326,10 @@ RSpec.describe 'Test Cases API', :type => :request do
     params = {
       "api_key" => @user.single_access_token,
       'test_cases' => {
-        0 => {'test_case_name' => 'case 1',
+        0 => {'name' => 'case 1',
               'category' => @category.name,
               'product_id' => 1},
-        1 => {'test_case_name' => 'case 2',
+        1 => {'name' => 'case 2',
               'category' => @category.name,
               'product_id' => 1}                   
       }
@@ -357,23 +357,23 @@ RSpec.describe 'Test Cases API', :type => :request do
       'test_cases' => {
         0 => {
           'to_update' => {
-            'test_case_name' => @test_case.name,
+            'name' => @test_case.name,
             'category' => @category.name,
             'product_id' => 1,            
           },
           'new_values' => {  
-            'test_case_name' => updated_name_1,
+            'name' => updated_name_1,
             'description' => updated_description_1,        
           }                 
         },
         1 => {
           'to_update' => {
-            'test_case_name' => @test_case_2.name,
+            'name' => @test_case_2.name,
             'category' => @category.name,
             'product_id' => 1,            
           },
           'new_values' => {  
-            'test_case_name' => updated_name_2,
+            'name' => updated_name_2,
             'description' => updated_description_2,        
           }                 
         }        

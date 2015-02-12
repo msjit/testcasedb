@@ -38,7 +38,7 @@ RSpec.describe 'Stencils API', :type => :request do
     params = {
       "api_key" => @user.single_access_token,
       'product_id' => 1,
-      'stencil_id' => 1
+      'id' => 1
     }.to_json
     request_headers = {
       "Accept" => "application/json",
@@ -54,7 +54,7 @@ RSpec.describe 'Stencils API', :type => :request do
     params = {
       "api_key" => @user.single_access_token,
       'product_id' => 1,
-      'stencil_id' => 1
+      'id' => 1
     }.to_json
     request_headers = {
       "Accept" => "application/json",
@@ -71,7 +71,7 @@ RSpec.describe 'Stencils API', :type => :request do
     name = 'Stencil'
     params = {
       "api_key" => @user.single_access_token,
-      'stencil_name' => name,
+      'name' => name,
       'product_name' => 'nonexistent product',      
     }.to_json
     request_headers = {
@@ -86,7 +86,7 @@ RSpec.describe 'Stencils API', :type => :request do
     name = 'Stencil'
     params = {
       "api_key" => @user.single_access_token,
-      'stencil_name' => name,      
+      'name' => name,      
       'product_id' => 1,
       'created_by_id' => 2
     }.to_json
@@ -103,7 +103,7 @@ RSpec.describe 'Stencils API', :type => :request do
     description = 'test stencil'
     params = {
       "api_key" => @user.single_access_token,
-      'stencil_name' => name,
+      'name' => name,
       'product_id' => 1,      
       'description' => description
     }.to_json
@@ -111,7 +111,7 @@ RSpec.describe 'Stencils API', :type => :request do
       "Accept" => "application/json",
       "Content-Type" => "application/json"
     }
-    post "api/stencils/create.json", params, request_headers 
+    post "api/stencils/create.json", params, request_headers      
     expect(response.status).to eq(201)
     expect(JSON.parse(response.body)['id']).to eq(1)  
     expect(JSON.parse(response.body)['parent_id']).to eq(nil)
@@ -123,7 +123,7 @@ RSpec.describe 'Stencils API', :type => :request do
     description = 'test stencil'
     params = {
       "api_key" => @user.single_access_token,
-      'stencil_name' => name,
+      'name' => name,
       'product_id' => 1,      
       'description' => description 
     }
@@ -148,7 +148,7 @@ RSpec.describe 'Stencils API', :type => :request do
     @stencil = Stencil.create(@stencil_attr_hash)
     params = {
       "api_key" => @user.single_access_token,
-      'stencil_id' => @stencil.id,
+      'id' => @stencil.id,
       'product_id' => @product.id
     }
     request_headers = {
@@ -175,11 +175,11 @@ RSpec.describe 'Stencils API', :type => :request do
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
-        'stencil_id' => @stencil.id,
+        'id' => @stencil.id,
         'product_id' => @product.id,            
       },
       'new_values' => {  
-        'stencil_name' => name,
+        'name' => name,
         'product_id' => 1, 
         'description' => description      
       },      
@@ -201,11 +201,11 @@ RSpec.describe 'Stencils API', :type => :request do
     description = 'test stencil'
     params = {
       "api_key" => @user.single_access_token,
-      'stencil_name' => name,
-      'product_id' => 1,      
+      'name' => name,
+      'product_id' => 1,
       'description' => description,
-      'test_plans' => [{'test_plan_id' => @test_plan.id, 'device_id' => @device.id},
-                       {'test_plan_id' => @test_plan_2.id, 'device_id' => @device_2.id}]
+      'test_plans' => [{'id' => @test_plan.id, 'device_id' => @device.id},
+                       {'id' => @test_plan_2.id, 'device_id' => @device_2.id}]
     }.to_json
     request_headers = {
       "Accept" => "application/json",
@@ -224,7 +224,7 @@ RSpec.describe 'Stencils API', :type => :request do
     @stencil = Stencil.create(@stencil_attr_hash)
     params = {
       "api_key" => @user.single_access_token,
-      'stencil_name' => @stencil.name,
+      'name' => @stencil.name,
       'product_id' => 1,      
       'description' => @stencil.description      
     }
@@ -240,12 +240,12 @@ RSpec.describe 'Stencils API', :type => :request do
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
-        'stencil_id' => @stencil.id,
+        'id' => @stencil.id,
         'product_id' => 1,            
       },
       'new_values' => {  
-        'test_plans' => [{'test_plan_id' => @test_plan.id, 'device_id' => @device.id},
-                         {'test_plan_id' => @test_plan_2.id, 'device_id' => @device_2.id}]     
+        'test_plans' => [{'id' => @test_plan.id, 'device_id' => @device.id},
+                         {'id' => @test_plan_2.id, 'device_id' => @device_2.id}]     
       }      
     }            
     post "api/stencils/update.json", params.to_json, request_headers    
@@ -264,7 +264,7 @@ RSpec.describe 'Stencils API', :type => :request do
     @stencil_test_plan_2 = StencilTestPlan.create(@stencil_test_plan_attr_hash_2)          
     params = {
       "api_key" => @user.single_access_token,
-      'stencil_name' => @stencil.name,
+      'name' => @stencil.name,
       'product_id' => 1,      
       'description' => @stencil.description      
     }
@@ -282,16 +282,16 @@ RSpec.describe 'Stencils API', :type => :request do
     expect(@stencils['test_plans'][0]['plan_order']).to eq(0)
     expect(@stencils['test_plans'][1]['test_plan_id']).to eq(@test_plan_2.id)
     expect(@stencils['test_plans'][1]['plan_order']).to eq(1)    
-    # update with test cases
+    # update with test plans
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
-        'stencil_id' => @stencil.id,
+        'id' => @stencil.id,
         'product_id' => 1,            
       },
       'new_values' => {  
-        'test_plans' => [{'test_plan_id' => @test_plan_2.id, 'device_id' => @device_2.id},
-                         {'test_plan_id' => @test_plan.id, 'device_id' => @device.id}]      
+        'test_plans' => [{'id' => @test_plan_2.id, 'device_id' => @device_2.id},
+                         {'id' => @test_plan.id, 'device_id' => @device.id}]      
       }      
     }            
     post "api/stencils/update.json", params.to_json, request_headers    
@@ -310,7 +310,7 @@ RSpec.describe 'Stencils API', :type => :request do
     @stencil_test_plan_2 = StencilTestPlan.create(@stencil_test_plan_attr_hash_2)          
     params = {
       "api_key" => @user.single_access_token,
-      'stencil_name' => @stencil.name,
+      'name' => @stencil.name,
       'product_id' => 1,      
       'description' => @stencil.description      
     }
@@ -328,15 +328,15 @@ RSpec.describe 'Stencils API', :type => :request do
     expect(@stencils['test_plans'][0]['plan_order']).to eq(0)
     expect(@stencils['test_plans'][1]['test_plan_id']).to eq(@test_plan_2.id)
     expect(@stencils['test_plans'][1]['plan_order']).to eq(1)   
-    # update with test cases
+    # update with test plans
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
-        'stencil_id' => @stencil.id,
+        'id' => @stencil.id,
         'product_id' => 1,            
       },
       'new_values' => {  
-        'test_plans' => [{'test_plan_id' => @test_plan_2.id, 'device_id' => @device_2.id}]      
+        'test_plans' => [{'id' => @test_plan_2.id, 'device_id' => @device_2.id}]      
       }      
     }            
     post "api/stencils/update.json", params.to_json, request_headers    
@@ -353,7 +353,7 @@ RSpec.describe 'Stencils API', :type => :request do
     @stencil_test_plan_2 = StencilTestPlan.create(@stencil_test_plan_attr_hash_2)          
     params = {
       "api_key" => @user.single_access_token,
-      'stencil_name' => @stencil.name,
+      'name' => @stencil.name,
       'product_id' => 1,      
       'description' => @stencil.description      
     }
@@ -371,16 +371,16 @@ RSpec.describe 'Stencils API', :type => :request do
     expect(@stencils['test_plans'][0]['plan_order']).to eq(0)
     expect(@stencils['test_plans'][1]['test_plan_id']).to eq(@test_plan_2.id)
     expect(@stencils['test_plans'][1]['plan_order']).to eq(1)   
-    # update with test cases
+    # update with test plans
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
-        'stencil_id' => @stencil.id,
+        'id' => @stencil.id,
         'product_id' => 1,            
       },
       'new_values' => {  
-        'test_plans' => [{'device_id' => @stencil_test_plan.device_id, 'test_plan_id' => @stencil_test_plan.test_plan_id},
-                         {'test_plan_id' => @stencil_test_plan_2.test_plan_id, 'device_id' => @stencil_test_plan_2.device_id}]     
+        'test_plans' => [{'device_id' => @stencil_test_plan.device_id, 'id' => @stencil_test_plan.test_plan_id},
+                         {'id' => @stencil_test_plan_2.test_plan_id, 'device_id' => @stencil_test_plan_2.device_id}]     
       }      
     }            
     post "api/stencils/update.json", params.to_json, request_headers    
@@ -398,7 +398,7 @@ RSpec.describe 'Stencils API', :type => :request do
     @stencil_test_plan_2 = StencilTestPlan.create(@stencil_test_plan_attr_hash_2)          
     params = {
       "api_key" => @user.single_access_token,
-      'stencil_name' => @stencil.name,
+      'name' => @stencil.name,
       'product_id' => 1,      
       'description' => @stencil.description      
     }
@@ -420,11 +420,11 @@ RSpec.describe 'Stencils API', :type => :request do
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
-        'stencil_id' => @stencil.id,
+        'id' => @stencil.id,
         'product_id' => 1,            
       },
       'new_values' => {  
-        'test_plans' => [{'test_plan_id' => @test_plan_2.id, 'device_id' => @device_2.id}]              
+        'test_plans' => [{'id' => @test_plan_2.id, 'device_id' => @device_2.id}]              
       },
       'new_version' => false
     }            

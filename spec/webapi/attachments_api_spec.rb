@@ -11,7 +11,7 @@ def verify_attachment(factory_girl_object, attachment, file_path)
   expect(attachment['size']).to eq(File.size(file_path))
 end
 
-RSpec.describe 'Attachments API', :focus, :type => :request do
+RSpec.describe 'Attachments API', :type => :request do
   
   before(:each) do
     @result = Result.create(FactoryGirl.attributes_for(:result))
