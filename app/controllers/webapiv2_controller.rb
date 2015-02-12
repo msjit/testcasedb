@@ -1,4 +1,6 @@
 require 'json'
+require 'base64'
+require 'fileutils'
 
 class Webapiv2Controller < ApplicationController
   skip_before_filter :require_login
@@ -106,6 +108,8 @@ class Webapiv2Controller < ApplicationController
       response_hash = _assignments(params[:endpoint], request_data)
     when 'results'
       response_hash = _results(params[:endpoint], request_data)                                                                                                  
+    when 'attachments'
+      response_hash = _attachments(params[:endpoint], request_data)                                                                                                  
     end
     if response_hash.nil?
       response_hash = {'response' => {'message' => 'Invalid API endpoint.'}, 'status' => 400}
@@ -276,6 +280,22 @@ class Webapiv2Controller < ApplicationController
       return _results_get(request_data)
     when 'set'
       return _results_set(request_data)
+    end
+    return nil   
+  end
+
+  def _attachments(endpoint, request_data)
+    case endpoint      
+    when 'upload'
+      return _attachments_handler(request_data, 'upload')
+    when 'download'
+      return _attachments_search(request_data, download=true)      
+    when 'search'
+      return _attachments_search(request_data)
+    when 'update'
+      return _attachments_handler(request_data, 'update')
+    when 'delete'
+      return _attachments_handler(request_data, 'delete')
     end
     return nil   
   end
@@ -960,15 +980,15 @@ class Webapiv2Controller < ApplicationController
       product = response_hash['product']
       categories = response_hash['categories']
       response_hash = {}        
-      if request_data['test_case_name'] == nil \
-         && request_data['test_case_id'] == nil 
+      if request_data['name'] == nil \
+         && request_data['id'] == nil 
         response_hash["message"] = "No search parameters provided. Please specify one or more of the following: " \
-                                   "'test_case_name', 'test_case_id'."
+                                   "'name', 'id'."
         return {'response' => response_hash,
                 'status' => 400}   
       end
-      conditions = {:name => request_data['test_case_name'],
-                    :id => request_data['test_case_id'] }             
+      conditions = {:name => request_data['name'],
+                    :id => request_data['id'] }             
       if categories.length > 1
         conditions[:category_id] = category.id
       else
@@ -979,7 +999,7 @@ class Webapiv2Controller < ApplicationController
       if test_case == []
         response_hash = {
           'response' => {'message' => 'Test case "%s" not found for product "%s" in category hierarchy "%s".' \
-                                      %[request_data['test_case_name'] || request_data['test_case_id'], product.name, categories.join('/')],
+                                      %[request_data['name'] || request_data['id'], product.name, categories.join('/')],
                          'found' => false},
           'status' => 200,
           'product' => product,
@@ -1072,7 +1092,7 @@ class Webapiv2Controller < ApplicationController
 
   def _test_cases_create(request_data)
     if !request_data['new_version']
-      request_data.delete('test_case_id')
+      request_data.delete('id')
     end
     response_hash = _test_cases_search(request_data)
     product = response_hash['product']
@@ -1145,12 +1165,12 @@ class Webapiv2Controller < ApplicationController
       else          
         if request_data['new_version']
           return {'response' => {'message' => 'Test case "%s" not found for product "%s" in category hierarchy "%s" to create new version from.' \
-                                  %[request_data['test_case_name'] || request_data['test_case_id'], product.name, categories],
+                                  %[request_data['name'] || request_data['id'], product.name, categories],
                                   'found' => false},
                   'status' => 400}                            
         end        
-        if request_data['test_case_name'] == nil
-          return {'response' => {'message' => 'No test_case_name provided.'},
+        if request_data['name'] == nil
+          return {'response' => {'message' => 'No name provided.'},
                   'status' => 400}   
         end
         if request_data['test_type_id'] \
@@ -1177,7 +1197,7 @@ class Webapiv2Controller < ApplicationController
           return {'response' => {'message' => message},
                   'status' => 400}          
         end
-        test_case = TestCase.new(:name => request_data['test_case_name'],
+        test_case = TestCase.new(:name => request_data['name'],
                                  :description => request_data['description'],
                                  :category_id => category ? category.id : nil,
                                  :product_id => product.id,
@@ -1255,7 +1275,7 @@ class Webapiv2Controller < ApplicationController
       product = response_hash['product']
       test_case = response_hash['test_case']
       category = response_hash['category']     
-      test_case.name = request_data['new_values']['test_case_name'] || test_case.name
+      test_case.name = request_data['new_values']['name'] || test_case.name
       test_case.description = request_data['new_values']['description'] || test_case.description       
       if request_data['new_values']["category"] || request_data["category_id"]           
         response_hash = _categories_search(request_data['new_values'])
@@ -1367,8 +1387,7 @@ class Webapiv2Controller < ApplicationController
        && request_data['name'] == nil 
       response_hash = {}                 
       response_hash["message"] = "No search parameters provided. One or more of the following are required: "\
-                                 "'product_id', %s, and optionally 'deprecated'" \
-                                 %[request_data['indirect_call'] ? "'name', 'id'" : "'test_plan_name', 'test_plan_id'"]
+                                 "'product_id', 'name', 'id', and optionally 'deprecated'"
       return {'response' => response_hash,
               'status' => 400}   
     end     
@@ -1483,8 +1502,8 @@ class Webapiv2Controller < ApplicationController
     if request_data['new_version']
       request_data['deprecated'] = 0
     end
-    response_hash = _test_plans_search({'id' => request_data['test_plan_id'],
-                                       'name' => request_data['test_plan_name'],
+    response_hash = _test_plans_search({'id' => request_data['id'],
+                                       'name' => request_data['name'],
                                        'product_id' => request_data['product_id'],
                                        'deprecated' => request_data['deprecated'],
                                        'indirect_call' => true})                                      
@@ -1521,8 +1540,8 @@ class Webapiv2Controller < ApplicationController
           response_hash['status'] = 400
           return response_hash
         end              
-        if request_data['test_plan_name'] == nil
-          return {'response' => {'message' => 'No test_plan_name provided.'},
+        if request_data['name'] == nil
+          return {'response' => {'message' => 'No name provided.'},
                   'status' => 400}   
         end        
         created_by_id = request_data['created_by_id']
@@ -1539,7 +1558,7 @@ class Webapiv2Controller < ApplicationController
                   'status' => 400}          
         end                
         test_plan = TestPlan.new(:product_id => request_data['product_id'],
-                                 :name => request_data['test_plan_name'],
+                                 :name => request_data['name'],
                                  :status => status,
                                  :description => request_data['description'],
                                  :created_by_id => created_by_id != nil ? created_by_id : 1)
@@ -1596,14 +1615,14 @@ class Webapiv2Controller < ApplicationController
       return {'response' => {'message' => "No to_update or new_values passed."},
               'status' => 400}   
     end     
-    response_hash = _test_plans_search({'id' => request_data['to_update']['test_plan_id'],
-                                       'name' => request_data['to_update']['test_plan_name'],
+    response_hash = _test_plans_search({'id' => request_data['to_update']['id'],
+                                       'name' => request_data['to_update']['name'],
                                        'product_id' => request_data['to_update']['product_id'],
                                        'deprecated' => request_data['to_update']['deprecated'],
                                        'indirect_call' => true})
     if response_hash["status"] == 200 && response_hash['response']['found'] 
       test_plan = TestPlan.where(:id => response_hash['response']['test_plans'].first['id']).first  
-      test_plan.name = request_data['new_values']['test_plan_name'] || test_plan.name
+      test_plan.name = request_data['new_values']['name'] || test_plan.name
       test_plan.description = request_data['new_values']['description'] || test_plan.description
       if request_data['new_values']['product_id']
         response_hash = _products_search({'name' => request_data['new_values']['product_name'],
@@ -1695,8 +1714,7 @@ class Webapiv2Controller < ApplicationController
        && request_data['name'] == nil 
       response_hash = {}                 
       response_hash["message"] = "No search parameters provided. One or more of the following are required: "\
-                                 "'product_id', %s, and optionally 'deprecated'" \
-                                 %[request_data['indirect_call'] ? "'name', 'id'" : "'stencil_name', 'stencil_id'"]
+                                 "'product_id', 'name', 'id', and optionally 'deprecated'"
       return {'response' => response_hash,
               'status' => 400}   
     end     
@@ -1776,7 +1794,7 @@ class Webapiv2Controller < ApplicationController
        stencil_test_plans = StencilTestPlan.where(:stencil_id => stencil.id).order(plan_order: :asc)       
        if !stencil_test_plans.empty?         
           ordered_test_plans = stencil_test_plans.map do |stp|
-            {'test_plan_id' => stp[:test_plan_id],
+            {'id' => stp[:test_plan_id],
              'device_id' => stp[:device_id]}
           end        
           if test_plans.count == ordered_test_plans.count
@@ -1798,12 +1816,12 @@ class Webapiv2Controller < ApplicationController
           stencil.reload                        
         end
         test_plans.each_with_index do|tp, i|                             
-          if !(tp.key?('test_plan_id') && tp.key?('device_id'))
-            return false, nil, 'Passed test plan "%s" did not contain both a test_plan_id and device_id key' %[tp] 
+          if !(tp.key?('id') && tp.key?('device_id'))
+            return false, nil, 'Passed test plan "%s" did not contain both a id and device_id key' %[tp] 
           end                 
-          test_plan = TestPlan.where(:id => tp['test_plan_id']).first
+          test_plan = TestPlan.where(:id => tp['id']).first
           if test_plan.nil?
-            return false, nil, 'No test plan with id "%s" was found' %[tp['test_plan_id']]
+            return false, nil, 'No test plan with id "%s" was found' %[tp['id']]
           end
           device = Device.where(:id => tp['device_id']).first
           if device.nil?
@@ -1811,7 +1829,7 @@ class Webapiv2Controller < ApplicationController
           end          
           if !test_plan.nil?                                                      
             stencil_test_plan = StencilTestPlan.new(:stencil_id => stencil.id,
-                                                    :test_plan_id => tp['test_plan_id'],
+                                                    :test_plan_id => tp['id'],
                                                     :device_id => tp['device_id'],
                                                     :plan_order => i)   
             stencil.stencil_test_plans << stencil_test_plan                      
@@ -1828,8 +1846,8 @@ class Webapiv2Controller < ApplicationController
     if request_data['new_version']
       request_data['deprecated'] = 0
     end
-    response_hash = _stencils_search({'id' => request_data['stencil_id'],
-                                      'name' => request_data['stencil_name'],
+    response_hash = _stencils_search({'id' => request_data['id'],
+                                      'name' => request_data['name'],
                                       'product_id' => request_data['product_id'],
                                       'deprecated' => request_data['deprecated'],
                                       'indirect_call' => true})                                      
@@ -1864,8 +1882,8 @@ class Webapiv2Controller < ApplicationController
           response_hash['status'] = 400
           return response_hash
         end     
-        if request_data['stencil_name'] == nil
-          return {'response' => {'message' => 'No stencil_name provided.'},
+        if request_data['name'] == nil
+          return {'response' => {'message' => 'No name provided.'},
                   'status' => 400}   
         end       
         created_by_id = request_data['created_by_id']
@@ -1882,7 +1900,7 @@ class Webapiv2Controller < ApplicationController
                   'status' => 400}          
         end           
         stencil = Stencil.new(:product_id => request_data['product_id'],
-                              :name => request_data['stencil_name'],
+                              :name => request_data['name'],
                               :status => status,
                               :description => request_data['description'],
                               :created_by_id => created_by_id != nil ? created_by_id : 1)                                                                           
@@ -1926,14 +1944,14 @@ class Webapiv2Controller < ApplicationController
       return {'response' => {'message' => "No to_update or new_values passed."},
               'status' => 400}   
     end    
-    response_hash = _stencils_search({'id' => request_data['to_update']['test_plan_id'],
-                                      'name' => request_data['to_update']['test_plan_name'],
+    response_hash = _stencils_search({'id' => request_data['to_update']['id'],
+                                      'name' => request_data['to_update']['name'],
                                       'product_id' => request_data['to_update']['product_id'],
                                       'deprecated' => request_data['to_update']['deprecated'],
                                       'indirect_call' => true})                                       
     if response_hash["status"] == 200 && response_hash['response']['found']
       stencil = Stencil.where(:id => response_hash['response']['stencils'].first['id']).first     
-      stencil.name = request_data['new_values']['stencil_name'] || stencil.name
+      stencil.name = request_data['new_values']['name'] || stencil.name
       stencil.description = request_data['new_values']['description'] || stencil.description     
       if request_data['new_values']['product_id']
         response_hash = _products_search({'name' => request_data['new_values']['product_name'],
@@ -2291,6 +2309,221 @@ class Webapiv2Controller < ApplicationController
       return {'response' => {'message' => 'Passed results list was empty or invalid.'},
               'status' => 400}
     end
+  end
+
+  def _attachments_handler(request_data, action)     
+    if request_data.key?('attachments')
+      if request_data['attachments'].is_a?(Array) \
+         && !request_data['attachments'].empty?
+        incorrect_fields = request_data['attachments'].map {|x| (x.is_a?(Hash) && !x.empty?) ? nil : x}.compact
+        if incorrect_fields.count > 0        
+          return {'response' => {'message' => 'One or more passed attachments were not of the correct type or empty.'},
+                  'status' => 400}        
+        end       
+        response_hash = {'attachments' => []}
+        request_data['attachments'].each do |value|
+          if action == 'upload'
+            result = _attachments_upload(value)
+            response_hash['message'] = 'Successfully uploaded all attachments'
+          elsif action == 'update'
+            result = _attachments_update(value)
+            response_hash['message'] = 'Successfully updated all attachments'
+          elsif action == 'delete'
+            result = _attachments_delete(value)
+            response_hash['message'] = 'Successfully deleted all attachments'            
+          end
+          if result['status'] == 200 || result['status'] == 201
+            response_hash['attachments'].push(result['response'])
+          else
+            return result
+          end          
+        end
+        return {'response' => response_hash,
+                'status' => 200}    
+      else
+        return {'response' => {'message' => 'Passed attachments list was empty or invalid.'},
+                'status' => 400}
+      end
+    else
+      case action      
+      when 'upload'
+        return _attachments_upload(request_data)
+      when 'update'
+        return _attachments_update(request_data)        
+      when 'delete'
+        return _attachments_delete(request_data)
+      end
+    end      
+  end
+
+  def _attachments_search(request_data, download=false)
+    response_hash = {}  
+    if request_data['description'] == nil \
+       && request_data['id'] == nil \
+       && request_data['file_name'] == nil \
+       && request_data['content_type'] == nil \
+       && request_data['parent_id'] == nil \
+       && request_data['parent_type'] == nil
+      response_hash["message"] = "No search parameters provided. Please specify one or more of the following: " \
+                                 "'id', 'description', 'file_name', 'content_type', 'parent_id', 'parent_type'"
+      return {'response' => response_hash,
+              'status' => 400}   
+    end
+    conditions = {:description => request_data['description'],
+                  :id => request_data['id'],
+                  :upload_file_name => request_data['file_name'],
+                  :upload_content_type => request_data['upload_content_type'],
+                  :uploadable_id => request_data['parent_id'],
+                  :uploadable_type => request_data['parent_type'] }
+    conditions.delete_if {|k,v| v.blank? }    
+    uploads = Upload.find(:all, :conditions => conditions)
+    if uploads != []
+      response_hash["attachments"] = 
+        uploads.map do |u|
+          { id: u[:id],
+            description: u[:description],
+            parent_id: u.uploadable_id,
+            parent_type: u.uploadable_type,
+            file_name: u.upload_file_name,
+            content_type: u.upload_content_type,
+            size: u.upload_file_size,
+            data: (Base64.encode64(File.read(u.upload.path)) if download),
+            created_at: u.created_at,
+            updated_at: u.updated_at }.reject{ |k,v| v.nil? }
+        end      
+      response_hash["message"] = "Attachments(s) found."
+      response_hash["found"] = true
+    else
+      response_hash["message"] = "No attachments(s) found. Try searching based on another parameter."
+      response_hash["found"] = false
+    end
+    return {'response' => response_hash,
+            'attachment' => uploads.first,
+            'status' => 200}    
+  end
+
+  def _attachments_upload(request_data)
+    if request_data['description'].nil? || request_data['file_name'].nil? || request_data['data'].nil? \
+       || request_data['parent_type'].nil? || request_data['parent_id'].nil?
+      response_hash = {"message" => "No description, file_name, content_type, parent_type, parent_id, or data parameter provided."}
+      return {'response' => response_hash,
+              'status' => 400}
+    end
+    request_data['parent_type'] = request_data['parent_type'].titleize 
+    # only allow Result attachments for now
+    if request_data['parent_type'] != "Result"
+        return {'response' => {'message' => "Currently, only Result attachment uploads are supported via the web api. Please specify 'Result'" \
+                                            " as the 'parent_type' and a valid Result object id for 'parent_id'."},
+                'status' => 400}
+    end
+    # make sure the result object exists
+    result = Result.where(:id => request_data['parent_id']).first
+    if result.nil?
+      return {'response' => {'message' => "No result with id %s found" %[request_data['parent_id']]},
+              'status' => 400}          
+    end
+    begin
+      temp_dir = Dir.mktmpdir
+      temp_file = File.new('%s/%s' %[temp_dir, request_data['file_name']], 'w+')
+      File.open(temp_file.path, 'wb') do |f|
+          f.write Base64.decode64(request_data['data'])
+      end
+      upload = Upload.new(:description => request_data['description'],
+                          :uploadable_id => request_data['parent_id'],
+                          :uploadable_type => request_data['parent_type'])
+      upload.upload = temp_file
+      if upload.save
+        response_hash = {
+          'response' => {
+            'message' => 'Attachment successfully uploaded.',
+            'id' => upload.id,          
+            'description' => upload.description,
+            'file_name' => upload.upload_file_name,
+            'content_type' => upload.upload_content_type,
+            'size' => upload.upload_file_size,
+            'parent_id' => upload.uploadable_id,
+            'parent_type' => upload.uploadable_type,
+            'created_at' => upload.created_at,
+            'updated_at' => upload.updated_at
+          },
+          'status' => 201
+        }        
+      else
+        response_hash = {
+          'response' => {'message' => 'Error uploading attachment.  Make sure the data was Base64 encoded.'},
+          'status' => 500
+        }
+      end
+    ensure
+      FileUtils.remove_entry temp_dir
+    end
+    return response_hash
+  end
+
+  def _attachments_update(request_data)
+    if request_data['to_update'] == nil \
+       && request_data['new_values'] == nil
+      return {'response' => {'message' => "No to_update or new_values passed."},
+              'status' => 400}
+    end
+    response_hash = _attachments_search(request_data['to_update'])
+    if response_hash["status"] == 200 && response_hash['response']['found']
+      attachment = response_hash['attachment']
+      attachment.description = request_data['new_values']['description'] || attachment.description
+      attachment.upload_content_type = request_data['new_values']['content_type'] || attachment.upload_content_type
+      # only allow Result attachments for now
+      if request_data['new_values']['parent_type'] && request_data['new_values']['parent_type'] != "Result"
+          return {'response' => {'message' => "Currently, only Result attachment uploads are supported via the web api. Please specify 'Result'" \
+                                              " as the 'parent_type' and a valid Result object id for 'parent_id'."},
+                  'status' => 400}
+      end      
+      # make sure the result object exists
+      result = Result.where(:id => request_data['new_values']['parent_id']).first
+      if result.nil?
+        return {'response' => {'message' => "No result with id %s found" %[request_data['new_values']['parent_id']]},
+                'status' => 400}          
+      end
+      attachment.uploadable_id = request_data['new_values']['parent_id'] || attachment.uploadable_id
+      if attachment.save
+        attachment.reload           
+        response_hash = {
+          'response' => {'message' => 'Successfully updated attachment "%s" with id "%s".' \
+                                      %[attachment.description, attachment.id],
+                         'id' => attachment.id,          
+                         'description' => attachment.description,
+                         'file_name' => attachment.upload_file_name,
+                         'content_type' => attachment.upload_content_type,
+                         'size' => attachment.upload_file_size,
+                         'parent_id' => attachment.uploadable_id,
+                         'parent_type' => attachment.uploadable_type,
+                         'created_at' => attachment.created_at,
+                         'updated_at' => attachment.updated_at                       
+                         },
+          'status' => 200
+        }                       
+      else
+        response_hash = {
+          'response' => {'message' => 'Error updating attachment "%s" with id "%s".' \
+                                      %[attachment.description, attachment.id]},
+          'status' => 500
+        }           
+      end
+    else
+      response_hash['status'] = 400
+      response_hash['response']['message'] += ' Failed to update using %s.' %[request_data['to_update']]
+    end
+    return response_hash            
+  end
+
+  def _attachments_delete(request_data)
+    attachment = Upload.where(:id => request_data['id']).first
+    if attachment.nil?
+      return {'response' => {'message' => "No attachment with id %s found" %[request_data['id']]},
+              'status' => 400}
+    end
+    attachment.destroy
+    return {'response' => {'message' => 'Successfully deleted attachment with id "%s".' %[request_data['id']]},
+            'status' => 200}    
   end
 
 end
