@@ -11,7 +11,13 @@ RSpec.describe 'Test Cases API', :type => :request do
     @tag_2 = Tag.create(FactoryGirl.attributes_for(:tag_2))
     @test_type = TestType.create(FactoryGirl.attributes_for(:test_type))    
     @test_case_attr_hash = FactoryGirl.attributes_for(:test_case) 
-    @test_2_case_attr_hash = FactoryGirl.attributes_for(:test_case_2)    
+    @test_2_case_attr_hash = FactoryGirl.attributes_for(:test_case_2)
+    @custom_fields = [{'name' => 'custom field 1',
+                       'value' => '1',
+                       'type' => 'string'},
+                      {'name' => 'custom field 2',
+                       'value' => '2',
+                       'type' => 'string'}]      
   end  
    
   it "statuses return" do
@@ -143,21 +149,13 @@ RSpec.describe 'Test Cases API', :type => :request do
   it "create successful" do
     name = 'Test Case'
     description = 'test case'
-    custom_fields = {
-      'field 1'=> {'name' => 'custom field 1',
-                   'value' => '1',
-                   'type' => 'string'},
-      'field 2'=> {'name' => 'custom field 2',
-                   'value' => '2',
-                   'type' => 'string'}                   
-    }
     params = {
       "api_key" => @user.single_access_token,
       'name' => name,
       'category' => @category.name,
       'product_id' => 1,      
       'description' => description,
-      'custom_fields' => custom_fields,
+      'custom_fields' => @custom_fields,
       'tags' => [@tag.name, @tag_2.name, 'tag 3']
     }.to_json
     request_headers = {
@@ -179,21 +177,13 @@ RSpec.describe 'Test Cases API', :type => :request do
     name = 'Test Case'
     description = 'test case'
     category = '%s/%s' %[@category.name, @sub_category.name]
-    custom_fields = {
-      'field 1'=> {'name' => 'custom field 1',
-                   'value' => '1',
-                   'type' => 'string'},
-      'field 2'=> {'name' => 'custom field 2',
-                   'value' => '2',
-                   'type' => 'string'}                   
-    }
     params = {
       "api_key" => @user.single_access_token,
       'name' => name,
       'category' => category,
       'product_id' => 1,      
       'description' => description,
-      'custom_fields' => custom_fields
+      'custom_fields' => @custom_fields
     }.to_json
     request_headers = {
       "Accept" => "application/json",
@@ -209,21 +199,13 @@ RSpec.describe 'Test Cases API', :type => :request do
   it "create new version successful" do
     name = 'Test Case'
     description = 'test case'
-    custom_fields = {
-      'field 1'=> {'name' => 'custom field 1',
-                   'value' => '1',
-                   'type' => 'string'},
-      'field 2'=> {'name' => 'custom field 2',
-                   'value' => '2',
-                   'type' => 'string'}                   
-    }
     params = {
       "api_key" => @user.single_access_token,
       'name' => name,
       'category' => @category.name,
       'product_id' => 1,      
       'description' => description,
-      'custom_fields' => custom_fields,
+      'custom_fields' => @custom_fields,
       'tags' => [@tag.name] 
     }
     request_headers = {
@@ -278,15 +260,7 @@ RSpec.describe 'Test Cases API', :type => :request do
     description = 'updated description'
     category = "%s/%s" %[@category.name, @sub_category.name]
     version = 5
-    params['overwrite_custom_fields'] = true
-    custom_fields = {
-      'field 1'=> {'name' => 'custom field 1',
-                   'value' => '1',
-                   'type' => 'string'},
-      'field 2'=> {'name' => 'custom field 2',
-                   'value' => '2',
-                   'type' => 'string'}                   
-    }     
+    params['overwrite_custom_fields'] = true    
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
@@ -299,7 +273,7 @@ RSpec.describe 'Test Cases API', :type => :request do
         'category' => category,
         'product_id' => 1, 
         'description' => description,
-        'custom_fields' => custom_fields,
+        'custom_fields' => @custom_fields,
         'overwrite_custom_fields' => true,
         'tags' => [@tag.name, @tag_2.name]        
       },      
@@ -315,8 +289,8 @@ RSpec.describe 'Test Cases API', :type => :request do
     expect(JSON.parse(response.body)['category']).to eq(category)
     expect(JSON.parse(response.body)['category_id']).to eq(@sub_category.id)    
     expect(JSON.parse(response.body)['custom_fields'].count).to eq(2)
-    expect(JSON.parse(response.body)['custom_fields'][0]).to eq(custom_fields['field 1'])
-    expect(JSON.parse(response.body)['custom_fields'][1]).to eq(custom_fields['field 2'])
+    expect(JSON.parse(response.body)['custom_fields'][0]).to eq(@custom_fields[0])
+    expect(JSON.parse(response.body)['custom_fields'][1]).to eq(@custom_fields[1])
     expect(JSON.parse(response.body)['tags'].count).to eq(2)
     expect(JSON.parse(response.body)['tags'][1]['id']).to eq(@tag_2.id)
     expect(JSON.parse(response.body)['status']).to eq((I18n.t :item_status)[@test_case.status])    

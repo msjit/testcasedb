@@ -312,16 +312,16 @@ class Webapiv2Controller < ApplicationController
     end
     success = false
     message = ""   
-    if request_data['custom_fields'].is_a?(Hash) \
+    if request_data['custom_fields'].is_a?(Array) \
        && !request_data['custom_fields'].empty?
-      incorrect_fields = request_data['custom_fields'].map {|k,v| (v.is_a?(Hash) && !v.empty?) ? nil : k.to_s}.compact
+      incorrect_fields = request_data['custom_fields'].map {|f| (f.is_a?(Hash) && !f.empty?) ? nil : f.to_s}.compact
       if incorrect_fields.count > 0
         return false, "One or more passed custom_fields were not of the correct type or empty"
       end                                
       # create custom field(s) if necessary
-      request_data['custom_fields'].each do |key, value|
-        if value.key?('name') && value.key?('type')
-          type = value['type']
+      request_data['custom_fields'].each do |field|
+        if field.key?('name') && field.key?('type')
+          type = field['type']
           if type == "string" \
              || type == "drop_down" \
              || type == "check_box" \
@@ -329,54 +329,54 @@ class Webapiv2Controller < ApplicationController
              || type == "number" \
              || type == "link"
             custom_fields = CustomField.where(:item_type => item_type,
-                                              :field_name => value['name'],
+                                              :field_name => field['name'],
                                               :field_type => type,
                                               :active => true)              
             if custom_fields == []
                
                custom_field = CustomField.new(:item_type => item_type,
-                                              :field_name => value['name'],
+                                              :field_name => field['name'],
                                               :field_type => type)            
                custom_field = custom_field.save
                # Only create results if object creation is successful
                if !custom_field                
-                 return false, "_set_custom_fields: error creating new custom field '#{value['name']}' for '#{item_type}' with type '#{type}'"
+                 return false, "_set_custom_fields: error creating new custom field '#{field['name']}' for '#{item_type}' with type '#{type}'"
                end
              end
           else
             return false, "_set_custom_fields: invalid field_type parameter '#{type}'"
           end         
         else
-          return false, "Custom field '" + key + "' does not contain both a name and type child element."        
+          return false, "Custom field '" + field.to_s + "' does not contain both a name and type child element."        
         end
       end
       custom_fields = CustomField.where(:item_type => item_type,
                                         :active => true)    
       # set custom field for item
       if custom_fields.count > 0
-        request_data['custom_fields'].each do |key, value|
+        request_data['custom_fields'].each do |field|
           # verify that the custom field has a name and value
-          if value.key?('name') && value.key?('value')
+          if field.key?('name') && field.key?('value')
             # if the custom field passed with the request exists then add it to the result
-            custom_field = custom_fields.map {|x| x.field_name == value['name'] ? x : nil}.compact
+            custom_field = custom_fields.map {|x| x.field_name == field['name'] ? x : nil}.compact
             if custom_field.count > 0
               # If a custom item entry for the current field doesn't exist, add it,
               # otherwise just set it
               custom_item = item.custom_items.where(:custom_field_id => custom_field.first.id).first
               if custom_item == nil
                 item.custom_items.build(:custom_field_id => custom_field.first.id,
-                                        :value => value['value'])
+                                        :value => field['value'])
               else
-                custom_item.value = value['value']
+                custom_item.value = field['value']
                 custom_item.save
               end
               success = true
             else
-              message = 'Custom field ' + value['name'] + ' does not exist'
+              message = 'Custom field ' + field['name'] + ' does not exist'
               success = false
             end   
           else
-            message = "Custom field " + key + " does not contain a name and value child element."         
+            message = "Custom field " + field.to_s + " does not contain a name and value child element."         
             success = false
           end
         end     
@@ -724,22 +724,40 @@ class Webapiv2Controller < ApplicationController
     if request_data['name'] == nil \
        && request_data['id'] == nil
       response_hash["message"] = "No search parameters provided. Please specify one or more of the following: " \
-                                 "'name', 'id'."
+                                 "'name', 'id' and optionally 'description' or 'custom_fields'."
       return {'response' => response_hash,
               'status' => 400}   
     end
     conditions = {:name => request_data['name'],
-                  :id => request_data['id']}
+                  :id => request_data['id'],
+                  :description => request_data['description']}
     conditions.delete_if {|k,v| v.blank? }    
     devices = Device.find(:all, :conditions => conditions)
-    if devices != []
-      response_hash["devices"] = 
-        devices.map do |d|
-          { id: d[:id],
-            name: d[:name],
-            description: d[:description],
-            custom_fields: _get_custom_fields('device', d) }
-        end                                                       
+    matching_devices = []
+    if devices != []      
+      if request_data['custom_fields']
+        matching_devices = 
+          devices.map do |d|
+            { id: d[:id],
+              name: d[:name],
+              description: d[:description],
+              custom_fields: _get_custom_fields('device', d),
+              custom_fields_comparison: request_data['custom_fields']
+            } if _get_custom_fields('device', d) == request_data['custom_fields'].map{ |f| f.symbolize_keys!}
+          end
+      else
+        matching_devices =
+          devices.map do |d|
+            { id: d[:id],
+              name: d[:name],
+              description: d[:description],
+              custom_fields: _get_custom_fields('device', d) }
+          end
+      end
+    end
+    matching_devices = matching_devices.compact
+    if matching_devices != []
+      response_hash["devices"] = matching_devices
       response_hash["message"] = "Device(s) found."
       response_hash["found"] = true
     else

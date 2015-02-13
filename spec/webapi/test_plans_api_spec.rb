@@ -12,7 +12,13 @@ RSpec.describe 'Test Plans API', :type => :request do
     @test_plan_attr_hash = FactoryGirl.attributes_for(:test_plan)
     @test_plan_attr_hash_2 = FactoryGirl.attributes_for(:test_plan_2)  
     @plan_case_attr_hash = FactoryGirl.attributes_for(:plan_case) 
-    @plan_case_attr_hash_2 = FactoryGirl.attributes_for(:plan_case_2)          
+    @plan_case_attr_hash_2 = FactoryGirl.attributes_for(:plan_case_2)
+    @custom_fields = [{'name' => 'custom field 1',
+                       'value' => '1',
+                       'type' => 'string'},
+                      {'name' => 'custom field 2',
+                       'value' => '2',
+                       'type' => 'string'}]              
   end  
    
   it "statuses return" do
@@ -172,20 +178,12 @@ RSpec.describe 'Test Plans API', :type => :request do
   it "create successful" do
     name = 'Test Plan'
     description = 'test plan'
-    custom_fields = {
-      'field 1'=> {'name' => 'custom field 1',
-                   'value' => '1',
-                   'type' => 'string'},
-      'field 2'=> {'name' => 'custom field 2',
-                   'value' => '2',
-                   'type' => 'string'}                   
-    }
     params = {
       "api_key" => @user.single_access_token,
       'name' => name,
       'product_id' => 1,      
       'description' => description,
-      'custom_fields' => custom_fields
+      'custom_fields' => @custom_fields
     }.to_json
     request_headers = {
       "Accept" => "application/json",
@@ -202,20 +200,12 @@ RSpec.describe 'Test Plans API', :type => :request do
   it "create new version successful" do
     name = 'Test PLan'
     description = 'test plan'
-    custom_fields = {
-      'field 1'=> {'name' => 'custom field 1',
-                   'value' => '1',
-                   'type' => 'string'},
-      'field 2'=> {'name' => 'custom field 2',
-                   'value' => '2',
-                   'type' => 'string'}                   
-    }
     params = {
       "api_key" => @user.single_access_token,
       'name' => name,
       'product_id' => 1,      
       'description' => description,
-      'custom_fields' => custom_fields 
+      'custom_fields' => @custom_fields 
     }
     request_headers = {
       "Accept" => "application/json",
@@ -262,15 +252,7 @@ RSpec.describe 'Test Plans API', :type => :request do
     # update
     name = 'Updated name'
     description = 'updated description'
-    params['overwrite_custom_fields'] = true
-    custom_fields = {
-      'field 1'=> {'name' => 'custom field 1',
-                   'value' => '1',
-                   'type' => 'string'},
-      'field 2'=> {'name' => 'custom field 2',
-                   'value' => '2',
-                   'type' => 'string'}                   
-    }     
+    params['overwrite_custom_fields'] = true  
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
@@ -281,7 +263,7 @@ RSpec.describe 'Test Plans API', :type => :request do
         'name' => name,
         'product_id' => 1, 
         'description' => description,
-        'custom_fields' => custom_fields,
+        'custom_fields' => @custom_fields,
         'overwrite_custom_fields' => true      
       },      
     }      
@@ -294,8 +276,8 @@ RSpec.describe 'Test Plans API', :type => :request do
     expect(JSON.parse(response.body)['parent_id']).to eq(@test_plan.parent_id)
     expect(JSON.parse(response.body)['product_id']).to eq(@test_plan.product.id)   
     expect(JSON.parse(response.body)['custom_fields'].count).to eq(2)
-    expect(JSON.parse(response.body)['custom_fields'][0]).to eq(custom_fields['field 1'])
-    expect(JSON.parse(response.body)['custom_fields'][1]).to eq(custom_fields['field 2'])
+    expect(JSON.parse(response.body)['custom_fields'][0]).to eq(@custom_fields[0])
+    expect(JSON.parse(response.body)['custom_fields'][1]).to eq(@custom_fields[1])
     expect(JSON.parse(response.body)['status']).to eq((I18n.t :item_status)[@test_plan.status])
     expect(JSON.parse(response.body)['test_cases'].count).to eq(0)    
   end 
