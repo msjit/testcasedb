@@ -312,16 +312,19 @@ class Webapiv2Controller < ApplicationController
     end
     success = false
     message = ""   
+    # symbolize keys
+    request_data['custom_fields'].map!{ |f| f.symbolize_keys!}
+    # verify format of custom fields list
     if request_data['custom_fields'].is_a?(Array) \
        && !request_data['custom_fields'].empty?
       incorrect_fields = request_data['custom_fields'].map {|f| (f.is_a?(Hash) && !f.empty?) ? nil : f.to_s}.compact
       if incorrect_fields.count > 0
         return false, "One or more passed custom_fields were not of the correct type or empty"
       end                                
-      # create custom field(s) if necessary
+      # create custom field(s) if necessary      
       request_data['custom_fields'].each do |field|
-        if field.key?('name') && field.key?('type')
-          type = field['type']
+        if field.key?(:name) && field.key?(:type)
+          type = field[:type]
           if type == "string" \
              || type == "drop_down" \
              || type == "check_box" \
@@ -329,18 +332,18 @@ class Webapiv2Controller < ApplicationController
              || type == "number" \
              || type == "link"
             custom_fields = CustomField.where(:item_type => item_type,
-                                              :field_name => field['name'],
+                                              :field_name => field[:name],
                                               :field_type => type,
                                               :active => true)              
             if custom_fields == []
                
                custom_field = CustomField.new(:item_type => item_type,
-                                              :field_name => field['name'],
+                                              :field_name => field[:name],
                                               :field_type => type)            
                custom_field = custom_field.save
                # Only create results if object creation is successful
                if !custom_field                
-                 return false, "_set_custom_fields: error creating new custom field '#{field['name']}' for '#{item_type}' with type '#{type}'"
+                 return false, "_set_custom_fields: error creating new custom field '#{field[:name]}' for '#{item_type}' with type '#{type}'"
                end
              end
           else
@@ -356,23 +359,23 @@ class Webapiv2Controller < ApplicationController
       if custom_fields.count > 0
         request_data['custom_fields'].each do |field|
           # verify that the custom field has a name and value
-          if field.key?('name') && field.key?('value')
+          if field.key?(:name) && field.key?(:value)
             # if the custom field passed with the request exists then add it to the result
-            custom_field = custom_fields.map {|x| x.field_name == field['name'] ? x : nil}.compact
+            custom_field = custom_fields.map {|x| x.field_name == field[:name] ? x : nil}.compact
             if custom_field.count > 0
               # If a custom item entry for the current field doesn't exist, add it,
               # otherwise just set it
               custom_item = item.custom_items.where(:custom_field_id => custom_field.first.id).first
               if custom_item == nil
                 item.custom_items.build(:custom_field_id => custom_field.first.id,
-                                        :value => field['value'])
+                                        :value => field[:value])
               else
-                custom_item.value = field['value']
+                custom_item.value = field[:value]
                 custom_item.save
               end
               success = true
             else
-              message = 'Custom field ' + field['name'] + ' does not exist'
+              message = 'Custom field ' + field[:name] + ' does not exist'
               success = false
             end   
           else

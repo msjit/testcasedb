@@ -148,4 +148,42 @@ RSpec.describe 'Devices API', :focus, :type => :request do
     expect(response.status).to eq(200) 
   end
     
+  it "create same name different description successful" do
+    @device = Device.create(@device_attr_hash) 
+    description = 'different description'   
+    params = {
+      "api_key" => @user.single_access_token,
+      'name' => @device.name,
+      'description' => description
+    }.to_json
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/devices/create.json", params, request_headers
+    expect(response.status).to eq(201) 
+    expect(JSON.parse(response.body)['name']).to eq(@device.name)
+    expect(JSON.parse(response.body)['description']).to eq(description)  
+  end    
+   
+  it "create same name and description different custom fields successful" do
+    @device = Device.create(@device_attr_hash)   
+    params = {
+      "api_key" => @user.single_access_token,
+      'name' => @device.name,
+      'description' => @device.description,
+      'custom_fields' => @custom_fields
+    }.to_json
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/devices/create.json", params, request_headers
+    expect(response.status).to eq(201) 
+    expect(JSON.parse(response.body)['name']).to eq(@device.name)
+    expect(JSON.parse(response.body)['description']).to eq(@device.description)
+    expect(JSON.parse(response.body)).to have_key('custom_fields')
+    expect(JSON.parse(response.body)['custom_fields'].count).to eq(2)    
+  end     
+    
 end
