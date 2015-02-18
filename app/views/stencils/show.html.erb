@@ -87,7 +87,7 @@
               <%= stencil_test_plan.test_plan.version %>
             </td>
             <td>
-              <%= stencil_test_plan.test_plan.description.truncate(50) %>
+              <%= stencil_test_plan.test_plan.description.truncate(50) if stencil_test_plan.test_plan.description %>
             </td>
             <td>
               <%= stencil_test_plan.device.name %>
