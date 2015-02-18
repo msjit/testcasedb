@@ -95,7 +95,7 @@ RSpec.describe 'Test Cases API', :type => :request do
     expect(response.status).to eq(400) 
   end  
   
-  it "create fails with wrong category" do
+  it "create automatically creates nonexistent category" do
     name = 'Test Case'
     category = 'Nonexistent Category'
     params = {
@@ -109,7 +109,7 @@ RSpec.describe 'Test Cases API', :type => :request do
       "Content-Type" => "application/json"
     }
     post "api/test_cases/create.json", params, request_headers
-    expect(response.status).to eq(400) 
+    expect(response.status).to eq(201) 
   end  
   
   it "create fails with bad user id" do

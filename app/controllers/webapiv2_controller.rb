@@ -311,16 +311,16 @@ class Webapiv2Controller < ApplicationController
       return false, "_handle_custom_fields: invalid item_type parameter '#{item_type}'"
     end
     success = false
-    message = ""   
-    # symbolize keys
-    request_data['custom_fields'].map!{ |f| f.symbolize_keys!}
+    message = ""
     # verify format of custom fields list
     if request_data['custom_fields'].is_a?(Array) \
        && !request_data['custom_fields'].empty?
       incorrect_fields = request_data['custom_fields'].map {|f| (f.is_a?(Hash) && !f.empty?) ? nil : f.to_s}.compact
       if incorrect_fields.count > 0
         return false, "One or more passed custom_fields were not of the correct type or empty"
-      end                                
+      end
+      # symbolize keys
+      request_data['custom_fields'].map!{ |f| f.symbolize_keys!}                         
       # create custom field(s) if necessary      
       request_data['custom_fields'].each do |field|
         if field.key?(:name) && field.key?(:type)
@@ -811,8 +811,7 @@ class Webapiv2Controller < ApplicationController
   
   def _categories_search(request_data)
     response_hash = _products_search({'name' => request_data['product_name'],
-                                      'id' => request_data['product_id'],
-                                      'indirect_call' => true})
+                                      'id' => request_data['product_id']})
     if response_hash["status"] == 200 && response_hash['response']['found'] 
       product = response_hash['product']
       parent_category = nil
@@ -876,13 +875,16 @@ class Webapiv2Controller < ApplicationController
         'current_category' => current_category,
         'categories' => all_categories        
       }
+    else
+      response_hash['response']['message'] = 'Categories Search: %s' %[response_hash['response']['message']]
+      response_hash['status'] = 400
     end
     return response_hash     
   end
  
   def _categories_create(request_data)    
     response_hash = _categories_search(request_data)    
-    if response_hash["status"] == 200 && !response_hash['response']['found']
+    if response_hash["status"] == 200 && !response_hash['response']['found'] && response_hash['product']
       categories = response_hash['categories']
       product = response_hash['product']     
       parent_category = Category.where(:name => categories[0],
@@ -1115,6 +1117,17 @@ class Webapiv2Controller < ApplicationController
     if !request_data['new_version']
       request_data.delete('id')
     end
+
+    response_hash = _categories_search(request_data)
+    if response_hash["status"] == 200 && !response_hash['response']['found'] 
+      response_hash = _categories_create(request_data)
+      if response_hash["status"] != 201
+        return response_hash
+      end
+    elsif response_hash["status"] != 200
+      return response_hash
+    end
+  
     response_hash = _test_cases_search(request_data)
     product = response_hash['product']
     test_case = response_hash['test_case']
@@ -1526,8 +1539,7 @@ class Webapiv2Controller < ApplicationController
     response_hash = _test_plans_search({'id' => request_data['id'],
                                        'name' => request_data['name'],
                                        'product_id' => request_data['product_id'],
-                                       'deprecated' => request_data['deprecated'],
-                                       'indirect_call' => true})                                      
+                                       'deprecated' => request_data['deprecated']})                                      
     if response_hash["status"] == 200 
       if response_hash['response']['found']
         if request_data['new_version']
@@ -1639,8 +1651,7 @@ class Webapiv2Controller < ApplicationController
     response_hash = _test_plans_search({'id' => request_data['to_update']['id'],
                                        'name' => request_data['to_update']['name'],
                                        'product_id' => request_data['to_update']['product_id'],
-                                       'deprecated' => request_data['to_update']['deprecated'],
-                                       'indirect_call' => true})
+                                       'deprecated' => request_data['to_update']['deprecated']})
     if response_hash["status"] == 200 && response_hash['response']['found'] 
       test_plan = TestPlan.where(:id => response_hash['response']['test_plans'].first['id']).first  
       test_plan.name = request_data['new_values']['name'] || test_plan.name
@@ -1738,7 +1749,7 @@ class Webapiv2Controller < ApplicationController
                                  "'product_id', 'name', 'id', and optionally 'deprecated'"
       return {'response' => response_hash,
               'status' => 400}   
-    end     
+    end
     conditions = {:id => request_data['id'],
                   :product_id => request_data['product_id'],
                   :name => request_data['name'],
@@ -1766,7 +1777,7 @@ class Webapiv2Controller < ApplicationController
             'modified_by_id' => s[:modified_by_id],
             'created_at' => s[:created_at],
             'updated_at' => s[:updated_at],
-            'custom_fields' => _get_custom_fields('test_plan', s),
+            'custom_fields' => _get_custom_fields('stencil', s),
             'test_plans' => get_stencil_test_plans(s) }
         end
       response_hash = {
@@ -1870,8 +1881,7 @@ class Webapiv2Controller < ApplicationController
     response_hash = _stencils_search({'id' => request_data['id'],
                                       'name' => request_data['name'],
                                       'product_id' => request_data['product_id'],
-                                      'deprecated' => request_data['deprecated'],
-                                      'indirect_call' => true})                                      
+                                      'deprecated' => request_data['deprecated']})                                      
     if response_hash["status"] == 200    
       if response_hash['response']['found']        
         if request_data['new_version'] 
@@ -1968,8 +1978,7 @@ class Webapiv2Controller < ApplicationController
     response_hash = _stencils_search({'id' => request_data['to_update']['id'],
                                       'name' => request_data['to_update']['name'],
                                       'product_id' => request_data['to_update']['product_id'],
-                                      'deprecated' => request_data['to_update']['deprecated'],
-                                      'indirect_call' => true})                                       
+                                      'deprecated' => request_data['to_update']['deprecated']})                                       
     if response_hash["status"] == 200 && response_hash['response']['found']
       stencil = Stencil.where(:id => response_hash['response']['stencils'].first['id']).first     
       stencil.name = request_data['new_values']['name'] || stencil.name
@@ -2097,15 +2106,13 @@ class Webapiv2Controller < ApplicationController
       response_hash = _test_plans_search({'id' => request_data['test_plan_id'],
                                          'name' => request_data['test_plan_name'],
                                          'product_id' => request_data['product_id'],
-                                         'deprecated' => request_data['deprecated'],
-                                         'indirect_call' => true})
+                                         'deprecated' => request_data['deprecated']})
       template_type = 'test_plan'      
     else
       response_hash = _stencils_search({'id' => request_data['stencil_id'],
                                         'name' => request_data['stencil_name'],
                                         'product_id' => request_data['product_id'],
-                                        'deprecated' => request_data['deprecated'],
-                                        'indirect_call' => true})      
+                                        'deprecated' => request_data['deprecated']})      
       template_type = 'stencil'
     end    
     if response_hash["status"] == 200 && response_hash['response']['found']      
@@ -2124,9 +2131,8 @@ class Webapiv2Controller < ApplicationController
       if request_data.key?('custom_fields')
         success, message = _handle_custom_fields(request_data, "assignment", assignment)
         if !success
-          response_hash["error"] = "Yes"
-          response_hash["details"] = message
-          return response_hash   
+          return {'response' => {'message' => message},
+                  'status' => 400}   
         end
       end
       if assignment.save

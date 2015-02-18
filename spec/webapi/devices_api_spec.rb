@@ -1,6 +1,6 @@
 require "webapi/webapi_spec_helper"
 
-RSpec.describe 'Devices API', :focus, :type => :request do
+RSpec.describe 'Devices API', :type => :request do
    
   before(:each) do
     @device_attr_hash = FactoryGirl.attributes_for(:device)

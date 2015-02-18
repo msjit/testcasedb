@@ -98,4 +98,19 @@ RSpec.describe 'Categories API', :type => :request do
     expect(response.status).to eq(201) 
   end      
       
+  it "create fails with bad category" do
+    category = 'Tests'
+    params = {
+      "api_key" => @user.single_access_token,
+      'category' => category,
+      'product_id' => 10
+    }.to_json
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/categories/create.json", params, request_headers 
+    expect(response.status).to eq(400) 
+  end
+   
 end
