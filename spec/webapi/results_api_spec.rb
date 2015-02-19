@@ -234,5 +234,20 @@ RSpec.describe 'Results API', :type => :request do
     expect(JSON.parse(response.body)['results'][1]['custom_fields'][0]).to eq(custom_fields_2[0])
     expect(JSON.parse(response.body)['results'][1]['custom_fields'][1]).to eq(custom_fields_2[1])        
   end       
+   
+  it "set results case insensitive success" do
+    params = {
+      "api_key" => @user.single_access_token,
+      "results" => {@result_2.id => {'result' => 'fAiled'},
+                    @result_3.id => {'result' => 'BlOCKED'}}
+    }.to_json
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/results/set.json", params, request_headers    
+    expect(response.status).to eq(200)
+    expect(JSON.parse(response.body)['results'].count).to eq(2)
+  end    
       
 end

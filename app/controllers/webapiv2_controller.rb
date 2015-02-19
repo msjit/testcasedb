@@ -2251,6 +2251,7 @@ class Webapiv2Controller < ApplicationController
         end
 
         # Check that value is a valid Result
+        test_state = test_state.downcase.titleize
         if test_state != "Passed" && test_state != "Failed" && test_state !="Blocked"
           return {'response' => {'message' => "Invalid result provided in request. Must specify Passed, Failed, or Blocked."},
                   'status' => 400}
