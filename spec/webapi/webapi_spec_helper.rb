@@ -175,5 +175,11 @@ FactoryGirl.define do
     upload { Rack::Test::UploadedFile.new(Rails.root.join('spec/test_files/attachments/images/snake.bmp'), 'image/bmp') }
     uploadable_id 1
     uploadable_type "Result"
-  end    
+  end 
+  factory :upload_gif, :class => Upload do
+    description "test gif"
+    upload { Rack::Test::UploadedFile.new(Rails.root.join('spec/test_files/attachments/images/xynthia_animated.gif'), 'image/gif') }
+    uploadable_id 1
+    uploadable_type "Result"
+  end      
 end

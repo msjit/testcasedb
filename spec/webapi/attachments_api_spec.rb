@@ -17,7 +17,8 @@ RSpec.describe 'Attachments API', :type => :request do
     @result = Result.create(FactoryGirl.attributes_for(:result))
     @upload_attr_hash_png = FactoryGirl.attributes_for(:upload_png)
     @upload_attr_hash_jpg = FactoryGirl.attributes_for(:upload_jpg)
-    @upload_attr_hash_bmp = FactoryGirl.attributes_for(:upload_bmp)     
+    @upload_attr_hash_bmp = FactoryGirl.attributes_for(:upload_bmp)
+    @upload_attr_hash_gif = FactoryGirl.attributes_for(:upload_gif)     
   end
    
   it "search not found" do
@@ -146,6 +147,7 @@ RSpec.describe 'Attachments API', :type => :request do
     @upload_png = Upload.create(@upload_attr_hash_png)
     @upload_jpg = Upload.create(@upload_attr_hash_jpg)
     @upload_bmp = Upload.create(@upload_attr_hash_bmp)
+    @upload_gif = Upload.create(@upload_attr_hash_gif)
     params = {
       "api_key" => @user.single_access_token,
       'parent_id' => @upload_png.uploadable_id
@@ -157,13 +159,15 @@ RSpec.describe 'Attachments API', :type => :request do
     post "api/attachments/search.json", params, request_headers
     expect(response.status).to eq(200)     
     expect(JSON.parse(response.body)['found']).to eq(true)
-    expect(JSON.parse(response.body)['attachments'].count).to eq(3)
+    expect(JSON.parse(response.body)['attachments'].count).to eq(4)
     verify_attachment(@upload_png, JSON.parse(response.body)['attachments'][0], @upload_png.upload.path)
     expect(JSON.parse(response.body)['attachments'][0]['data']).to eq(nil)
     verify_attachment(@upload_jpg, JSON.parse(response.body)['attachments'][1], @upload_jpg.upload.path)
     expect(JSON.parse(response.body)['attachments'][1]['data']).to eq(nil)
     verify_attachment(@upload_bmp, JSON.parse(response.body)['attachments'][2], @upload_bmp.upload.path)
-    expect(JSON.parse(response.body)['attachments'][2]['data']).to eq(nil)    
+    expect(JSON.parse(response.body)['attachments'][2]['data']).to eq(nil)
+    verify_attachment(@upload_gif, JSON.parse(response.body)['attachments'][3], @upload_gif.upload.path)
+    expect(JSON.parse(response.body)['attachments'][3]['data']).to eq(nil)         
   end 
  
   it "download not found" do
@@ -202,6 +206,7 @@ RSpec.describe 'Attachments API', :type => :request do
     @upload_png = Upload.create(@upload_attr_hash_png)
     @upload_jpg = Upload.create(@upload_attr_hash_jpg)
     @upload_bmp = Upload.create(@upload_attr_hash_bmp)
+    @upload_gif = Upload.create(@upload_attr_hash_gif)
     params = {
       "api_key" => @user.single_access_token,
       'parent_id' => @upload_png.uploadable_id
@@ -213,13 +218,15 @@ RSpec.describe 'Attachments API', :type => :request do
     post "api/attachments/download.json", params, request_headers
     expect(response.status).to eq(200)     
     expect(JSON.parse(response.body)['found']).to eq(true)
-    expect(JSON.parse(response.body)['attachments'].count).to eq(3)
+    expect(JSON.parse(response.body)['attachments'].count).to eq(4)
     verify_attachment(@upload_png, JSON.parse(response.body)['attachments'][0], @upload_png.upload.path)
     expect(JSON.parse(response.body)['attachments'][0]['data']).to eq(Base64.encode64(File.read(@upload_png.upload.path)))
     verify_attachment(@upload_jpg, JSON.parse(response.body)['attachments'][1], @upload_jpg.upload.path)
     expect(JSON.parse(response.body)['attachments'][1]['data']).to eq(Base64.encode64(File.read(@upload_jpg.upload.path)))
     verify_attachment(@upload_bmp, JSON.parse(response.body)['attachments'][2], @upload_bmp.upload.path)
-    expect(JSON.parse(response.body)['attachments'][2]['data']).to eq(Base64.encode64(File.read(@upload_bmp.upload.path)))    
+    expect(JSON.parse(response.body)['attachments'][2]['data']).to eq(Base64.encode64(File.read(@upload_bmp.upload.path)))
+    verify_attachment(@upload_gif, JSON.parse(response.body)['attachments'][3], @upload_gif.upload.path)
+    expect(JSON.parse(response.body)['attachments'][3]['data']).to eq(Base64.encode64(File.read(@upload_gif.upload.path)))  
   end 
  
   it "upload png successful" do
@@ -305,6 +312,35 @@ RSpec.describe 'Attachments API', :type => :request do
     expect(JSON.parse(response.body)['file_name']).to eq(file_name)
     expect(JSON.parse(response.body)['content_type']).to eq(content_type)
     expect(JSON.parse(response.body)['size']).to eq(File.size(Rails.root.join('spec/test_files/attachments/images/snake.bmp')))
+    expect(JSON.parse(response.body)['parent_id']).to eq(parent_id)
+    expect(JSON.parse(response.body)['parent_type']).to eq(parent_type)
+  end 
+
+  it "upload gif successful" do
+    description = 'test description'
+    file_name = 'test.gif'
+    content_type = 'image/gif'
+    parent_id = 1
+    parent_type = 'Result'
+    params = {
+      'api_key' => @user.single_access_token,
+      'description' => description,
+      'file_name' => file_name,
+      'parent_id' => parent_id,
+      'parent_type' => parent_type,
+      'data' => Base64.encode64(File.read(Rails.root.join('spec/test_files/attachments/images/xynthia_animated.gif')))
+    }.to_json
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/attachments/upload.json", params, request_headers
+    expect(response.status).to eq(201)    
+    expect(JSON.parse(response.body)['id']).to eq(1)
+    expect(JSON.parse(response.body)['description']).to eq(description)
+    expect(JSON.parse(response.body)['file_name']).to eq(file_name)
+    expect(JSON.parse(response.body)['content_type']).to eq(content_type)
+    expect(JSON.parse(response.body)['size']).to eq(File.size(Rails.root.join('spec/test_files/attachments/images/xynthia_animated.gif')))
     expect(JSON.parse(response.body)['parent_id']).to eq(parent_id)
     expect(JSON.parse(response.body)['parent_type']).to eq(parent_type)
   end 
