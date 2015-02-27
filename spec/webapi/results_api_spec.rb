@@ -187,23 +187,19 @@ RSpec.describe 'Results API', :type => :request do
     expect(JSON.parse(response.body)['results'].count).to eq(2)
   end 
   
-  it "set results with custom fieldssuccess" do
-    custom_fields_1 = {
-      'field 1'=> {'name' => 'custom field 1-1',
-                   'value' => '1',
-                   'type' => 'string'},
-      'field 2'=> {'name' => 'custom field 2-1',
-                   'value' => '2',
-                   'type' => 'string'}                   
-    }    
-    custom_fields_2 = {
-      'field 1'=> {'name' => 'custom field 2-1',
-                   'value' => '1',
-                   'type' => 'string'},
-      'field 2'=> {'name' => 'custom field 2-2',
-                   'value' => '2',
-                   'type' => 'string'}                   
-    }       
+  it "set results with custom fields success" do
+    custom_fields_1 = [{'name' => 'custom field 1-1',
+                        'value' => '1',
+                        'type' => 'string'},
+                       {'name' => 'custom field 2-1',
+                        'value' => '2',
+                        'type' => 'string'}]
+    custom_fields_2 = [{'name' => 'custom field 2-1',
+                        'value' => '1',
+                        'type' => 'string'},
+                       {'name' => 'custom field 2-2',
+                        'value' => '2',
+                        'type' => 'string'}]
     params = {
       "api_key" => @user.single_access_token,
       "results" => {@result_2.id => {'result' => 'Failed', 'custom_fields' => custom_fields_1},
@@ -231,12 +227,27 @@ RSpec.describe 'Results API', :type => :request do
     expect(JSON.parse(response.body)['results'].count).to eq(2)
     expect(JSON.parse(response.body)['results'][0]['id']).to eq(@result_2.id)
     expect(JSON.parse(response.body)['results'][0]['custom_fields'].count).to eq(2)
-    expect(JSON.parse(response.body)['results'][0]['custom_fields'][0]).to eq(custom_fields_1['field 1'])
-    expect(JSON.parse(response.body)['results'][0]['custom_fields'][1]).to eq(custom_fields_1['field 2'])
+    expect(JSON.parse(response.body)['results'][0]['custom_fields'][0]).to eq(custom_fields_1[0])
+    expect(JSON.parse(response.body)['results'][0]['custom_fields'][1]).to eq(custom_fields_1[1])
     expect(JSON.parse(response.body)['results'][1]['id']).to eq(@result_3.id)
     expect(JSON.parse(response.body)['results'][1]['custom_fields'].count).to eq(2)
-    expect(JSON.parse(response.body)['results'][1]['custom_fields'][0]).to eq(custom_fields_2['field 1'])
-    expect(JSON.parse(response.body)['results'][1]['custom_fields'][1]).to eq(custom_fields_2['field 2'])        
+    expect(JSON.parse(response.body)['results'][1]['custom_fields'][0]).to eq(custom_fields_2[0])
+    expect(JSON.parse(response.body)['results'][1]['custom_fields'][1]).to eq(custom_fields_2[1])        
   end       
+   
+  it "set results case insensitive success" do
+    params = {
+      "api_key" => @user.single_access_token,
+      "results" => {@result_2.id => {'result' => 'fAiled'},
+                    @result_3.id => {'result' => 'BlOCKED'}}
+    }.to_json
+    request_headers = {
+      "Accept" => "application/json",
+      "Content-Type" => "application/json"
+    }
+    post "api/results/set.json", params, request_headers    
+    expect(response.status).to eq(200)
+    expect(JSON.parse(response.body)['results'].count).to eq(2)
+  end    
       
 end

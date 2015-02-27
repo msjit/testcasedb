@@ -157,5 +157,29 @@ FactoryGirl.define do
     result nil
     note 'result note'
     device_id 1
-  end               
+  end
+  factory :upload_png, :class => Upload do
+    description "test png"
+    upload { Rack::Test::UploadedFile.new(Rails.root.join('spec/test_files/attachments/images/snake.png'), 'image/png') }
+    uploadable_id 1
+    uploadable_type "Result"
+  end
+  factory :upload_jpg, :class => Upload do
+    description "test jpg"
+    upload { Rack::Test::UploadedFile.new(Rails.root.join('spec/test_files/attachments/images/snake.jpg'), 'image/jpeg') }
+    uploadable_id 1
+    uploadable_type "Result"
+  end 
+  factory :upload_bmp, :class => Upload do
+    description "test bmp"
+    upload { Rack::Test::UploadedFile.new(Rails.root.join('spec/test_files/attachments/images/snake.bmp'), 'image/bmp') }
+    uploadable_id 1
+    uploadable_type "Result"
+  end 
+  factory :upload_gif, :class => Upload do
+    description "test gif"
+    upload { Rack::Test::UploadedFile.new(Rails.root.join('spec/test_files/attachments/images/xynthia_animated.gif'), 'image/gif') }
+    uploadable_id 1
+    uploadable_type "Result"
+  end      
 end
