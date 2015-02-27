@@ -11,7 +11,13 @@ RSpec.describe 'Test Cases API', :type => :request do
     @tag_2 = Tag.create(FactoryGirl.attributes_for(:tag_2))
     @test_type = TestType.create(FactoryGirl.attributes_for(:test_type))    
     @test_case_attr_hash = FactoryGirl.attributes_for(:test_case) 
-    @test_2_case_attr_hash = FactoryGirl.attributes_for(:test_case_2)    
+    @test_2_case_attr_hash = FactoryGirl.attributes_for(:test_case_2)
+    @custom_fields = [{'name' => 'custom field 1',
+                       'value' => '1',
+                       'type' => 'string'},
+                      {'name' => 'custom field 2',
+                       'value' => '2',
+                       'type' => 'string'}]      
   end  
    
   it "statuses return" do
@@ -45,7 +51,7 @@ RSpec.describe 'Test Cases API', :type => :request do
       "api_key" => @user.single_access_token,
       'category' => 'Test Category',
       'product_id' => 1,
-      'test_case_name' => 'Test Case'
+      'name' => 'Test Case'
     }.to_json
     request_headers = {
       "Accept" => "application/json",
@@ -62,7 +68,7 @@ RSpec.describe 'Test Cases API', :type => :request do
       "api_key" => @user.single_access_token,
       'category' => @category.name,
       'product_id' => 1,
-      'test_case_name' => 'Test Case'
+      'name' => 'Test Case'
     }.to_json
     request_headers = {
       "Accept" => "application/json",
@@ -77,7 +83,7 @@ RSpec.describe 'Test Cases API', :type => :request do
     name = 'Test Case'
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => @category.name,
       'product_name' => 'nonexistent product',      
     }.to_json
@@ -89,12 +95,12 @@ RSpec.describe 'Test Cases API', :type => :request do
     expect(response.status).to eq(400) 
   end  
   
-  it "create fails with wrong category" do
+  it "create automatically creates nonexistent category" do
     name = 'Test Case'
     category = 'Nonexistent Category'
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => category,
       'product_id' => 1,      
     }.to_json
@@ -103,14 +109,14 @@ RSpec.describe 'Test Cases API', :type => :request do
       "Content-Type" => "application/json"
     }
     post "api/test_cases/create.json", params, request_headers
-    expect(response.status).to eq(400) 
+    expect(response.status).to eq(201) 
   end  
   
   it "create fails with bad user id" do
     name = 'Test Case'
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => @category.name,      
       'product_id' => 1,
       'created_by_id' => 2
@@ -127,7 +133,7 @@ RSpec.describe 'Test Cases API', :type => :request do
     name = 'Test Case'
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => @category.name,      
       'product_id' => 1,
       'test_type_id' => 2
@@ -143,21 +149,13 @@ RSpec.describe 'Test Cases API', :type => :request do
   it "create successful" do
     name = 'Test Case'
     description = 'test case'
-    custom_fields = {
-      'field 1'=> {'name' => 'custom field 1',
-                   'value' => '1',
-                   'type' => 'string'},
-      'field 2'=> {'name' => 'custom field 2',
-                   'value' => '2',
-                   'type' => 'string'}                   
-    }
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => @category.name,
       'product_id' => 1,      
       'description' => description,
-      'custom_fields' => custom_fields,
+      'custom_fields' => @custom_fields,
       'tags' => [@tag.name, @tag_2.name, 'tag 3']
     }.to_json
     request_headers = {
@@ -179,21 +177,13 @@ RSpec.describe 'Test Cases API', :type => :request do
     name = 'Test Case'
     description = 'test case'
     category = '%s/%s' %[@category.name, @sub_category.name]
-    custom_fields = {
-      'field 1'=> {'name' => 'custom field 1',
-                   'value' => '1',
-                   'type' => 'string'},
-      'field 2'=> {'name' => 'custom field 2',
-                   'value' => '2',
-                   'type' => 'string'}                   
-    }
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => category,
       'product_id' => 1,      
       'description' => description,
-      'custom_fields' => custom_fields
+      'custom_fields' => @custom_fields
     }.to_json
     request_headers = {
       "Accept" => "application/json",
@@ -209,21 +199,13 @@ RSpec.describe 'Test Cases API', :type => :request do
   it "create new version successful" do
     name = 'Test Case'
     description = 'test case'
-    custom_fields = {
-      'field 1'=> {'name' => 'custom field 1',
-                   'value' => '1',
-                   'type' => 'string'},
-      'field 2'=> {'name' => 'custom field 2',
-                   'value' => '2',
-                   'type' => 'string'}                   
-    }
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => name,
+      'name' => name,
       'category' => @category.name,
       'product_id' => 1,      
       'description' => description,
-      'custom_fields' => custom_fields,
+      'custom_fields' => @custom_fields,
       'tags' => [@tag.name] 
     }
     request_headers = {
@@ -249,7 +231,7 @@ RSpec.describe 'Test Cases API', :type => :request do
     @test_case = TestCase.create(@test_case_attr_hash)
     params = {
       "api_key" => @user.single_access_token,
-      'test_case_name' => @test_case.name,
+      'name' => @test_case.name,
       'category' => @category.name,
       'product_id' => 1,      
       'description' => @test_case.description,
@@ -278,28 +260,20 @@ RSpec.describe 'Test Cases API', :type => :request do
     description = 'updated description'
     category = "%s/%s" %[@category.name, @sub_category.name]
     version = 5
-    params['overwrite_custom_fields'] = true
-    custom_fields = {
-      'field 1'=> {'name' => 'custom field 1',
-                   'value' => '1',
-                   'type' => 'string'},
-      'field 2'=> {'name' => 'custom field 2',
-                   'value' => '2',
-                   'type' => 'string'}                   
-    }     
+    params['overwrite_custom_fields'] = true    
     params = {
       'api_key' => @user.single_access_token,
       'to_update' => {
-        'test_case_name' => @test_case.name,
+        'name' => @test_case.name,
         'category' => @category.name,
         'product_id' => 1,            
       },
       'new_values' => {  
-        'test_case_name' => name,
+        'name' => name,
         'category' => category,
         'product_id' => 1, 
         'description' => description,
-        'custom_fields' => custom_fields,
+        'custom_fields' => @custom_fields,
         'overwrite_custom_fields' => true,
         'tags' => [@tag.name, @tag_2.name]        
       },      
@@ -315,8 +289,8 @@ RSpec.describe 'Test Cases API', :type => :request do
     expect(JSON.parse(response.body)['category']).to eq(category)
     expect(JSON.parse(response.body)['category_id']).to eq(@sub_category.id)    
     expect(JSON.parse(response.body)['custom_fields'].count).to eq(2)
-    expect(JSON.parse(response.body)['custom_fields'][0]).to eq(custom_fields['field 1'])
-    expect(JSON.parse(response.body)['custom_fields'][1]).to eq(custom_fields['field 2'])
+    expect(JSON.parse(response.body)['custom_fields'][0]).to eq(@custom_fields[0])
+    expect(JSON.parse(response.body)['custom_fields'][1]).to eq(@custom_fields[1])
     expect(JSON.parse(response.body)['tags'].count).to eq(2)
     expect(JSON.parse(response.body)['tags'][1]['id']).to eq(@tag_2.id)
     expect(JSON.parse(response.body)['status']).to eq((I18n.t :item_status)[@test_case.status])    
@@ -326,10 +300,10 @@ RSpec.describe 'Test Cases API', :type => :request do
     params = {
       "api_key" => @user.single_access_token,
       'test_cases' => {
-        0 => {'test_case_name' => 'case 1',
+        0 => {'name' => 'case 1',
               'category' => @category.name,
               'product_id' => 1},
-        1 => {'test_case_name' => 'case 2',
+        1 => {'name' => 'case 2',
               'category' => @category.name,
               'product_id' => 1}                   
       }
@@ -357,23 +331,23 @@ RSpec.describe 'Test Cases API', :type => :request do
       'test_cases' => {
         0 => {
           'to_update' => {
-            'test_case_name' => @test_case.name,
+            'name' => @test_case.name,
             'category' => @category.name,
             'product_id' => 1,            
           },
           'new_values' => {  
-            'test_case_name' => updated_name_1,
+            'name' => updated_name_1,
             'description' => updated_description_1,        
           }                 
         },
         1 => {
           'to_update' => {
-            'test_case_name' => @test_case_2.name,
+            'name' => @test_case_2.name,
             'category' => @category.name,
             'product_id' => 1,            
           },
           'new_values' => {  
-            'test_case_name' => updated_name_2,
+            'name' => updated_name_2,
             'description' => updated_description_2,        
           }                 
         }        

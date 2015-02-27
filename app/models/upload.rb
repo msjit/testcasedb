@@ -1,6 +1,6 @@
 class Upload < ActiveRecord::Base
   has_attached_file :upload, :url => ":class/:id/:style/:filename", 
-                    :path => ':rails_root/assets/:class/:id_partition/:style_:filename', 
+                    :path => '%s/:class/:id_partition/:style_:filename' %[Rails.env.test? ? ":rails_root/spec/test_files/#{Rails.env}" : ':rails_root/assets'],
                     :styles => { :preview => "600x600>", :thumb => "75x75>" }
   
   validates_attachment_presence :upload

@@ -10,5 +10,4 @@ class Device < ActiveRecord::Base
 	accepts_nested_attributes_for :custom_items
 	  
   validates :name, :presence => true
-  validates :name, :uniqueness => true
 end
