@@ -27,7 +27,7 @@ class UserSessionsController < ApplicationController
   def destroy
     # Delet old session 
     user_session = UserSession.find
-    user_session.destroy
+    user_session.destroy if user_session
     
     # Prepare new session
     @user_session = UserSession.new
