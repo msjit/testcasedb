@@ -33,7 +33,7 @@
           </div>
         <% end %>
       <% end %>
-      
+      <%= hidden_field :user_session, :referer, value: params[:referer]%>
       <%= f.input :username, label: false, placeholder: "Username" %>
       <%= f.input :password, label: false, placeholder: "Password" %>
       <label class="checkbox">
