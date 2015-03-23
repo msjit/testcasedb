@@ -29,7 +29,7 @@ Redis is used for session storage, caching and pulling email delivery out of the
 To enable Redis, Follow these steps.
 
 1. Install Redis on your TestCaseDB server or a separate server.
-  * Install structions can be found at https://www.linode.com/docs/databases/redis/redis-on-ubuntu-12-04-precise-pangolin
+  * Install instructions can be found at https://www.linode.com/docs/databases/redis/redis-on-ubuntu-12-04-precise-pangolin
 
 2. Open config/app_config.yml from the root TCDB directory with your favorite text editor.
 
