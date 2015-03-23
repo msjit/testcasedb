@@ -14,6 +14,11 @@
 <body>
   <div id="wrap">  
     <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner pull-right">
+        <ul class="nav">
+          <li><a href="/" id="help-link">Help</a></li>
+        </ul>
+      </div>
       <div class="navbar-inner">
         <div class="container">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -151,6 +156,12 @@
     <div class="container">
        <p class="muted credit">Need assistance. Download the <%= link_to "Admin Guide", "assets/admin_guide.pdf" %> or  <%= link_to "Quick Start Guide", "assets/quick_start_guide.pdf" %></p>
       <p class="muted credit"><a href="http://www.testcasedb.com" target="_blank">TestCaseDB</a>. Copyright &copy; 2012 - 2013 <a href="http://www.msjit.ca" target="_blank">MSJ IT Services Inc</a>.</p>
+    </div>
+  </div>
+  
+  <div id="help-modal">
+    <h1>Online Help</h1>
+    <div id="help-content">
     </div>
   </div>
 </body>

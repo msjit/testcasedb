@@ -162,7 +162,8 @@ TestDB::Application.routes.draw do
   # and then append the id in javascript. This should newver be called directly. Only the line above should be called
   # you must use the :as path for new and edit forms
   match 'update_version_select/', :controller=>'application', :action => 'update_version_select', :as => 'jquery_application_version_update'
-
+  
+  match 'help', :controller => 'help', :action => 'index', :as => 'help'
   # Guide root to the home module
   root :to =>  "home#index", :as => 'home'
   
