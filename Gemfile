@@ -1,28 +1,31 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.2.21'
+gem 'rails', '4.2.3'
 gem 'mysql2', group: :mysql
 gem 'pg', group: :postgres
 
-gem "unicorn", "~> 4.8.2"
+# Use this temporarily until we update all models to use strong paramters
+gem 'protected_attributes'
+
+# gem "unicorn", "~> 4.8.2"
 
 gem 'sidekiq'
 
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
-  gem 'coffee-rails', '~> 3.2.1'
+  gem 'coffee-rails'
 
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
   # gem 'therubyracer', :platforms => :ruby
 
-  gem 'uglifier', '>= 1.0.3'
+  gem 'uglifier'
   gem 'therubyracer', :platforms => :ruby
 end
 
-gem 'best_in_place', '~> 3.0.1'
+gem 'best_in_place'
 gem 'jquery-fileupload-rails'
-gem 'sass-rails',   '~> 3.2.3'
+gem 'sass-rails'
 gem 'bootstrap-sass', '~> 2.3.2.1'
 
 gem "jquery-rails"
@@ -31,6 +34,7 @@ gem "jquery-ui-rails"
 gem "less-rails" #Sprockets (what Rails 3.1 uses for its asset pipeline) supports LESS
 
 gem 'rtf'
+gem 'minitest'
 
 # NO LONGER NEEDED in ruby 1.9
 # gem 'fastercsv'
@@ -64,7 +68,8 @@ gem 'redis-rails'
 
 gem 'kaminari'
 
-gem 'prawn'
+gem 'prawn', '~> 1.2.1'
+gem 'prawn-table', '~> 0.1.0'
 
 gem 'soap4r-ruby1.9'
 

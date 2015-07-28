@@ -3,7 +3,7 @@
 //= require jquery
 //= require jquery_ujs
 //= require bootstrap
-//= require jquery.ui.all
+//= require jquery-ui
 //= require jquery-fileupload/basic
 //= require jquery-fileupload/vendor/tmpl
 //= require best_in_place

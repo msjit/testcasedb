@@ -362,7 +362,7 @@ class TestPlansController < ApplicationController
   def list_categories
     # This function takes a product ID and returns a list of categories
     # JS returned.
-    @categories = Category.find_all_by_product_id(params[:product_id], :order => "name")
+    @categories = Category.where(product_id: params[:product_id]).order(:name)
     
     # We need to pass this on. Plan ID is required for figuring out if a case is already included
     # in a test plan

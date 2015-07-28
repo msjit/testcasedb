@@ -388,7 +388,7 @@ class TestCasesController < ApplicationController
   # GET /test_cases/list/:product_id
   def list
     authorize! :read, TestCase
-    
+            
     # This new item is simple used to test if the user can create test cases
     # There is a bug in cancan that prevents ?can TestCase from working
     # https://github.com/ryanb/cancan/issues/523
@@ -396,7 +396,8 @@ class TestCasesController < ApplicationController
     
     # This function takes a product ID and returns a list of categories
     # either JS or HTML is returned.
-    @categories = Category.find_all_by_product_id(params[:product_id], :order => "name")
+    @categories = Category.where(product_id: params[:product_id].to_i).order(:name)
+    
     
     # It seems unneccessary to get the product as it is related to the categories
     # however, if there are no categories, we still need to know which product we're deling with 

@@ -2,7 +2,8 @@ module TestCasesHelper
   # Used to delete fields on accepts_nested_Attributes (ex. test case steps)
   # function courtesy of railcasts #197
   def link_to_remove_steps(name, f)
-    f.hidden_field(:_destroy) + button_to_function(name, "remove_steps(this)", :class => "btn btn-danger btn-small")
+    #### f.hidden_field(:_destroy) + button_to_function(name, "remove_steps(this)", :class => "btn btn-danger btn-small")
+    ("<button class='btn btn-success'>" + name + "</button>").html_safe
   end
   
   def link_to_add_steps(name, f, association)
@@ -11,21 +12,27 @@ module TestCasesHelper
       render(association.to_s.singularize + "_fields", :f => builder)
     end
     # fields += '<input id="test_case_steps_attributes_new_step_id" name="test_case[steps_attributes][new_step][id]" type="hidden"  />'.html_safe
-    button_to_function(name, "add_steps(this, \"#{association}\", \"#{escape_javascript(fields)}\")", :class => "btn btn-success")
+    
+    #### button_to_function(name, "add_steps(this, \"#{association}\", \"#{escape_javascript(fields)}\")", :class => "btn btn-success")
+    ("<button class='btn btn-success'>" + name + "</button>").html_safe
   end
   
   def link_to_remove_test_case_targets(name, f)
-    f.hidden_field(:_destroy) + button_to_function(name, "remove_test_case_targets(this)",  :class => "btn btn-danger btn-small")
+    #### f.hidden_field(:_destroy) + button_to_function(name, "remove_test_case_targets(this)",  :class => "btn btn-danger btn-small")
+    #### f.hidden_field(:_destroy)  + "<button id=<%= name %>, class='btn btn-danger btn-small'><%= name %></button>".html_safe
+    ("<button class='btn btn-success'>" + name + "</button>").html_safe
   end
   
-  def link_to_add_test_case_targets(name, f, association)
-    new_object = f.object.class.reflect_on_association(association).klass.new
-    fields = f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
-      render(association.to_s.singularize + "_fields", :f => builder)
-    end
-    # fields += '<input id="test_case_steps_attributes_new_step_id" name="test_case[steps_attributes][new_step][id]" type="hidden"  />'.html_safe
-    button_to_function(name, "add_test_case_targets(this, \"#{association}\", \"#{escape_javascript(fields)}\")", :class => "btn")
-  end
+  # MJ - 28 July 2015 -n o longer in use
+  # def link_to_add_test_case_targets(name, f, association)
+  #   new_object = f.object.class.reflect_on_association(association).klass.new
+  #   fields = f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
+  #     render(association.to_s.singularize + "_fields", :f => builder)
+  #   end
+  #   # fields += '<input id="test_case_steps_attributes_new_step_id" name="test_case[steps_attributes][new_step][id]" type="hidden"  />'.html_safe
+  #   button_to_function(name, "add_test_case_targets(this, \"#{association}\", \"#{escape_javascript(fields)}\")", :class => "btn")
+  #   
+  # end
   
   def list_of_test_case_tags(tags)
     tag_array = []
@@ -41,7 +48,7 @@ module TestCasesHelper
   end
   
   def test_type_list
-    TestType.find(:all).collect {|d| [ d.name, d.id ]}
+    TestType.all.collect {|d| [ d.name, d.id ]}
   end
   
   # Takes a test case and figures out if it is the parent

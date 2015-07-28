@@ -66,7 +66,7 @@ class AssignmentsController < ApplicationController
     @assignment.task = Task.new
     
     # This is for the auto created task
-    @users_select = User.find(:all, :order => "last_name").collect {|u| [ u.first_name + ' ' + u.last_name, u.id ]}
+    @users_select = User.all_users_ordered
         
     @products_select = current_user.products
     
@@ -120,7 +120,7 @@ class AssignmentsController < ApplicationController
   	end
     
     # This is for the related created task
-    @users_select = User.find(:all, :order => "last_name").collect {|u| [ u.first_name + ' ' + u.last_name, u.id ]}
+    @users_select = User.all_users_ordered
   end
 
   # POST /assignments
@@ -197,7 +197,7 @@ class AssignmentsController < ApplicationController
         end
       else
         # Are these the four items we need for failed create
-        @users_select = User.find(:all, :order => "last_name").collect {|u| [ u.first_name + ' ' + u.last_name, u.id ]}
+        @users_select = User.all_users_ordered
         @products_select = Product.find(:all).collect {|p| [ p.name, p.id ]}
 
         logger.warn "Assignment not saved correctly}"
@@ -223,7 +223,7 @@ class AssignmentsController < ApplicationController
         format.html { redirect_to(@assignment, :notice => 'Assignment was successfully updated.') }
       else
         # Are these the four items we need for failed create
-        @users_select = User.find(:all, :order => "last_name").collect {|u| [ u.first_name + ' ' + u.last_name, u.id ]}
+        @users_select = User.all_users_ordered
         @products_select = Product.find(:all).collect {|p| [ p.name, p.id ]}
         #!# @versions = Version.find(:all)
         #!# @plans_select = TestPlan.find(:all).collect {|p| [ p.name + " | Version " + p.version.to_s, p.id ]}

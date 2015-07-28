@@ -136,7 +136,7 @@ class CategoriesController < ApplicationController
     authorize! :read, Category
     # This function takes a product ID and returns a list of categories
     # either JS or HTML is returned.
-    @categories = Category.find_all_by_product_id(params[:product_id], :order => "name")
+    @categories = Category.where(product_id: params[:product_id]).order(:name)
     
     # It seems unneccessary to get the product as it is related to the categories
     # however, if there are no categories, we still need to know which product we're deling with 

@@ -7,7 +7,9 @@ class User < ActiveRecord::Base
     c.logged_in_timeout = TestDB::Application.config.session_timeout.minutes 
   end
   
-  scope :active, where(:active=> true)
+  scope :active, -> {
+    where(:active=> true)
+  }
   attr_accessible :username, :email, :password, :first_name, :last_name, :password_confirmation, :role, :active, :time_zone, :product_ids
   validates :username, :presence => true
   validates :username, :uniqueness => true
@@ -66,7 +68,12 @@ class User < ActiveRecord::Base
     
     errors
   end
-
+  
+  # Provide a list of all users in an odered list 
+  def self.all_users_ordered
+    User.all.order(:last_name).collect {|u| [ u.first_name + ' ' + u.last_name, u.id ]}
+  end
+  
   def self.open_spreadsheet(file)
     case File.extname(file.original_filename)
     when ".csv" then Roo::Csv.new(file.path, nil, :ignore)

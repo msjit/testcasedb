@@ -11,7 +11,7 @@ class Setting < ActiveRecord::Base
   # For Enabled/Disabled, true/false are returned
   # Otherwise the value is returned
 	def self.value (name)
-    entry = Setting.find(:first, :conditions => ['name = ?', name])
+    entry = Setting.find_by_name(name)
     
     if !entry 
       return nil

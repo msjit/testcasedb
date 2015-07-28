@@ -10,7 +10,7 @@ class TestCase < ActiveRecord::Base
 	belongs_to :product
 	belongs_to :created_by, :class_name => "User", :foreign_key => "created_by_id"
 	belongs_to :modified_by, :class_name => "User", :foreign_key => "modified_by_id"
-	has_many :steps, :dependent => :destroy, :order => "step_number"
+	has_many :steps, -> { order(:step_number) }, :dependent => :destroy
 	has_many :comments, :dependent => :destroy
 	has_many :plan_cases
 	has_many :test_plans, :through => :plan_cases

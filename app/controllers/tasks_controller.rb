@@ -38,7 +38,7 @@ class TasksController < ApplicationController
   # GET /tasks/new.xml
   def new
     authorize! :create, Task
-    @users_select = User.find(:all, :order => "last_name").collect {|u| [ u.first_name + ' ' + u.last_name, u.id ]}
+    @users_select = User.all_users_ordered
     
     @task = Task.new
     respond_to do |format|
@@ -49,7 +49,7 @@ class TasksController < ApplicationController
   # GET /tasks/1/edit
   def edit
     authorize! :update, Task
-    @users_select = User.find(:all, :order => "last_name").collect {|u| [ u.first_name + ' ' + u.last_name, u.id ]}
+    @users_select = User.all_users_ordered
     
     @task = Task.find(params[:id])    
   end
@@ -68,10 +68,10 @@ class TasksController < ApplicationController
           UserMailer.task_assigned(@task, @url).deliver
           format.html { redirect_to(@task, :notice => 'Task was successfully created.') }
         rescue
-          format.html { redirect_to(@task, :flash => { :warning => 'Task was successfully created, but there was an error sending the notification email.'}) }
+          format.html { redirect_to(@task, :flash => { :warning => 'Task was successfully created, but there was an error sending the notification email. '}) }
         end
       else
-        @users_select = User.find(:all, :order => "last_name").collect {|u| [ u.first_name + ' ' + u.last_name, u.id ]}
+        @users_select = User.all_users_ordered
         
         format.html { render :action => "new" }
       end
@@ -94,7 +94,7 @@ class TasksController < ApplicationController
           
         format.html { redirect_to(@task, :notice => 'Task was successfully updated.') }
       else
-        @users_select = User.find(:all, :order => "last_name").collect {|u| [ u.first_name + ' ' + u.last_name, u.id ]}
+        @users_select = User.all_users_ordered
         
         format.html { render :action => "edit" }
       end
