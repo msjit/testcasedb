@@ -3,7 +3,7 @@ module TestCasesHelper
   # function courtesy of railcasts #197
   def link_to_remove_steps(name, f)
     #### f.hidden_field(:_destroy) + button_to_function(name, "remove_steps(this)", :class => "btn btn-danger btn-small")
-    ("<button class='btn btn-success'>" + name + "</button>").html_safe
+    f.hidden_field(:_destroy) + ("<input type='button' value='Delete' class='btn btn-danger btn-small' onclick='").html_safe + "remove_steps(this);" + "'>".html_safe
   end
   
   def link_to_add_steps(name, f, association)
@@ -14,13 +14,13 @@ module TestCasesHelper
     # fields += '<input id="test_case_steps_attributes_new_step_id" name="test_case[steps_attributes][new_step][id]" type="hidden"  />'.html_safe
     
     #### button_to_function(name, "add_steps(this, \"#{association}\", \"#{escape_javascript(fields)}\")", :class => "btn btn-success")
-    ("<button class='btn btn-success'>" + name + "</button>").html_safe
+    ("<input type='button' value='Add Step' class='btn btn-success' onclick='").html_safe + "add_steps(this, \"#{association}\", \"#{escape_javascript(fields)}\");" + "'>".html_safe
+    
   end
   
   def link_to_remove_test_case_targets(name, f)
     #### f.hidden_field(:_destroy) + button_to_function(name, "remove_test_case_targets(this)",  :class => "btn btn-danger btn-small")
-    #### f.hidden_field(:_destroy)  + "<button id=<%= name %>, class='btn btn-danger btn-small'><%= name %></button>".html_safe
-    ("<button class='btn btn-success'>" + name + "</button>").html_safe
+    f.hidden_field(:_destroy) + ("<input type='button' value='Delete' class='btn btn-danger btn-small' onclick='").html_safe + "remove_test_case_targets(this);" + "'>".html_safe
   end
   
   # MJ - 28 July 2015 -n o longer in use
